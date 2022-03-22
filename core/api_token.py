@@ -1,8 +1,10 @@
+import requests
 from datetime import timedelta
 from core.validate import str_to_oid
 from core.model import Token, TokenData
 from apis.users.models import UserGlobal
 from core.database import get_collection
+from core.dependencies import get_settings, Settings
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, status
 from core.security import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_token_data
@@ -11,6 +13,31 @@ router = APIRouter(
     prefix='/token',
     tags=['token'],
 )
+
+
+@router.get(
+    '/',
+    summary='微信登录以获取访问令牌',
+)
+async def weixin_login_for_access_token(code: str, settings: Settings = Depends(get_settings)):
+    weixin_response = requests.get(
+        f'https://api.weixin.qq.com/sns/jscode2session?appid={settings.weixin_app_id}&secret={settings.weixin_app_secret}&js_code={code}&grant_type=authorization_code')
+    if weixin_response.status_code != 200:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='WeChat authorization request failed',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+    weixin_json = weixin_response.json()
+    if 'errmsg' in weixin_json:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f'WeChat authorized login failed ({weixin_json["errmsg"]})',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+    # weixin_json[session_key] 微信服务器给开发者服务器颁发的身份凭证
+    # weixin_json[openid] 微信用户id, 可以用这个id来区分不同的微信用户
+    return weixin_json
 
 
 @router.post(
