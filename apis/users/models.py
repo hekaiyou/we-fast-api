@@ -40,9 +40,9 @@ class UserUpdate(UserBase):
 class UserRead(UserBase):
     ''' 用户数据的读取模型 '''
     id: ObjId = Field(..., alias='_id')
-    username: str
-    email: EmailStr
-    role_id: str
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role_id: Optional[str] = None
     create_time: datetime
     update_time: datetime
 
