@@ -1,14 +1,18 @@
-import apis.users.routing as users_routing
+import os
+import importlib
 from fastapi import APIRouter, Depends
 from core.dependencies import verify_api_permission
-# 下面导入 API 模块路由
-# 例如: import apis.projects.routing as projects_routing
 
 router = APIRouter(
     prefix='/api',
     dependencies=[Depends(verify_api_permission)],
 )
 
-router.include_router(users_routing.router)
-# 下面添加 API 模块路由
-# 例如: router.include_router(projects_routing.router)
+exclude_dir_path = ['apis_urls.py', '__init__.py', '__pycache__']
+# 自动查找可用的 API 模块并添加路由
+for dir_path in os.listdir('apis/'):
+    if not dir_path in exclude_dir_path:
+        if os.path.exists(f'apis/{dir_path}/routing.py'):
+            module_name = f'apis.{dir_path}.routing'
+            meta_class = importlib.import_module(module_name)
+            router.include_router(meta_class.router)
