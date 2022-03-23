@@ -1,13 +1,15 @@
+import random
+import string
 import requests
 from datetime import timedelta
 from core.validate import str_to_oid
 from core.model import Token, TokenData
-from apis.users.models import UserGlobal
-from core.database import get_collection
+from core.database import get_collection, doc_create
+from apis.users.models import UserGlobal, COL_USER
 from core.dependencies import get_settings, Settings
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, status
-from core.security import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_token_data
+from core.security import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_token_data, get_password_hash
 
 router = APIRouter(
     prefix='/token',
@@ -35,8 +37,19 @@ async def weixin_login_for_access_token(code: str, settings: Settings = Depends(
             detail=f'WeChat authorized login failed ({weixin_json["errmsg"]})',
             headers={'WWW-Authenticate': 'Bearer'},
         )
-    # weixin_json[session_key] 微信服务器给开发者服务器颁发的身份凭证
-    # weixin_json[openid] 微信用户id, 可以用这个id来区分不同的微信用户
+    user_col = get_collection(COL_USER)
+    # 判断微信端用户是否已存在
+    user_filter = {'weixin_open_id': weixin_json['openid']}
+    user = user_col.find_one(user_filter)
+    if not user:
+        doc_create(user_col, {
+            'weixin_open_id': weixin_json['openid'],
+            'password': get_password_hash(''.join(random.sample(string.ascii_letters + string.digits, 16))),
+            'source': 'WeChat',
+        })
+        user = user_col.find_one(user_filter)
+    print(user)
+    # weixin_json['session_key'] 微信服务器给开发者服务器颁发的身份凭证
     return weixin_json
 
 
@@ -50,7 +63,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     按照 **OAuth 2.0** 协议规定: 客户端/用户必须将 `username` 和 `password` 字段作为表单数据发送
     '''
     user = authenticate_user(
-        get_collection('user'),
+        get_collection(COL_USER),
         form_data.username,
         form_data.password,
     )
@@ -82,7 +95,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     summary='读取令牌对应的用户',
 )
 async def read_token_user(current_token: TokenData = Depends(get_token_data)):
-    user = get_collection('user').find_one({
+    user = get_collection(COL_USER).find_one({
         '_id': str_to_oid(current_token.user_id),
     })
     if user is None:
