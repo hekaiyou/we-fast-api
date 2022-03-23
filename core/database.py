@@ -49,6 +49,7 @@ def whether_to_initialize(apis_urls):
                 'disabled': False,
                 'password': get_password_hash('123456'),
                 'role_id': role_id,
+                'source': 'Initialization',
                 'create_time': datetime.utcnow(),
                 'update_time': datetime.utcnow(),
             })
