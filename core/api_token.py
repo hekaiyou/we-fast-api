@@ -3,7 +3,7 @@ import string
 import requests
 from datetime import timedelta
 from core.validate import str_to_oid
-from core.model import Token, TokenData
+from core.model import Token, TokenData, WeixinToken
 from core.database import get_collection, doc_create
 from apis.users.models import UserGlobal, COL_USER
 from core.dependencies import get_settings, Settings
@@ -19,6 +19,7 @@ router = APIRouter(
 
 @router.get(
     '/',
+    response_model=WeixinToken,
     summary='微信登录以获取访问令牌',
 )
 async def weixin_login_for_access_token(code: str, settings: Settings = Depends(get_settings)):
@@ -30,6 +31,7 @@ async def weixin_login_for_access_token(code: str, settings: Settings = Depends(
             detail='WeChat authorization request failed',
             headers={'WWW-Authenticate': 'Bearer'},
         )
+    # weixin_json['session_key'] 微信服务器给开发者服务器颁发的身份凭证
     weixin_json = weixin_response.json()
     if 'errmsg' in weixin_json:
         raise HTTPException(
@@ -43,14 +45,23 @@ async def weixin_login_for_access_token(code: str, settings: Settings = Depends(
     user = user_col.find_one(user_filter)
     if not user:
         doc_create(user_col, {
-            'weixin_open_id': weixin_json['openid'],
+            'username': weixin_json['openid'],
+            'email': None,
+            'full_name': None,
+            'disabled': False,
             'password': get_password_hash(''.join(random.sample(string.ascii_letters + string.digits, 16))),
+            'role_id': '',
             'source': 'WeChat',
+            'weixin_open_id': weixin_json['openid'],
         })
         user = user_col.find_one(user_filter)
-    print(user)
-    # weixin_json['session_key'] 微信服务器给开发者服务器颁发的身份凭证
-    return weixin_json
+    # 生成访问令牌
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={'sub': f'{user["_id"]}:{user["role_id"]}'},
+        expires_delta=access_token_expires,
+    )
+    return WeixinToken(access_token=access_token, token_type='bearer', complete_info=bool(user['full_name']))
 
 
 @router.post(

@@ -8,6 +8,11 @@ class Token(BaseModel):
     token_type: str
 
 
+class WeixinToken(Token):
+    ''' 微信访问令牌的模型 '''
+    complete_info: bool
+
+
 class TokenData(BaseModel):
     ''' 访问令牌的数据解析模型 '''
     user_id: Optional[str] = None

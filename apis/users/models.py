@@ -25,9 +25,9 @@ class UserGlobal(UserBase):
 class UserCreate(UserBase):
     ''' 用户数据的创建模型 '''
     username: str
-    email: EmailStr
+    email: Optional[EmailStr] = None
     password: str
-    role_id: str
+    role_id: Optional[str] = ''
 
 
 class UserUpdate(UserBase):

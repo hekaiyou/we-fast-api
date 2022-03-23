@@ -1,3 +1,5 @@
+import core.dependencies as dependencies
+
 DYNAMIC_ROLE_PERMISSIONS = {}
 DYNAMIC_USERNAME_BINDING = {}
 
@@ -14,6 +16,8 @@ def set_role_permissions(role_col):
 def get_role_permissions(role_id):
     ''' 获取动态全局变量: 角色权限 '''
     try:
+        if not role_id:
+            return dependencies.get_settings().user_default_permission
         return DYNAMIC_ROLE_PERMISSIONS[role_id]
     except KeyError as e:
         return []

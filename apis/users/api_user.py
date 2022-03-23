@@ -36,11 +36,12 @@ async def create_user(user: UserCreate):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='Email address already exists',
         )
-    if not get_collection(COL_ROLE).count_documents({'_id': str_to_oid(user.role_id)}):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Role id does not exist',
-        )
+    if user.role_id:
+        if not get_collection(COL_ROLE).count_documents({'_id': str_to_oid(user.role_id)}):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Role id does not exist',
+            )
     user_json = jsonable_encoder(user)
     user_json['password'] = get_password_hash(user.password)
     user_json['source'] = 'Web'
@@ -111,11 +112,12 @@ async def update_user(user_id: ObjIdParams, user: UserUpdate):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail='Email address already exists',
             )
-    if not get_collection(COL_ROLE).count_documents({'_id': str_to_oid(updated_user.role_id)}):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Role id does not exist',
-        )
+    if updated_user.role_id:
+        if not get_collection(COL_ROLE).count_documents({'_id': str_to_oid(updated_user.role_id)}):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Role id does not exist',
+            )
     # 把 模型实例副本 转换为适配 JSON 的数据, 再保存至数据库集合
     doc_update(user_col, stored_user_data, jsonable_encoder(updated_user))
     # 同步更新全部绑定用户名的集合及其字段内容

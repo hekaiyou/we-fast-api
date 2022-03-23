@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     # MongoDB 连接: 认证信息
     mongo_db_username: str = ''
     mongo_db_password: str = ''
+    # 用户未分配角色时的默认权限
+    user_default_permission: list = []
     # 微信小程序配置
     weixin_app_id: str = ''
     weixin_app_secret: str = ''
