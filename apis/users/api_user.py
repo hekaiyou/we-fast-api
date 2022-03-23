@@ -43,6 +43,7 @@ async def create_user(user: UserCreate):
         )
     user_json = jsonable_encoder(user)
     user_json['password'] = get_password_hash(user.password)
+    user_json['source'] = 'Web'
     doc_create(user_col, user_json)
     return user_json
 
