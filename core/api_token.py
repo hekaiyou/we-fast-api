@@ -3,7 +3,7 @@ import string
 import requests
 from datetime import timedelta
 from core.validate import str_to_oid
-from core.model import Token, TokenData, WeixinToken
+from core.model import Token, TokenData
 from core.database import get_collection, doc_create
 from apis.users.models import UserGlobal, COL_USER
 from core.dependencies import get_settings, Settings
@@ -19,7 +19,7 @@ router = APIRouter(
 
 @router.get(
     '/',
-    response_model=WeixinToken,
+    response_model=Token,
     summary='微信登录以获取访问令牌',
 )
 async def weixin_login_for_access_token(code: str, settings: Settings = Depends(get_settings)):
@@ -61,7 +61,7 @@ async def weixin_login_for_access_token(code: str, settings: Settings = Depends(
         data={'sub': f'{user["_id"]}:{user["role_id"]}'},
         expires_delta=access_token_expires,
     )
-    return WeixinToken(access_token=access_token, token_type='bearer', complete_info=bool(user['full_name']))
+    return Token(access_token=access_token, token_type='Bearer')
 
 
 @router.post(
@@ -97,7 +97,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={'sub': f'{user.id}:{user.role_id}'},
         expires_delta=access_token_expires,
     )
-    return Token(access_token=access_token, token_type='bearer')
+    return Token(access_token=access_token, token_type='Bearer')
 
 
 @router.get(
