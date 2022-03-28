@@ -13,8 +13,8 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 SECRET_KEY = '2203a6a1be54a1ab3afad0e5ca16de1dfe2ee384f13fe4b710c0b16359db9983'
 # 设定 JWT 令牌签名算法
 ALGORITHM = 'HS256'
-# 设置令牌过期时间 (分钟)
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+# 设置令牌过期时间 (默认720分钟即12小时)
+ACCESS_TOKEN_EXPIRE_MINUTES = 720
 
 # 依赖项 `oauth2_scheme` 会返回 `str` 类型的 `token` 令牌, 工作流:
 # 1. 检查请求 `header` 中是否加上 `Authorization Bearer token` 值

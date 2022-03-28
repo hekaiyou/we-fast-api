@@ -4,8 +4,10 @@ import requests
 from datetime import timedelta
 from core.validate import str_to_oid
 from core.model import Token, TokenData
-from core.database import get_collection, doc_create
-from apis.users.models import UserGlobal, COL_USER
+from core.dynamic import get_username_binding
+from fastapi.encoders import jsonable_encoder
+from core.database import get_collection, doc_create, doc_update
+from apis.users.models import UserGlobal, COL_USER, UserUpdateMe
 from core.dependencies import get_settings, Settings
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -101,7 +103,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 @router.get(
-    '/me',
+    '/me/',
     response_model=UserGlobal,
     summary='读取令牌对应的用户',
 )
@@ -115,3 +117,50 @@ async def read_token_user(current_token: TokenData = Depends(get_token_data)):
             detail='Token could not match user',
         )
     return UserGlobal(**user)
+
+
+@router.put(
+    '/me/',
+    response_model=UserUpdateMe,
+    summary='更新令牌对应的用户',
+)
+async def update_token_user(user: UserUpdateMe, current_token: TokenData = Depends(get_token_data)):
+    user_col = get_collection(COL_USER)
+    stored_user_data = user_col.find_one({
+        '_id': str_to_oid(current_token.user_id),
+    })
+    if stored_user_data is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Token could not match user',
+        )
+    stored_user_model = UserUpdateMe(**stored_user_data)
+    update_data = user.dict(exclude_unset=True)
+    updated_user = stored_user_model.copy(update=update_data)
+    if stored_user_model.username != updated_user.username:
+        if user_col.count_documents({'username': updated_user.username}):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Username already exists',
+            )
+    if 'deleted' in updated_user.username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Username wants to do something',
+        )
+    if stored_user_model.email != updated_user.email:
+        if user_col.count_documents({'email': updated_user.email}):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Email address already exists',
+            )
+    doc_update(user_col, stored_user_data, jsonable_encoder(updated_user))
+    for binding_k, binding_v in get_username_binding().items():
+        for field in binding_v:
+            doc_update(
+                collection=get_collection(binding_k),
+                filter={field: stored_user_data['username']},
+                update={field: updated_user.username},
+                many=True
+            )
+    return updated_user

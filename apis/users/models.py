@@ -17,7 +17,7 @@ class UserGlobal(UserBase):
     ''' 用户数据的全局模型 '''
     id: ObjId = Field(..., alias='_id')
     username: str
-    email: EmailStr
+    email: Optional[EmailStr] = None
     password: str
     role_id: str
 
@@ -35,6 +35,12 @@ class UserUpdate(UserBase):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
     role_id: Optional[str] = None
+
+
+class UserUpdateMe(UserBase):
+    ''' 用户数据的更新模型 (我的) '''
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
 
 
 class UserRead(UserBase):
