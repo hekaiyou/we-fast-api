@@ -6,11 +6,11 @@ from core.validate import str_to_oid
 from core.model import Token, TokenData
 from core.dynamic import get_username_binding
 from fastapi.encoders import jsonable_encoder
-from core.database import get_collection, doc_create, doc_update
-from apis.users.models import UserGlobal, COL_USER, UserUpdateMe
 from core.dependencies import get_settings, Settings
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, status
+from core.database import get_collection, doc_create, doc_update
+from apis.users.models import UserGlobal, COL_USER, UserUpdateMe, COL_ROLE
 from core.security import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_token_data, get_password_hash
 
 router = APIRouter(
@@ -57,13 +57,18 @@ async def weixin_login_for_access_token(code: str, settings: Settings = Depends(
             'weixin_open_id': weixin_json['openid'],
         })
         user = user_col.find_one(user_filter)
+    role = {'title': 'Default', 'permissions': settings.user_default_permission}
+    if user['role_id']:
+        role = get_collection(COL_ROLE).find_one({
+            '_id': str_to_oid(user['role_id']),
+        })
     # 生成访问令牌
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={'sub': f'{user["_id"]}:{user["role_id"]}'},
         expires_delta=access_token_expires,
     )
-    return Token(access_token=access_token, token_type='Bearer')
+    return Token(access_token=access_token, token_type='Bearer', role_title=role['title'], role_permissions=role['permissions'])
 
 
 @router.post(
@@ -71,7 +76,7 @@ async def weixin_login_for_access_token(code: str, settings: Settings = Depends(
     response_model=Token,
     summary='登录以获取访问令牌',
 )
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), settings: Settings = Depends(get_settings)):
     '''
     按照 **OAuth 2.0** 协议规定: 客户端/用户必须将 `username` 和 `password` 字段作为表单数据发送
     '''
@@ -92,6 +97,11 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail='User has been disabled',
             headers={'WWW-Authenticate': 'Bearer'},
         )
+    role = {'title': 'Default', 'permissions': settings.user_default_permission}
+    if user.role_id:
+        role = get_collection(COL_ROLE).find_one({
+            '_id': str_to_oid(user.role_id),
+        })
     # 根据令牌过期权限, 获取令牌过期时间
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     # 创建访问令牌, 同时放置唯一且是字符串的 sub 标识
@@ -99,7 +109,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={'sub': f'{user.id}:{user.role_id}'},
         expires_delta=access_token_expires,
     )
-    return Token(access_token=access_token, token_type='Bearer')
+    return Token(access_token=access_token, token_type='Bearer', role_title=role['title'], role_permissions=role['permissions'])
 
 
 @router.get(

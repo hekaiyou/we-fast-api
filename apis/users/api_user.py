@@ -74,7 +74,7 @@ async def read_user_page(
     return results
 
 
-@router.patch(
+@router.put(
     '/{user_id}',
     response_model=UserUpdate,
     summary='更新用户',

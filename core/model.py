@@ -6,6 +6,8 @@ class Token(BaseModel):
     ''' 访问令牌的模型 '''
     access_token: str
     token_type: str
+    role_title: str
+    role_permissions: list
 
 
 class TokenData(BaseModel):
