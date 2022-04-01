@@ -1,15 +1,24 @@
 # We FastAPI
 
-一个基于 [FastAPI](https://fastapi.tiangolo.com/) 的后端服务快速启动项目
+一个基于 [FastAPI](https://fastapi.tiangolo.com/) 的后端服务快速启动项目.
 
-## 运行环境
+## 快速开始
+
+创建 Python3 版本的虚拟环境:
 
 ```shell
 $ python3 -m venv env
 $ pip install -r requirements.txt
 ```
 
-配置数据库环境变量
+在根目录下创建一个配置环境变量的 `.env` 文件, 添加数据库的连接信息:
+
+```shell
+MONGO_DB_USERNAME='admin'
+MONGO_DB_PASSWORD='xxxxxx'
+```
+
+使用指定的地址和端口启动项目:
 
 ```shell
 $ uvicorn main:app --host '0.0.0.0' --port 8083 --reload
