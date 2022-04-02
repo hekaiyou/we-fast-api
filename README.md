@@ -24,6 +24,12 @@ MONGO_DB_PASSWORD='xxxxxx'
 $ uvicorn main:app --host '0.0.0.0' --port 8083 --reload
 ```
 
+访问以下文档和服务地址:
+
+- 通过 http://127.0.0.1:8083 打开 Web 服务.
+- 通过 http://127.0.0.1:8083/docs 打开由 [Swagger UI](https://github.com/swagger-api/swagger-ui) 提供的文档.
+- 通过 http://127.0.0.1:8083/redoc 打开由 [ReDoc](https://github.com/Rebilly/ReDoc) 提供的文档.
+
 ### 用户授权
 
 访问 `http://127.0.0.1:8083/docs` 打开由 [Swagger UI](https://github.com/swagger-api/swagger-ui) 提供的文档.

@@ -213,7 +213,7 @@ async def read_token_avata(current_token: TokenData = Depends(get_token_data)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Token could not match user',
         )
-    if not user['avata']:
-        return FileResponse(path=os.path.join(FILES_PATH, 'avata', 'default'), filename='default.png')
-    else:
+    if user['avata']:
         return FileResponse(path=os.path.join(FILES_PATH, 'avata', current_token.user_id), filename=user['avata'])
+    else:
+        return FileResponse(path=os.path.join(FILES_PATH, 'avata', 'default'), filename='default.png')
