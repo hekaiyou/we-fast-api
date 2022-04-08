@@ -1,7 +1,9 @@
 import apis.apis_urls as apis_urls
+import view.view_urls as view_urls
 import core.api_token as token_urls
 from fastapi import FastAPI
 from core.dependencies import get_settings
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import create_db_client, close_db_client
 
@@ -12,6 +14,8 @@ app = FastAPI(
 )
 app.include_router(token_urls.router)
 app.include_router(apis_urls.router)
+app.include_router(view_urls.router)
+app.mount('/static', StaticFiles(directory='view/public/static'), name='static')
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allow_origins,

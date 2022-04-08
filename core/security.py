@@ -19,7 +19,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 720
 # 依赖项 `oauth2_scheme` 会返回 `str` 类型的 `token` 令牌, 工作流:
 # 1. 检查请求 `header` 中是否加上 `Authorization Bearer token` 值
 # 2. 如果 `header` 中找不到, 而且请求参数中没有 `token` 值, 直接响应 401 异常
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token/')
 
 
 def verify_password(plain_password, password):

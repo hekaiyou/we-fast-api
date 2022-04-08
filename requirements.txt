@@ -8,3 +8,4 @@ python-dotenv
 loguru
 pydantic[email]
 requests
+jinja2
