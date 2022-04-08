@@ -25,6 +25,6 @@ async def startup_event():
     create_db_client(apis_urls)
 
 
-@app.on_event("shutdown")
+@app.on_event('shutdown')
 async def shutdown_event():
     close_db_client()

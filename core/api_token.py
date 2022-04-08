@@ -22,59 +22,6 @@ router = APIRouter(
 )
 
 
-@router.get(
-    '/',
-    response_model=Token,
-    summary='微信登录以获取访问令牌',
-)
-async def weixin_login_for_access_token(code: str, settings: Settings = Depends(get_settings)):
-    weixin_response = requests.get(
-        f'https://api.weixin.qq.com/sns/jscode2session?appid={settings.weixin_app_id}&secret={settings.weixin_app_secret}&js_code={code}&grant_type=authorization_code')
-    if weixin_response.status_code != 200:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='WeChat authorization request failed',
-            headers={'WWW-Authenticate': 'Bearer'},
-        )
-    # weixin_json['session_key'] 微信服务器给开发者服务器颁发的身份凭证
-    weixin_json = weixin_response.json()
-    if 'errmsg' in weixin_json:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f'WeChat authorized login failed ({weixin_json["errmsg"]})',
-            headers={'WWW-Authenticate': 'Bearer'},
-        )
-    user_col = get_collection(COL_USER)
-    # 判断微信端用户是否已存在
-    user_filter = {'weixin_open_id': weixin_json['openid']}
-    user = user_col.find_one(user_filter)
-    if not user:
-        doc_create(user_col, {
-            'username': weixin_json['openid'],
-            'email': None,
-            'full_name': None,
-            'disabled': False,
-            'password': get_password_hash(''.join(random.sample(string.ascii_letters + string.digits, 16))),
-            'role_id': '',
-            'source': 'WeChat',
-            'avata': '',
-            'weixin_open_id': weixin_json['openid'],
-        })
-        user = user_col.find_one(user_filter)
-    role = {'title': 'Default', 'permissions': settings.user_default_permission}
-    if user['role_id']:
-        role = get_collection(COL_ROLE).find_one({
-            '_id': str_to_oid(user['role_id']),
-        })
-    # 生成访问令牌
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={'sub': f'{user["_id"]}:{user["role_id"]}'},
-        expires_delta=access_token_expires,
-    )
-    return Token(access_token=access_token, token_type='Bearer', role_title=role['title'], role_permissions=role['permissions'])
-
-
 @router.post(
     '/',
     response_model=Token,
@@ -217,3 +164,56 @@ async def read_token_avata(current_token: TokenData = Depends(get_token_data)):
         return FileResponse(path=os.path.join(FILES_PATH, 'avata', current_token.user_id), filename=user['avata'])
     else:
         return FileResponse(path=os.path.join(FILES_PATH, 'avata', 'default'), filename='default.png')
+
+
+@router.get(
+    '/wechat/',
+    response_model=Token,
+    summary='微信登录以获取访问令牌',
+)
+async def wechat_login_for_access_token(code: str, settings: Settings = Depends(get_settings)):
+    wechat_response = requests.get(
+        f'https://api.weixin.qq.com/sns/jscode2session?appid={settings.wechat_app_id}&secret={settings.wechat_app_secret}&js_code={code}&grant_type=authorization_code')
+    if wechat_response.status_code != 200:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='WeChat authorization request failed',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+    # wechat_json['session_key'] 微信服务器给开发者服务器颁发的身份凭证
+    wechat_json = wechat_response.json()
+    if 'errmsg' in wechat_json:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f'WeChat authorized login failed ({wechat_json["errmsg"]})',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+    user_col = get_collection(COL_USER)
+    # 判断微信端用户是否已存在
+    user_filter = {'bind.wechat': wechat_json['openid']}
+    user = user_col.find_one(user_filter)
+    if not user:
+        doc_create(user_col, {
+            'username': wechat_json['openid'],
+            'email': None,
+            'full_name': None,
+            'disabled': False,
+            'password': get_password_hash(''.join(random.sample(string.ascii_letters + string.digits, 16))),
+            'role_id': '',
+            'source': 'WeChat',
+            'avata': '',
+            'bind': {'wechat': wechat_json['openid']},
+        })
+        user = user_col.find_one(user_filter)
+    role = {'title': 'Default', 'permissions': settings.user_default_permission}
+    if user['role_id']:
+        role = get_collection(COL_ROLE).find_one({
+            '_id': str_to_oid(user['role_id']),
+        })
+    # 生成访问令牌
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={'sub': f'{user["_id"]}:{user["role_id"]}'},
+        expires_delta=access_token_expires,
+    )
+    return Token(access_token=access_token, token_type='Bearer', role_title=role['title'], role_permissions=role['permissions'])

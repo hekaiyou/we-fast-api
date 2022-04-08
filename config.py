@@ -15,9 +15,9 @@ class Settings(BaseSettings):
     mongo_db_password: str = ''
     # 用户未分配角色时的默认权限
     user_default_permission: list = []
-    # 微信小程序配置
-    weixin_app_id: str = ''
-    weixin_app_secret: str = ''
+    # 微信小程序配置 (可选)
+    wechat_app_id: str = ''
+    wechat_app_secret: str = ''
 
     class Config:
         env_file = '.env'

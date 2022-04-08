@@ -44,8 +44,8 @@ $ uvicorn main:app --host '0.0.0.0' --port 8083 --reload
 在 `.env` 文件中添加微信小程序的的连接配置:
 
 ```shell
-WEIXIN_APP_ID='wxxxxxxxxxxxxxxxxx'
-WEIXIN_APP_SECRET='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+WECHAT_APP_ID='wxxxxxxxxxxxxxxxxx'
+WECHAT_APP_SECRET='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ```
 
 保存配置后微信小程序就可以调用 *GET /token/* 接口获取凭证.

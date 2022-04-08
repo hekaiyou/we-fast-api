@@ -44,12 +44,14 @@ def whether_to_initialize(apis_urls):
                 role_id = str(role_result['_id'])
             user_col.insert_one({
                 'username': 'admin',
-                'email': 'admin@we.com',
+                'email': 'admin@admin.com',
                 'full_name': 'Administrator',
                 'disabled': False,
                 'password': get_password_hash('123456'),
                 'role_id': role_id,
                 'source': 'Initialization',
+                'avata': '',
+                'bind': {'wechat': ''},
                 'create_time': datetime.utcnow(),
                 'update_time': datetime.utcnow(),
             })
