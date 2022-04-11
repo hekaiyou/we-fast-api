@@ -5,7 +5,7 @@ from functools import lru_cache
 from pymongo import ASCENDING, DESCENDING
 from core.dynamic import get_role_permissions
 from core.security import get_token_data, TokenData
-from fastapi import Depends, HTTPException, Query, status, Request
+from fastapi import Depends, HTTPException, Query, status, Request, Cookie
 
 
 @lru_cache()
@@ -71,3 +71,12 @@ async def verify_api_permission(request: Request, current_token: TokenData = Dep
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f'No {routes[path_key]["summary"]} permission',
         )
+
+
+async def get_view_request(
+    request: Request,
+    token: Optional[str] = Cookie(None),
+    permission: Optional[str] = Cookie(None),
+    settings: Settings = Depends(get_settings),
+):
+    pass

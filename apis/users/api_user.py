@@ -77,7 +77,7 @@ async def read_user_page(
 
 
 @router.put(
-    '/{user_id}',
+    '/{user_id}/',
     response_model=UserUpdate,
     summary='更新用户',
 )
@@ -135,7 +135,7 @@ async def update_user(user_id: ObjIdParams, user: UserUpdate):
 
 
 @router.delete(
-    '/{user_id}',
+    '/{user_id}/',
     summary='删除用户',
 )
 async def delete_user(user_id: ObjIdParams):

@@ -39,13 +39,13 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Wrong user name or password',
+            detail='账户名或密码错误',
             headers={'WWW-Authenticate': 'Bearer'},
         )
     if user.disabled:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='User has been disabled',
+            detail='账户已被禁用',
             headers={'WWW-Authenticate': 'Bearer'},
         )
     role = {'title': 'Default', 'permissions': settings.user_default_permission}

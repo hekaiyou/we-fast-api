@@ -51,7 +51,7 @@ async def create_role(role: RoleCreate, routes: dict = Depends(get_api_routes)):
 
 
 @router.delete(
-    '/{role_id}',
+    '/{role_id}/',
     summary='删除角色',
 )
 async def delete_role(role_id: ObjIdParams):
@@ -72,7 +72,7 @@ async def delete_role(role_id: ObjIdParams):
 
 
 @router.put(
-    '/{role_id}',
+    '/{role_id}/',
     response_model=RoleUpdate,
     summary='更新角色',
 )
