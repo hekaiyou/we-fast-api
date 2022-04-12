@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from apis.users.models import UserGlobal
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import HTTPException, Depends, status
+from fastapi import HTTPException, Depends, status, Cookie
 
 # 用于哈希和校验密码的 PassLib 上下文
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -19,7 +19,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 720
 # 依赖项 `oauth2_scheme` 会返回 `str` 类型的 `token` 令牌, 工作流:
 # 1. 检查请求 `header` 中是否加上 `Authorization Bearer token` 值
 # 2. 如果 `header` 中找不到, 而且请求参数中没有 `token` 值, 直接响应 401 异常
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token/')
+# 3. 设置 `auto_error=False` 可以关闭自动异常响应, 实现自定义异常响应
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token/', auto_error=False)
 
 
 def verify_password(plain_password, password):
@@ -63,11 +64,19 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def get_token_data(token: str = Depends(oauth2_scheme)):
+async def get_token_data(token: str = Depends(oauth2_scheme), token_s: Optional[str] = Cookie(None)):
     ''' 依赖项: 获取当前令牌数据 '''
+    if not token:
+        if not token_s:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='未认证',
+                headers={'WWW-Authenticate': 'Bearer'},
+            )
+        token = token_s
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail='Unable to verify credentials',
+        detail='无法验证凭据',
         headers={'WWW-Authenticate': 'Bearer'},
     )
     try:
