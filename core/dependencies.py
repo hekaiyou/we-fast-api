@@ -75,10 +75,5 @@ async def verify_api_permission(request: Request, current_token: TokenData = Dep
             )
 
 
-async def get_view_request(
-    request: Request,
-    token: Optional[str] = Cookie(None),
-    permission: Optional[str] = Cookie(None),
-    settings: Settings = Depends(get_settings),
-):
-    pass
+async def get_view_request(request: Request, settings: Settings = Depends(get_settings)):
+    return {'request': request, 'settings': settings}

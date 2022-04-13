@@ -13,7 +13,6 @@
 {% endblock %}
 
 {% block body %}
-<!-- Amp Sidebar -->
 <amp-sidebar id="sidebar-left" class="sample-sidebar" layout="nodisplay" side="left">
     <aside>
         <nav>
@@ -28,20 +27,21 @@
             </button>
             <ul>
                 <li>
-                    <h3>Theme</h3>
+                    <h3><a href="/view/users/dashboard/">仪表板</a></h3>
                 </li>
-                <li><a href="./">Auto</a></li>
+                <li><a href="?theme=auto">Auto</a></li>
                 <li><a href="?theme=light">Light</a></li>
                 <li><a href="?theme=dark">Dark</a></li>
             </ul>
         </nav>
     </aside>
-</amp-sidebar><!-- ./ Amp Sidebar -->
-
-<!-- Nav -->
+</amp-sidebar>
 <nav>
     <ul>
         <li>
+            {% if sub %}
+            <a href="javascript:history.back(-1)">返回</a>
+            {% else %}
             <button on="tap:sidebar-left.toggle" aria-label="Close menu">
                 <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24" height="16px" fill="none" stroke="currentColor" stroke-width="2"
@@ -51,6 +51,7 @@
                     <line x1="3" y1="18" x2="21" y2="18"></line>
                 </svg>
             </button>
+            {% endif %}
         </li>
     </ul>
     <ul>
@@ -60,49 +61,13 @@
     </ul>
     <ul>
         <li>
-            <a href="#" aria-label="Facebook">
-                <img src="/token/avata/" alt="头像" height="33px" width="33px" />
+            <a href="/view/users/dashboard/me/" aria-label="Facebook">
+                <img src="/token/avata/" alt="头像" height="30px" width="30px" />
             </a>
         </li>
     </ul>
-</nav><!-- ./ Nav -->
-
-<!-- Main -->
+</nav>
 <main>
-    <hgroup>
-        <h1>Google Amp</h1>
-        <h2>A simple layout for Google Amp, with inlined CSS, Fixed nav, Sidebar and Social Share.</h2>
-    </hgroup>
-    <figure>
-        <amp-img src="https://source.unsplash.com/pGM4sjt_BdQ/2000x1000" srcset="https://source.unsplash.com/pGM4sjt_BdQ/2000x1000 2000w,
-                       https://source.unsplash.com/pGM4sjt_BdQ/1000x500 1000w,
-                       https://source.unsplash.com/pGM4sjt_BdQ/500x250 500w" width="2000" height="1000"
-            layout="responsive" alt="Cupcake">
-        </amp-img>
-        <figcaption>Image from <a href="https://unsplash.com">unsplash.com</a></figcaption>
-    </figure>
-    <p>
-        <amp-social-share type="twitter" width="2rem" height="1.5rem" aria-label="Share on Titter"></amp-social-share>
-        <amp-social-share type="facebook" width="2rem" height="1.5rem" aria-label="Share on Facebook">
-        </amp-social-share>
-        <amp-social-share type="pinterest" width="2rem" height="1.5rem" aria-label="Share on Pinterest">
-        </amp-social-share>
-    </p>
-    <p>Integer vitae mi sed est rutrum feugiat. Ut bibendum sagittis dictum. Donec dictum pellentesque ipsum quis
-        maximus.
-        Fusce porttitor, arcu nec convallis rutrum, lectus justo auctor enim, vitae condimentum quam leo eu ante. Mauris
-        nec
-        augue in orci posuere imperdiet. Nam vel aliquet nisl. Vivamus iaculis ultrices nisl vitae ultrices. Aenean ac
-        risus
-        a tortor gravida dictum malesuada nec erat. Fusce sodales pharetra facilisis. Nunc viverra, eros quis imperdiet
-        dapibus, mauris nunc venenatis lorem, ut pharetra magna lorem in mi.</p>
-    <p>Vivamus malesuada fermentum urna, sit amet luctus urna ultrices id. In consequat orci a enim congue, et
-        pellentesque mi ultrices. Pellentesque cursus sapien arcu, consectetur faucibus massa sollicitudin sed. Vivamus
-        porttitor vehicula leo, id volutpat velit posuere vel. Pellentesque diam dui, faucibus quis mollis eget,
-        consequat
-        et est. Nullam vel tellus massa. Suspendisse in lorem ac lorem varius euismod. Cras consectetur suscipit tellus
-        rutrum condimentum. Etiam in erat laoreet, congue nisi maximus, tristique lacus. Quisque et lorem ex.</p>
-    <p>For this example, we have compiled a custom and class-less version of pico (<a
-            href="https://github.com/picocss/examples/blob/master/google-amp/">Source code here</a>).</p>
-</main><!-- ./ Main -->
+    {% block main %}{% endblock %}
+</main>
 {% endblock %}

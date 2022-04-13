@@ -12,7 +12,7 @@ templates = Jinja2Templates(directory='view/public/templates')
 
 
 @router.get('/', response_class=HTMLResponse, include_in_schema=False)
-async def read_token(request: Request, token_s: Optional[str] = Cookie(None)):
+async def page_token(request: Request, token_s: Optional[str] = Cookie(None)):
     settings = get_settings()
     if token_s:
         return RedirectResponse('/view/users/dashboard/')
