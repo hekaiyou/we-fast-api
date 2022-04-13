@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from apis.users.models import UserGlobal
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import HTTPException, Depends, status, Cookie
+from fastapi import HTTPException, Depends, status, Request
 
 # 用于哈希和校验密码的 PassLib 上下文
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -64,16 +64,19 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def get_token_data(token: str = Depends(oauth2_scheme), token_s: Optional[str] = Cookie(None)):
+async def get_token_data(request: Request, token: str = Depends(oauth2_scheme)):
     ''' 依赖项: 获取当前令牌数据 '''
     if not token:
-        if not token_s:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail='未认证',
-                headers={'WWW-Authenticate': 'Bearer'},
-            )
-        token = token_s
+        if not request.cookies.get('token_s', None):
+            if not '/open/' in str(request.url):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail='未认证',
+                    headers={'WWW-Authenticate': 'Bearer'},
+                )
+            else:
+                return TokenData(user_id='', role_id='')
+        token = request.cookies.get('token_s')
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail='无法验证凭据',

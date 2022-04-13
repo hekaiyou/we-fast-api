@@ -24,11 +24,12 @@ def get_api_routes():
     routes = {}
     for r in apis_urls.router.routes:
         ritem = r.__dict__
-        routes[f'{list(ritem["methods"])[0]} {ritem["path"]}'] = {
-            'name': ritem['name'],
-            'tag': ritem['tags'][0],
-            'summary': ritem['summary'],
-        }
+        if not '/open/' in ritem['path']:
+            routes[f'{list(ritem["methods"])[0]} {ritem["path"]}'] = {
+                'name': ritem['name'],
+                'tag': ritem['tags'][0],
+                'summary': ritem['summary'],
+            }
     return routes
 
 
@@ -66,11 +67,12 @@ async def verify_api_permission(request: Request, current_token: TokenData = Dep
     if request.path_params:
         for param_k, param_v in request.path_params.items():
             path_key = path_key.replace(param_v, '{%s}' % (param_k))
-    if not routes[path_key]['name'] in get_role_permissions(current_token.role_id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f'No {routes[path_key]["summary"]} permission',
-        )
+    if current_token.role_id:
+        if not routes[path_key]['name'] in get_role_permissions(current_token.role_id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f'No {routes[path_key]["summary"]} permission',
+            )
 
 
 async def get_view_request(

@@ -95,7 +95,7 @@
                         记住账户
                     </label>
                 </fieldset>
-                <button type="submit" class="contrast" onclick="event.preventDefault()">登录</button>
+                <button type="submit" onclick="event.preventDefault()">登录</button>
             </form>
         </div>
         <div></div>
@@ -113,9 +113,10 @@
                     'password': $('#password').val(),
                 },
                 success = function (data, textStatus) {
-                    Cookies.set('token', data.token_type + ' ' + data.access_token, { expires: 0.5, path: '/view/' });
-                    Cookies.set('role', data.role_title, { expires: 0.5, path: '/view/' });
-                    Cookies.set('permissions', data.role_permissions, { expires: 0.5, path: '/view/' });
+                    Cookies.set('token_s', data.access_token, { expires: 0.5, path: '/' });
+                    Cookies.set('role', data.role_title, { expires: 0.5, path: '/' });
+                    Cookies.set('permissions', data.role_permissions, { expires: 0.5, path: '/' });
+                    window.location.href = '/view/users/dashboard/';
                 },
             );
         });

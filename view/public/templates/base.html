@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh">
 
 <head>
     <meta charset="utf-8">
@@ -11,6 +11,8 @@
     <script src="{{ url_for('static', path='/sweetalert/sweetalert.min.js') }}"></script>
     <script src="{{ url_for('static', path='/js-cookie/js.cookie.min.js') }}"></script>
     <script src="{{ url_for('static', path='/js/utils-net.js') }}"></script>
+    <!-- Pico.css custom build inlined for Google AMP -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/amp/pico.google-amp.min.css') }}">
     {% block head %}
     {% endblock %}
 </head>
@@ -18,13 +20,6 @@
 <body>
     {% block body %}
     {% endblock %}
-    <script>
-        if (!Cookies.get('token')) {
-            if (window.location.href.indexOf('/view/users/token') == -1) {
-                window.location.href = '/view/users/token';
-            }
-        }
-    </script>
 </body>
 
 </html>

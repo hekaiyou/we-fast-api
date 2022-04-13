@@ -4,6 +4,7 @@ import core.api_token as token_urls
 from fastapi import FastAPI
 from core.dependencies import get_settings
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import create_db_client, close_db_client
 
@@ -22,6 +23,11 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+
+@app.get('/', include_in_schema=False)
+async def redirect_view():
+    return RedirectResponse('/view/users/token/')
 
 
 @app.on_event('startup')

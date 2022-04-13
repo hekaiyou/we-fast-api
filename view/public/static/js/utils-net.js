@@ -1,3 +1,13 @@
+if (!Cookies.get('token_s')) {
+    if (window.location.href.indexOf('/view/users/token') == -1) {
+        window.location.href = '/view/users/token/';
+    }
+} else {
+    if (window.location.href.indexOf('/view/users/token') != -1) {
+        window.location.href = '/view/users/dashboard/';
+    }
+}
+
 function utilAjax(type, url, data, success) {
     $.ajax({
         type: type,
@@ -20,6 +30,9 @@ function utilAjax(type, url, data, success) {
             console.log(request, textStatus, errorThrown);
             if (request.status == 0) {
                 var errText = '服务器无法连接';
+                var errIcon = 'error';
+            } else if (request.status == 422) {
+                var errText = '请求格式或内容错误';
                 var errIcon = 'error';
             } else {
                 var errText = request.responseJSON.detail;
