@@ -1,3 +1,4 @@
+from time import time
 from typing import Optional
 from core.security import get_password_hash
 from fastapi.encoders import jsonable_encoder
@@ -164,11 +165,11 @@ async def delete_user(user_id: ObjIdParams):
     if not stored_user_data:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='User not found',
+            detail='未找到用户',
         )
     user_col.delete_one(stored_user_data)
     # 同步处理全部绑定用户名的集合及其字段内容
-    update_name = f'[deleted]{stored_user_data["username"]}'
+    update_name = f'[deleted{int(time())}]{stored_user_data["username"]}'
     if stored_user_data['username'] != update_name:
         for binding_k, binding_v in get_username_binding().items():
             for field in binding_v:

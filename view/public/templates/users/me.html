@@ -22,7 +22,7 @@
         <input type="email" id="email" placeholder="电子邮箱地址" required>
     </label>
     <label for="avata">
-        头像 <img src="/token/avata/" width="100px" height="100px" alt="头像"></img>
+        头像 (可选)
         <input type="file" id="file" accept="image/png,image/jpeg">
     </label>
 </form>
@@ -60,9 +60,20 @@
                     $('#username').val(data.username);
                     $('#full_name').val(data.full_name);
                     $('#email').val(data.email);
-                    swal('更新成功', { icon: 'success', buttons: false, });
                 },
+                success_reminder = true,
             );
+        });
+        $('#file').change(function () {
+            if ($(this).val() != '') {
+                utilAjaxFile(
+                    type = 'POST',
+                    url = '/token/avata/',
+                    file = $(this),
+                    success = function (data, textStatus) { },
+                    success_reminder = true,
+                );
+            }
         });
     });
 </script>
