@@ -16,7 +16,7 @@ app = FastAPI(
 app.include_router(token_urls.router)
 app.include_router(apis_urls.router)
 app.include_router(view_urls.router)
-app.mount('/static', StaticFiles(directory='view/public/static'), name='static')
+app.mount('/static', StaticFiles(directory='view/static'), name='static')
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allow_origins,
