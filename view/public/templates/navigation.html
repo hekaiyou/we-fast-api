@@ -61,13 +61,16 @@
     </ul>
     <ul>
         <li>
+            {% block operate %}
             <a href="/view/users/dashboard/me/" aria-label="Facebook">
                 <img src="/token/avata/" alt="头像" height="30px" width="30px" />
             </a>
+            {% endblock %}
         </li>
     </ul>
 </nav>
 <main>
     {% block main %}{% endblock %}
+    {% block javascript %}{% endblock %}
 </main>
 {% endblock %}

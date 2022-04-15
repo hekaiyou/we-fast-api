@@ -122,15 +122,35 @@ async def update_user(user_id: ObjIdParams, user: UserUpdate):
             )
     # 把 模型实例副本 转换为适配 JSON 的数据, 再保存至数据库集合
     doc_update(user_col, stored_user_data, jsonable_encoder(updated_user))
-    # 同步更新全部绑定用户名的集合及其字段内容
-    for binding_k, binding_v in get_username_binding().items():
-        for field in binding_v:
-            doc_update(
-                collection=get_collection(binding_k),
-                filter={field: stored_user_data['username']},
-                update={field: updated_user.username},
-                many=True
-            )
+    if stored_user_data['username'] != updated_user.username:
+        # 同步更新全部绑定用户名的集合及其字段内容
+        for binding_k, binding_v in get_username_binding().items():
+            for field in binding_v:
+                if ':array' in field:
+                    field = field.split(':')[0]
+                    change_item = get_collection(binding_k).find({
+                        field: {'$elemMatch': {
+                            '$in': [stored_user_data['username']]
+                        }}
+                    }, {field: 1, '_id': 1})
+                    for change in change_item:
+                        revise = change[field]
+                        for i, v in enumerate(revise):
+                            if v == stored_user_data['username']:
+                                revise[i] = updated_user.username
+                                break
+                        doc_update(
+                            collection=get_collection(binding_k),
+                            filter={'_id': change['_id']},
+                            update={field: revise},
+                        )
+                else:
+                    doc_update(
+                        collection=get_collection(binding_k),
+                        filter={field: stored_user_data['username']},
+                        update={field: updated_user.username},
+                        many=True
+                    )
     return updated_user
 
 
@@ -149,12 +169,32 @@ async def delete_user(user_id: ObjIdParams):
     user_col.delete_one(stored_user_data)
     # 同步处理全部绑定用户名的集合及其字段内容
     update_name = f'[deleted]{stored_user_data["username"]}'
-    for binding_k, binding_v in get_username_binding().items():
-        for field in binding_v:
-            doc_update(
-                collection=get_collection(binding_k),
-                filter={field: stored_user_data['username']},
-                update={field: update_name},
-                many=True
-            )
+    if stored_user_data['username'] != update_name:
+        for binding_k, binding_v in get_username_binding().items():
+            for field in binding_v:
+                if ':array' in field:
+                    field = field.split(':')[0]
+                    change_item = get_collection(binding_k).find({
+                        field: {'$elemMatch': {
+                            '$in': [stored_user_data['username']]
+                        }}
+                    }, {field: 1, '_id': 1})
+                    for change in change_item:
+                        revise = change[field]
+                        for i, v in enumerate(revise):
+                            if v == stored_user_data['username']:
+                                revise[i] = update_name
+                                break
+                        doc_update(
+                            collection=get_collection(binding_k),
+                            filter={'_id': change['_id']},
+                            update={field: revise},
+                        )
+                else:
+                    doc_update(
+                        collection=get_collection(binding_k),
+                        filter={field: stored_user_data['username']},
+                        update={field: update_name},
+                        many=True
+                    )
     return {}

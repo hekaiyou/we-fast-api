@@ -1,6 +1,69 @@
 {% extends 'navigation.html' %}
 {% block title %}我的信息{% endblock %}
 
+{% block operate %}
+<a id="submit" role="button" href="javascript:void(0);">更新</a>
+{% endblock %}
+
 {% block main %}
-我的信息页面
+<form>
+    <div class="grid">
+        <label for="username">
+            账户名
+            <input type="text" id="username" placeholder="账户名" required>
+        </label>
+        <label for="full_name">
+            账户昵称
+            <input type="text" id="full_name" placeholder="账户昵称" required>
+        </label>
+    </div>
+    <label for="email">
+        电子邮箱地址
+        <input type="email" id="email" placeholder="电子邮箱地址" required>
+    </label>
+    <label for="avata">
+        头像 <img src="/token/avata/" width="100px" height="100px" alt="头像"></img>
+        <input type="file" id="file" accept="image/png,image/jpeg">
+    </label>
+</form>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        utilAjax(
+            type = 'GET',
+            url = '/token/me/',
+            data = {},
+            check = {},
+            success = function (data, textStatus) {
+                $('#username').val(data.username)
+                $('#full_name').val(data.full_name)
+                $('#email').val(data.email)
+            },
+        );
+        $('#submit').click(function () {
+            utilAjax(
+                type = 'PUT',
+                url = '/token/me/',
+                data = {
+                    'username': $('#username').val(),
+                    'full_name': $('#full_name').val(),
+                    'email': $('#email').val(),
+                },
+                check = {
+                    'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
+                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位'],
+                    'email': [/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/, '电子邮箱地址的格式不正确'],
+                },
+                success = function (data, textStatus) {
+                    $('#username').val(data.username);
+                    $('#full_name').val(data.full_name);
+                    $('#email').val(data.email);
+                    swal('更新成功', { icon: 'success', buttons: false, });
+                },
+            );
+        });
+    });
+</script>
 {% endblock %}

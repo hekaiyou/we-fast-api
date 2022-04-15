@@ -116,14 +116,34 @@ async def update_token_user(user: UserUpdateMe, current_token: TokenData = Depen
                 detail='Email address already exists',
             )
     doc_update(user_col, stored_user_data, jsonable_encoder(updated_user))
-    for binding_k, binding_v in get_username_binding().items():
-        for field in binding_v:
-            doc_update(
-                collection=get_collection(binding_k),
-                filter={field: stored_user_data['username']},
-                update={field: updated_user.username},
-                many=True
-            )
+    if stored_user_data['username'] != updated_user.username:
+        for binding_k, binding_v in get_username_binding().items():
+            for field in binding_v:
+                if ':array' in field:
+                    field = field.split(':')[0]
+                    change_item = get_collection(binding_k).find({
+                        field: {'$elemMatch': {
+                            '$in': [stored_user_data['username']]
+                        }}
+                    }, {field: 1, '_id': 1})
+                    for change in change_item:
+                        revise = change[field]
+                        for i, v in enumerate(revise):
+                            if v == stored_user_data['username']:
+                                revise[i] = updated_user.username
+                                break
+                        doc_update(
+                            collection=get_collection(binding_k),
+                            filter={'_id': change['_id']},
+                            update={field: revise},
+                        )
+                else:
+                    doc_update(
+                        collection=get_collection(binding_k),
+                        filter={field: stored_user_data['username']},
+                        update={field: updated_user.username},
+                        many=True
+                    )
     return updated_user
 
 
