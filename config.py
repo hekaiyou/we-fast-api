@@ -4,6 +4,9 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     app_name: str = 'We FastAPI'
     app_version: str = '0.0.1'
+    # Token 密钥与过期分钟数
+    token_expire_minute: int = 720
+    token_secret_key: str = '2203a6a1be54a1ab3afad0e5ca16de1dfe2ee384f13fe4b710c0b16359db9983'
     # 允许跨域请求的源列表
     allow_origins: list = ['*']
     # MongoDB 连接: 基本信息

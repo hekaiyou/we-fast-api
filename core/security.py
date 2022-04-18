@@ -1,4 +1,5 @@
 from typing import Optional
+from config import Settings
 from jose import JWTError, jwt
 from core.model import TokenData
 from datetime import datetime, timedelta
@@ -10,11 +11,11 @@ from fastapi import HTTPException, Depends, status, Request
 # 用于哈希和校验密码的 PassLib 上下文
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 # 使用命令生成一个安全的随机密钥: `openssl rand -hex 32`
-SECRET_KEY = '2203a6a1be54a1ab3afad0e5ca16de1dfe2ee384f13fe4b710c0b16359db9983'
+SECRET_KEY = Settings().token_secret_key
 # 设定 JWT 令牌签名算法
 ALGORITHM = 'HS256'
 # 设置令牌过期时间 (默认720分钟即12小时)
-ACCESS_TOKEN_EXPIRE_MINUTES = 720
+ACCESS_TOKEN_EXPIRE_MINUTES = Settings().token_expire_minute
 
 # 依赖项 `oauth2_scheme` 会返回 `str` 类型的 `token` 令牌, 工作流:
 # 1. 检查请求 `header` 中是否加上 `Authorization Bearer token` 值
