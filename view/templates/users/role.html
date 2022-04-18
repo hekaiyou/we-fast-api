@@ -1,0 +1,31 @@
+{% extends 'navigation.html' %}
+{% block title %}角色与权限{% endblock %}
+
+{% block operate_right %}
+<a id="submit" role="button" href="javascript:void(0);">创建</a>
+{% endblock %}
+
+{% block main %}
+<div id="details-content"></div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        utilAjax(
+            type = 'GET',
+            url = '/api/users/role/',
+            data = {},
+            check = {},
+            success = function (data, textStatus) {
+                data['all_item'].forEach(function (value, index) {
+                    $('#details-content').append('<details onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['title'] + ' <sup>有' + value['permissions'].length + '个权限</sup></summary></details>');
+                });
+                $('details').click(function () {
+                    window.location.href = '/view/users/role/update/' + $(this).attr('id') + '/';
+                });
+            },
+        );
+    });
+</script>
+{% endblock %}

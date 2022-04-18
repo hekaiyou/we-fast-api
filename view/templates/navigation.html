@@ -10,8 +10,6 @@
 <script async custom-element="amp-form" src="{{ url_for('static', path='/amp/amp-form-0.1.js') }}"></script>
 <!-- Google font: Calistoga -->
 <link href="{{ url_for('static', path='/amp/css2') }}" rel="stylesheet">
-<!-- Permission related content -->
-<script src="{{ url_for('static', path='/utils/permission.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -27,13 +25,10 @@
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
-            <ul>
+            <ul id="nav-content">
                 <li>
                     <h3><a href="/view/users/dashboard/">仪表板</a></h3>
                 </li>
-                <li><a href="?theme=auto">Auto</a></li>
-                <li><a href="?theme=light">Light</a></li>
-                <li><a href="?theme=dark">Dark</a></li>
             </ul>
         </nav>
     </aside>
@@ -41,9 +36,7 @@
 <nav>
     <ul>
         <li>
-            {% if sub %}
-            <a href="javascript:history.back(-1)">返回</a>
-            {% else %}
+            {% block operate_left %}
             <button on="tap:sidebar-left.toggle" aria-label="Close menu">
                 <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24" height="16px" fill="none" stroke="currentColor" stroke-width="2"
@@ -53,7 +46,7 @@
                     <line x1="3" y1="18" x2="21" y2="18"></line>
                 </svg>
             </button>
-            {% endif %}
+            {% endblock %}
         </li>
     </ul>
     <ul>
@@ -63,14 +56,16 @@
     </ul>
     <ul>
         <li>
-            {% block operate %}
-            <a href="/view/users/dashboard/me/" aria-label="Facebook">
-                <img src="/token/avata/" alt="头像" height="30px" width="30px" />
+            {% block operate_right %}
+            <a href="/view/users/me/" aria-label="我的信息">
+                <img src="/token/avata/" alt="头像图片" height="30px" width="30px" />
             </a>
             {% endblock %}
         </li>
     </ul>
 </nav>
+<!-- Permission related content -->
+<script src="{{ url_for('static', path='/utils/permission.js') }}"></script>
 <main>
     {% block main %}{% endblock %}
     {% block javascript %}{% endblock %}

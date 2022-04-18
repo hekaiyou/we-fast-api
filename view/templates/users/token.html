@@ -117,9 +117,9 @@
                     'password': [/^\S{6,}$/, '登录密码的长度需要大于6位'],
                 },
                 success = function (data, textStatus) {
-                    Cookies.set('token_s', data.access_token, { expires: cookiesExpires, path: '/' });
-                    Cookies.set('role', data.role_title, { expires: cookiesExpires, path: '/' });
-                    Cookies.set('permissions', data.role_permissions, { expires: cookiesExpires, path: '/' });
+                    Cookies.set('token_s', data.access_token, { expires: cookiesExpiresDay, path: '/' });
+                    Cookies.set('role', data.role_title, { expires: cookiesExpiresDay, path: '/' });
+                    Cookies.set('permissions', data.role_permissions, { expires: cookiesExpiresDay, path: '/' });
                     window.location.href = '/view/users/dashboard/';
                 },
             );

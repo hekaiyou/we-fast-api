@@ -1,0 +1,59 @@
+{% extends 'navigation.html' %}
+{% block title %}更新角色{% endblock %}
+
+{% block operate_left %}
+<a href="javascript:history.back(-1)">返回</a>
+{% endblock %}
+{% block operate_right %}
+<a id="submit" role="button" href="javascript:void(0);">创建</a>
+{% endblock %}
+
+{% block main %}
+<form id="form-content">
+    <label for="title">
+        角色名称
+        <input type="text" id="title" placeholder="角色名称" required>
+    </label>
+</form>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        utilAjax(
+            type = 'GET',
+            url = '/api/users/permission/',
+            data = {},
+            check = {},
+            success = function (data, textStatus) {
+                var tagDict = {};
+                data['all_item'].forEach(function (value, index) {
+                    if (tagDict[value['tag']]) {
+                        tagDict[value['tag']].push(value);
+                    } else {
+                        tagDict[value['tag']] = [value];
+                    }
+                });
+                for (var key in tagDict) {
+                    let item = tagDict[key];
+                    $('#form-content').append('<label>访问 ' + key + ' 模块的权限<details role="list"><summary aria-haspopup="listbox"></summary><ul role="listbox" id="tag-' + key + '"></ul></details></label>');
+                    item.forEach(function (value, index) {
+                        console.log(value, index);
+                        $('#tag-' + key).append('<li><label><input type="checkbox">' + value['summary'] + '</label></li>');
+                    });
+                }
+            },
+        );
+        utilAjax(
+            type = 'GET',
+            url = '/api/users/role/{{ role_id }}/',
+            data = {},
+            check = {},
+            success = function (data, textStatus) {
+                console.log(data, textStatus);
+                $('#title').val(data.title);
+            },
+        );
+    });
+</script>
+{% endblock %}

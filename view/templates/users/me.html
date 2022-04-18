@@ -1,7 +1,10 @@
 {% extends 'navigation.html' %}
 {% block title %}我的信息{% endblock %}
 
-{% block operate %}
+{% block operate_left %}
+<a href="javascript:history.back(-1)">返回</a>
+{% endblock %}
+{% block operate_right %}
 <a id="submit" role="button" href="javascript:void(0);">更新</a>
 {% endblock %}
 
