@@ -5,7 +5,7 @@
 <a href="javascript:history.back(-1)">返回</a>
 {% endblock %}
 {% block operate_right %}
-<a id="submit" role="button" href="javascript:void(0);">创建</a>
+<a id="submit" role="button" href="javascript:void(0);">更新</a>
 {% endblock %}
 
 {% block main %}
@@ -19,7 +19,20 @@
 
 {% block javascript %}
 <script>
+    var tagSelectDict = {};
     $(document).ready(function () {
+        utilAjax(
+            type = 'GET',
+            url = '/api/users/role/{{ role_id }}/',
+            data = {},
+            check = {},
+            success = function (data, textStatus) {
+                $('#title').val(data.title);
+                data.permissions.forEach(function (value, index) {
+                    tagSelectDict[value] = true;
+                });
+            },
+        );
         utilAjax(
             type = 'GET',
             url = '/api/users/permission/',
@@ -35,25 +48,64 @@
                     }
                 });
                 for (var key in tagDict) {
-                    let item = tagDict[key];
-                    $('#form-content').append('<label>访问 ' + key + ' 模块的权限<details role="list"><summary aria-haspopup="listbox"></summary><ul role="listbox" id="tag-' + key + '"></ul></details></label>');
+                    let keyName = key;
+                    let item = tagDict[keyName];
+                    $('#form-content').append('<label>服务模块 ' + keyName + '<details role="list"><summary aria-haspopup="listbox" id="summary-' + keyName + '" select="">包含 0 个接口访问权限</summary><ul role="listbox" id="tag-' + keyName + '"></ul></details></label>');
                     item.forEach(function (value, index) {
-                        console.log(value, index);
-                        $('#tag-' + key).append('<li><label><input type="checkbox">' + value['summary'] + '</label></li>');
+                        $('#tag-' + keyName).append('<li><label><input type="checkbox" name="' + keyName + '" value="' + value['name'] + '">' + value['summary'] + '</label></li>');
+                        if (tagSelectDict.hasOwnProperty(value['name'])) {
+                            $('[value="' + value['name'] + '"]:checkbox').attr('checked', 'checked');
+                            let summarys = $('#summary-' + keyName).attr('select').split(',');
+                            if (summarys[0] == '') {
+                                summarys = [];
+                            }
+                            summarys.push(value['name']);
+                            $('#summary-' + keyName).attr('select', summarys.toString());
+                            $('#summary-' + keyName).html('包含 ' + summarys.length + ' 个接口访问权限');
+                        } else {
+                            tagSelectDict[value['name']] = false;
+                        }
+                    });
+                    $('[name="' + keyName + '"]:checkbox').on('click', function () {
+                        tagSelectDict[$(this).val()] = !tagSelectDict[$(this).val()];
+                        let summarys = $('#summary-' + keyName).attr('select').split(',');
+                        if (summarys[0] == '') {
+                            summarys = [];
+                        }
+                        if ($(this).is(':checked')) {
+                            summarys.push($(this).val());
+                        } else {
+                            summarys.splice(summarys.indexOf($(this).val()), 1);
+                        }
+                        $('#summary-' + keyName).attr('select', summarys.toString());
+                        $('#summary-' + keyName).html('包含 ' + summarys.length + ' 个接口访问权限');
                     });
                 }
             },
         );
-        utilAjax(
-            type = 'GET',
-            url = '/api/users/role/{{ role_id }}/',
-            data = {},
-            check = {},
-            success = function (data, textStatus) {
-                console.log(data, textStatus);
-                $('#title').val(data.title);
-            },
-        );
+        $('#submit').click(function () {
+            let permissions = [];
+            for (var key in tagSelectDict) {
+                if (tagSelectDict[key]) {
+                    permissions.push(key);
+                }
+            }
+            utilAjax(
+                type = 'PUT',
+                url = '/api/users/role/{{ role_id }}/',
+                data = {
+                    'title': $('#title').val(),
+                    'permissions': permissions,
+                },
+                check = {
+                    'title': [/^\S{2,}$/, '角色名称的长度需要大于2位'],
+                },
+                success = function (data, textStatus) {
+                    $('#title').val(data.title);
+                },
+                success_reminder = true,
+            );
+        });
     });
 </script>
 {% endblock %}

@@ -151,7 +151,7 @@ async def update_token_user(user: UserUpdateMe, current_token: TokenData = Depen
     '/avata/',
     summary='创建令牌对应的头像文件',
 )
-async def create_token_avata(file: UploadFile = File(...), current_token: TokenData = Depends(get_token_data)):
+async def create_token_avata_file(file: UploadFile = File(...), current_token: TokenData = Depends(get_token_data)):
     user_col = get_collection(COL_USER)
     user = user_col.find_one({
         '_id': str_to_oid(current_token.user_id),
@@ -170,7 +170,7 @@ async def create_token_avata(file: UploadFile = File(...), current_token: TokenD
     '/avata/',
     summary='读取令牌对应的头像文件',
 )
-async def read_token_avata(current_token: TokenData = Depends(get_token_data)):
+async def read_token_avata_file(current_token: TokenData = Depends(get_token_data)):
     user_col = get_collection(COL_USER)
     user = user_col.find_one({
         '_id': str_to_oid(current_token.user_id),
@@ -191,7 +191,7 @@ async def read_token_avata(current_token: TokenData = Depends(get_token_data)):
     response_model=Token,
     summary='微信登录以获取访问令牌',
 )
-async def wechat_login_for_access_token(code: str, settings: Settings = Depends(get_settings)):
+async def login_for_access_token_wechat(code: str, settings: Settings = Depends(get_settings)):
     wechat_response = requests.get(
         f'https://api.weixin.qq.com/sns/jscode2session?appid={settings.wechat_app_id}&secret={settings.wechat_app_secret}&js_code={code}&grant_type=authorization_code')
     if wechat_response.status_code != 200:
