@@ -15,7 +15,7 @@ class ObjId(ObjectId):
         try:
             ObjectId.is_valid(v)
         except InvalidId as e:
-            raise ValueError('Invalid object id')
+            raise ValueError('无效的对象 ID')
         return str(v)
 
     @classmethod
@@ -32,7 +32,7 @@ class ObjIdParams(ObjectId):
     @classmethod
     def validate(cls, v):
         if not ObjectId.is_valid(v):
-            raise ValueError('Invalid string id')
+            raise ValueError('无效的字符串 ID')
         return ObjectId(v)
 
     @classmethod
@@ -45,4 +45,4 @@ def str_to_oid(str_id):
     try:
         return ObjectId(str_id)
     except InvalidId as e:
-        raise HTTPException(status_code=400, detail='Invalid string id')
+        raise HTTPException(status_code=400, detail='无效的字符串 ID')
