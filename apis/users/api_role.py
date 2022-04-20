@@ -33,7 +33,7 @@ async def read_role(role_id: ObjIdParams):
     role_col = get_collection(COL_ROLE)
     if not role_col.count_documents({'_id': role_id}):
         raise HTTPException(
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail='找不到角色',
         )
     return RoleRead(**(get_collection(COL_ROLE).find_one({'_id': role_id})))
@@ -73,7 +73,7 @@ async def delete_role(role_id: ObjIdParams):
     role_col = get_collection(COL_ROLE)
     if not role_col.count_documents({'_id': role_id}):
         raise HTTPException(
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail='找不到角色',
         )
     if get_collection(COL_USER).count_documents({'role_id': str(role_id)}):
@@ -96,7 +96,7 @@ async def update_role(role_id: ObjIdParams, role: RoleUpdate):
     stored_role_data = role_col.find_one({'_id': role_id})
     if not stored_role_data:
         raise HTTPException(
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail='找不到角色',
         )
     stored_role_model = RoleUpdate(**stored_role_data)

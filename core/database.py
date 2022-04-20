@@ -104,10 +104,7 @@ async def paginate_find(collection: Collection, paginate_parameters: dict, query
     ''' 分页查询 DB 集合中的数据 '''
     find_count = collection.count_documents(query_content)
     if not find_count:
-        raise HTTPException(
-            status_code=status.HTTP_204_NO_CONTENT,
-            detail='没有找到匹配的数据',
-        )
+        return Paginate(items=[], total=0)
     if paginate_parameters['sort_list']:
         # 包括排序参数的查询
         find_results = collection.find(query_content).sort(

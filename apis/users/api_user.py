@@ -88,7 +88,7 @@ async def update_user(user_id: ObjIdParams, user: UserUpdate):
     stored_user_data = user_col.find_one({'_id': user_id})
     if not stored_user_data:
         raise HTTPException(
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail='未找到用户',
         )
     # 使用 集合中存储的用户数据 创建一个 用户数据模型实例
@@ -164,7 +164,7 @@ async def delete_user(user_id: ObjIdParams):
     stored_user_data = user_col.find_one({'_id': user_id})
     if not stored_user_data:
         raise HTTPException(
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail='未找到用户',
         )
     user_col.delete_one(stored_user_data)
