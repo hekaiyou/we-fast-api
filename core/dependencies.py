@@ -1,6 +1,7 @@
 import apis.apis_urls as apis_urls
 from config import Settings
 from typing import Optional
+from datetime import datetime
 from functools import lru_cache
 from pymongo import ASCENDING, DESCENDING
 from core.dynamic import get_role_permissions
@@ -38,8 +39,17 @@ async def get_paginate_parameters(
     limit: int = Query(default=10, ge=1, le=100),
     orderby: Optional[str] = Query(
         default=None,
-        description='Example: field1 asc,field2 desc',
+        description='示例: field1 asc,field2 desc',
         regex='^.+\s+(asc|desc)*$',
+    ),
+    start_time: Optional[int] = Query(
+        default=None, ge=1640966400000, le=4796640000000,
+    ),
+    end_time: Optional[int] = Query(
+        default=None, ge=1640966400000, le=4796640000000,
+    ),
+    time_field: Optional[str] = Query(
+        default='create_time', regex='^[a-zA-Z]\w{2,31}$',
     ),
 ):
     ''' 全局依赖项: 获取分页参数 '''
@@ -56,9 +66,22 @@ async def get_paginate_parameters(
             else:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail='The sort parameter orderby is malformed',
+                    detail='排序参数 orderby 格式错误',
                 )
-    return {'skip': skip, 'limit': limit, 'sort_list': sort_list}
+    time_te = {}
+    if start_time:
+        time_te['$gte'] = datetime.fromtimestamp(
+            float(format(start_time/1000, '.3f')))
+    if end_time:
+        time_te['$lte'] = datetime.fromtimestamp(
+            float(format(end_time/1000, '.3f')))
+    if start_time and end_time:
+        if not time_te['$lte'].__gt__(time_te['$gte']):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='结束时间必须大于开始时间',
+            )
+    return {'skip': skip, 'limit': limit, 'sort_list': sort_list, 'time_field': time_field, 'time_te': time_te}
 
 
 async def verify_api_permission(request: Request, current_token: TokenData = Depends(get_token_data), routes: dict = Depends(get_api_routes)):

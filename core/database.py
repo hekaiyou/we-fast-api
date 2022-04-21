@@ -55,13 +55,11 @@ def whether_to_initialize(apis_urls):
                 'create_time': datetime.utcnow(),
                 'update_time': datetime.utcnow(),
             })
-            logger.success(
-                'For the first connection, initialize the administrator account: admin / 123456')
-            logger.warning(
-                'Please log in to the administrator account as soon as possible and change the password in time')
+            logger.success('第一次连接, 初始化管理员账号: admin / 123456')
+            logger.warning('请尽快登录管理员账号并及时修改密码')
         set_role_permissions(role_col)
     except Exception as e:
-        logger.error(f'Initializing MongoDB connection exception, {e}')
+        logger.error(f'初始化 MongoDB 连接异常, {e}')
 
 
 def create_db_client(apis_urls):
@@ -102,6 +100,11 @@ def utc_offset():
 
 async def paginate_find(collection: Collection, paginate_parameters: dict, query_content: dict, item_model: BaseModel):
     ''' 分页查询 DB 集合中的数据 '''
+    if paginate_parameters['time_te']:
+        time_te = paginate_parameters['time_te']
+        for te_k, te_v in time_te.items():
+            time_te[te_k] = te_v - utc_offset()
+        query_content[paginate_parameters['time_field']] = time_te
     find_count = collection.count_documents(query_content)
     if not find_count:
         return Paginate(items=[], total=0)
