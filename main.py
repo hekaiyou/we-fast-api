@@ -2,6 +2,7 @@ import apis.apis_urls as apis_urls
 import view.view_urls as view_urls
 import core.api_token as token_urls
 from fastapi import FastAPI
+from core.dynamic import get_startup_task
 from core.dependencies import get_settings
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
@@ -33,6 +34,8 @@ async def redirect_view():
 @app.on_event('startup')
 async def startup_event():
     create_db_client(apis_urls)
+    for task in get_startup_task():
+        task()
 
 
 @app.on_event('shutdown')
