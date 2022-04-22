@@ -1,10 +1,10 @@
-from datetime import datetime
 from pydantic import BaseModel
 from core.logger import logger
 from functools import lru_cache
 from pymongo import MongoClient
 from functools import lru_cache
 from core.model import Paginate
+from datetime import datetime, timedelta
 from fastapi import HTTPException, status
 from pymongo.collection import Collection
 from core.dependencies import get_settings
@@ -130,8 +130,42 @@ async def paginate_find(collection: Collection, paginate_parameters: dict, query
         result['create_time'] += utc_offset()
         result['update_time'] += utc_offset()
         # 使用指定的模型读取查询结果
-        items.append(item_model(**result))
+        if item_model:
+            items.append(item_model(**result))
+        else:
+            items.append(result)
     return Paginate(items=items, total=find_count)
+
+
+async def paginate_get_cache(paginate_parameters: dict, cache_name: str, cache_key: str, cache_interval_minutes: int = 7):
+    cache_key = f'{paginate_parameters["sort_list"]}{paginate_parameters["time_field"]}{paginate_parameters["time_te"]}{cache_key}'
+    cache_find = get_collection('paginate_cache').find_one({
+        'name': cache_name, 'key': cache_key,
+    })
+    if cache_find:
+        cache_find['update_time'] += utc_offset()
+        if datetime.now() - cache_find['update_time'] > timedelta(minutes=cache_interval_minutes):
+            # 超过指定间隔分钟数则删除缓存
+            get_collection('paginate_cache').delete_many({
+                'name': cache_name, 'key': cache_key,
+            })
+        else:
+            return Paginate(
+                items=cache_find['value'][paginate_parameters['skip']:paginate_parameters['limit']],
+                total=len(cache_find['value']),
+            )
+
+
+async def paginate_set_cache(paginate_parameters: dict, cache_name: str, cache_key: str, cache_value: list):
+    cache_key = f'{paginate_parameters["sort_list"]}{paginate_parameters["time_field"]}{paginate_parameters["time_te"]}{cache_key}'
+    doc_create(
+        collection=get_collection('paginate_cache'),
+        document={'name': cache_name, 'key': cache_key, 'value': cache_value},
+    )
+    return Paginate(
+        items=cache_value[paginate_parameters['skip']:paginate_parameters['limit']],
+        total=len(cache_value),
+    )
 
 
 def doc_create(collection: Collection, document: dict, **kw):
