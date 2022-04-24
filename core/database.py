@@ -9,7 +9,7 @@ from fastapi import HTTPException, status
 from pymongo.collection import Collection
 from core.dependencies import get_settings
 from core.security import get_password_hash
-from core.dynamic import set_role_permissions
+from core.dynamic import set_role_permissions, set_startup_task
 
 # MongoDB 数据库客户端
 DBClient = None
@@ -138,6 +138,7 @@ async def paginate_find(collection: Collection, paginate_parameters: dict, query
 
 
 async def paginate_get_cache(paginate_parameters: dict, cache_name: str, cache_key: str, cache_interval_minutes: int = 7):
+    ''' 分页查询缓存中的数据 '''
     cache_key = f'{paginate_parameters["sort_list"]}{paginate_parameters["time_field"]}{paginate_parameters["time_te"]}{cache_key}'
     cache_find = get_collection('paginate_cache').find_one({
         'name': cache_name, 'key': cache_key,
@@ -151,21 +152,27 @@ async def paginate_get_cache(paginate_parameters: dict, cache_name: str, cache_k
             })
         else:
             return Paginate(
-                items=cache_find['value'][paginate_parameters['skip']:paginate_parameters['limit']],
+                items=cache_find['value'][paginate_parameters['skip']
+                    :paginate_parameters['limit']],
                 total=len(cache_find['value']),
             )
 
 
 async def paginate_set_cache(paginate_parameters: dict, cache_name: str, cache_key: str, cache_value: list):
+    ''' 分页设置缓存中的数据 '''
     cache_key = f'{paginate_parameters["sort_list"]}{paginate_parameters["time_field"]}{paginate_parameters["time_te"]}{cache_key}'
     doc_create(
         collection=get_collection('paginate_cache'),
         document={'name': cache_name, 'key': cache_key, 'value': cache_value},
     )
     return Paginate(
-        items=cache_value[paginate_parameters['skip']:paginate_parameters['limit']],
+        items=cache_value[paginate_parameters['skip']
+            :paginate_parameters['limit']],
         total=len(cache_value),
     )
+
+# 服务启动时清理分页缓存数据
+set_startup_task(lambda: get_collection('paginate_cache').delete_many({}))
 
 
 def doc_create(collection: Collection, document: dict, **kw):
