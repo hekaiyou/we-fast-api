@@ -98,7 +98,7 @@ def utc_offset():
     return local_time - utc_time
 
 
-async def paginate_find(collection: Collection, paginate_parameters: dict, query_content: dict, item_model: BaseModel):
+async def paginate_find(collection: Collection, paginate_parameters: dict, query_content: dict, item_model: BaseModel, no_pagin: bool = False):
     ''' 分页查询 DB 集合中的数据 '''
     if paginate_parameters['time_te']:
         time_te = paginate_parameters['time_te']
@@ -108,22 +108,30 @@ async def paginate_find(collection: Collection, paginate_parameters: dict, query
     find_count = collection.count_documents(query_content)
     if not find_count:
         return Paginate(items=[], total=0)
-    if paginate_parameters['sort_list']:
-        # 包括排序参数的查询
-        find_results = collection.find(query_content).sort(
-            key_or_list=paginate_parameters['sort_list'],
-        ).skip(
-            skip=paginate_parameters['skip'],
-        ).limit(
-            limit=paginate_parameters['limit'],
-        )
+    if no_pagin:
+        if paginate_parameters['sort_list']:
+            find_results = collection.find(query_content).sort(
+                key_or_list=paginate_parameters['sort_list'],
+            )
+        else:
+            find_results = collection.find(query_content)
     else:
-        # 没有排序参数的查询
-        find_results = collection.find(query_content).skip(
-            skip=paginate_parameters['skip'],
-        ).limit(
-            limit=paginate_parameters['limit'],
-        )
+        if paginate_parameters['sort_list']:
+            # 包括排序参数的查询
+            find_results = collection.find(query_content).sort(
+                key_or_list=paginate_parameters['sort_list'],
+            ).skip(
+                skip=paginate_parameters['skip'],
+            ).limit(
+                limit=paginate_parameters['limit'],
+            )
+        else:
+            # 没有排序参数的查询
+            find_results = collection.find(query_content).skip(
+                skip=paginate_parameters['skip'],
+            ).limit(
+                limit=paginate_parameters['limit'],
+            )
     items = []
     for result in find_results:
         # 将 UTC 时间转为本地时间

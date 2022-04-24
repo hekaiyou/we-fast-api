@@ -106,6 +106,7 @@ async def update_role(role_id: ObjIdParams, role: RoleUpdate):
     role_col = get_collection(COL_ROLE)
     if str(role_id) == '100000000000000000000001':
         revise_settings('user_default_permission', role.permissions)
+        set_role_permissions(role_col)
         return role
     stored_role_data = role_col.find_one({'_id': role_id})
     if not stored_role_data:
