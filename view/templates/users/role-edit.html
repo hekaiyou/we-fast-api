@@ -28,6 +28,9 @@
             check = {},
             success = function (data, textStatus) {
                 $('#title').val(data.title);
+                if (data.title == 'Default') {
+                    $('#title').attr('disabled', true);
+                }
                 data.permissions.forEach(function (value, index) {
                     tagSelectDict[value] = true;
                 });

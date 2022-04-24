@@ -1,4 +1,5 @@
 import apis.apis_urls as apis_urls
+from json import dumps
 from config import Settings
 from typing import Optional
 from datetime import datetime
@@ -17,6 +18,19 @@ def get_settings():
     依赖项示例: settings = get_settings()
     '''
     return Settings()
+
+
+def revise_settings(key, value):
+    with open('.env', 'r', encoding='utf-8') as file_obj:
+        contents = file_obj.read()
+    for content in contents.split('\n'):
+        content_kv = content.split('=')
+        if key.upper() == content_kv[0]:
+            if isinstance(value, list):
+                value = dumps(value)
+            contents = contents.replace(content, f'{content_kv[0]}={value}')
+    with open('.env', 'w', encoding='utf-8') as file_obj:
+        file_obj.write(contents)
 
 
 @lru_cache()

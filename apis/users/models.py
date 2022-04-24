@@ -82,5 +82,5 @@ class RoleRead(RoleBase):
     ''' 角色数据的读取模型 '''
     id: ObjId = Field(..., alias='_id')
     permissions: list
-    create_time: datetime
-    update_time: datetime
+    create_time: Optional[datetime] = None
+    update_time: Optional[datetime] = None

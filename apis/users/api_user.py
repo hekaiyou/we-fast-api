@@ -25,23 +25,23 @@ async def create_user(user: UserCreate):
     if user_col.count_documents({'username': user.username}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Username already exists',
+            detail='用户名已存在',
         )
     if 'deleted' in user.username:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Username wants to do something',
+            detail='用户名想搞事情',
         )
     if user_col.count_documents({'email': user.email}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='Email address already exists',
+            detail='电子邮箱地址已存在',
         )
     if user.role_id:
         if not get_collection(COL_ROLE).count_documents({'_id': str_to_oid(user.role_id)}):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail='Role id does not exist',
+                detail='角色 ID 不存在',
             )
     user_json = jsonable_encoder(user)
     user_json['password'] = get_password_hash(user.password)

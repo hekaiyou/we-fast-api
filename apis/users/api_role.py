@@ -1,7 +1,7 @@
 from core.model import NoPaginate
-from core.validate import ObjIdParams
+from core.validate import ObjIdParams, str_to_oid
 from core.database import get_collection, doc_create, doc_update
-from core.dependencies import get_api_routes
+from core.dependencies import get_api_routes, get_settings, revise_settings
 from fastapi.encoders import jsonable_encoder
 from core.dynamic import set_role_permissions
 from fastapi import APIRouter, HTTPException, status, Depends
@@ -31,6 +31,12 @@ async def read_role_all():
 )
 async def read_role(role_id: ObjIdParams):
     role_col = get_collection(COL_ROLE)
+    if str(role_id) == '100000000000000000000001':
+        return {
+            '_id': '100000000000000000000001',
+            'title': 'Default',
+            'permissions': get_settings().user_default_permission,
+        }
     if not role_col.count_documents({'_id': role_id}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -58,6 +64,11 @@ async def create_role(role: RoleCreate, routes: dict = Depends(get_api_routes)):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='角色名称已经存在',
+        )
+    if 'Default' == role.title:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='角色名称想搞事情',
         )
     role_json = jsonable_encoder(role)
     doc_create(role_col, role_json)
@@ -93,6 +104,9 @@ async def delete_role(role_id: ObjIdParams):
 )
 async def update_role(role_id: ObjIdParams, role: RoleUpdate):
     role_col = get_collection(COL_ROLE)
+    if str(role_id) == '100000000000000000000001':
+        revise_settings('user_default_permission', role.permissions)
+        return role
     stored_role_data = role_col.find_one({'_id': role_id})
     if not stored_role_data:
         raise HTTPException(

@@ -6,7 +6,11 @@
 {% endblock %}
 
 {% block main %}
-<div id="details-content"></div>
+<div id="details-content">
+    <details onclick="event.preventDefault()" id="100000000000000000000001">
+        <summary>Default</summary>
+    </details>
+</div>
 {% endblock %}
 
 {% block javascript %}
