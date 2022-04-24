@@ -236,4 +236,7 @@ async def login_for_access_token_wechat(code: str, settings: Settings = Depends(
         data={'sub': f'{user["_id"]}:{user["role_id"]}'},
         expires_delta=access_token_expires,
     )
-    return Token(access_token=access_token, token_type='Bearer', role_title=role['title'], role_permissions=role['permissions'])
+    return Token(
+        access_token=access_token, token_type='Bearer', role_title=role['title'], role_permissions=role['permissions'],
+        incomplete=(user['username'] == user['bind']['wechat']),
+    )

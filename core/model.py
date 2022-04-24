@@ -8,6 +8,7 @@ class Token(BaseModel):
     token_type: str
     role_title: str
     role_permissions: list
+    incomplete: Optional[bool] = False
 
 
 class TokenData(BaseModel):
