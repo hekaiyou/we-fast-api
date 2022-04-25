@@ -33,7 +33,7 @@ function generalErrorHandling(request) {
     });
 }
 
-function utilAjax(type, url, data, check, success, success_reminder) {
+function utilAjax(type, url, data, check, success, success_reminder, not_close) {
     var checkResult = true;
     $.each(check, function (key, value) {
         if (!value[0].test(data[key])) {
@@ -74,7 +74,9 @@ function utilAjax(type, url, data, check, success, success_reminder) {
             if (success_reminder) {
                 swal('请求成功', { icon: 'success', buttons: false, timer: 1500, });
             } else {
-                swal.close();
+                if (!not_close) {
+                    swal.close();
+                }
             }
         },
         error: function (request, textStatus, errorThrown) {

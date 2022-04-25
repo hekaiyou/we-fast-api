@@ -122,6 +122,8 @@
                     Cookies.set('permissions', data.role_permissions, { expires: cookiesExpiresDay, path: '/' });
                     window.location.href = '/view/users/dashboard/';
                 },
+                success_reminder = false,
+                not_close = false,
             );
         });
     });

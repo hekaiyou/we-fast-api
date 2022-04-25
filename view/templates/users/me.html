@@ -44,6 +44,8 @@
                 $('#full_name').val(data.full_name)
                 $('#email').val(data.email)
             },
+            success_reminder = false,
+            not_close = false,
         );
         $('#submit').click(function () {
             utilAjax(
