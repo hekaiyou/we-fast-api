@@ -1,9 +1,29 @@
+import os
+import importlib
 from config import Settings
-import core.dependencies as dependencies
 
+DYNAMIC_APIS_CONFIGS = {}
 DYNAMIC_ROLE_PERMISSIONS = {}
 DYNAMIC_USERNAME_BINDING = {}
 DYNAMIC_STARTUP_TASK = []
+
+
+def get_apis_configs(module):
+    ''' 获取动态全局变量: 接口配置 '''
+    global DYNAMIC_APIS_CONFIGS
+    if module in DYNAMIC_APIS_CONFIGS:
+        return DYNAMIC_APIS_CONFIGS[module]
+    else:
+        if os.path.exists(f'apis/{module}/config.py'):
+            meta_class = importlib.import_module(f'apis.{module}.config')
+            if os.path.exists(f'apis/{module}/.env'):
+                DYNAMIC_APIS_CONFIGS[module] = meta_class.Settings(
+                    _env_file=f'apis/{module}/.env',
+                    _env_file_encoding='utf-8',
+                )
+            else:
+                DYNAMIC_APIS_CONFIGS[module] = meta_class.Settings()
+            return DYNAMIC_APIS_CONFIGS[module]
 
 
 def set_role_permissions(role_col):

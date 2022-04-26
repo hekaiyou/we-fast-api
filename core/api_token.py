@@ -9,7 +9,7 @@ from core.model import Token, TokenData
 from fastapi.responses import FileResponse
 from core.dynamic import get_username_binding
 from fastapi.encoders import jsonable_encoder
-from core.dependencies import get_settings, Settings
+from core.dependencies import get_base_settings, Settings
 from fastapi.security import OAuth2PasswordRequestForm
 from core.database import get_collection, doc_create, doc_update
 from apis.users.models import UserGlobal, COL_USER, UserUpdateMe, COL_ROLE
@@ -27,7 +27,7 @@ router = APIRouter(
     response_model=Token,
     summary='登录以获取访问令牌',
 )
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), settings: Settings = Depends(get_settings)):
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), settings: Settings = Depends(get_base_settings)):
     '''
     按照 **OAuth 2.0** 协议规定: 客户端/用户必须将 `username` 和 `password` 字段作为表单数据发送
     '''
@@ -191,13 +191,13 @@ async def read_token_avata_file(current_token: TokenData = Depends(get_token_dat
     response_model=Token,
     summary='微信登录以获取访问令牌',
 )
-async def login_for_access_token_wechat(code: str, settings: Settings = Depends(get_settings)):
+async def login_for_access_token_wechat(code: str, settings: Settings = Depends(get_base_settings)):
     wechat_response = requests.get(
         f'https://api.weixin.qq.com/sns/jscode2session?appid={settings.wechat_app_id}&secret={settings.wechat_app_secret}&js_code={code}&grant_type=authorization_code')
     if wechat_response.status_code != 200:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='WeChat authorization request failed',
+            detail='微信授权请求失败',
             headers={'WWW-Authenticate': 'Bearer'},
         )
     # wechat_json['session_key'] 微信服务器给开发者服务器颁发的身份凭证
@@ -205,7 +205,7 @@ async def login_for_access_token_wechat(code: str, settings: Settings = Depends(
     if 'errmsg' in wechat_json:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f'WeChat authorized login failed ({wechat_json["errmsg"]})',
+            detail=f'微信授权登录失败 ({wechat_json["errmsg"]})',
             headers={'WWW-Authenticate': 'Bearer'},
         )
     user_col = get_collection(COL_USER)

@@ -3,13 +3,13 @@ import view.view_urls as view_urls
 import core.api_token as token_urls
 from fastapi import FastAPI
 from core.dynamic import get_startup_task
-from core.dependencies import get_settings
+from core.dependencies import get_base_settings
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import create_db_client, close_db_client
 
-settings = get_settings()
+settings = get_base_settings()
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,

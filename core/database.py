@@ -7,7 +7,7 @@ from core.model import Paginate
 from datetime import datetime, timedelta
 from fastapi import HTTPException, status
 from pymongo.collection import Collection
-from core.dependencies import get_settings
+from core.dependencies import get_base_settings
 from core.security import get_password_hash
 from core.dynamic import set_role_permissions, set_startup_task
 
@@ -18,7 +18,7 @@ DBClient = None
 @lru_cache()
 def get_collection(collection_name: str):
     ''' 获取 DB 集合 (同一参数仅创建一次) '''
-    settings = get_settings()
+    settings = get_base_settings()
     db = DBClient[settings.mongo_db_name]
     # 获取 pymongo.collection.Collection 实例
     collection = db[collection_name]
@@ -64,7 +64,7 @@ def whether_to_initialize(apis_urls):
 
 def create_db_client(apis_urls):
     ''' 创建 MongoDB 数据库客户端 '''
-    settings = get_settings()
+    settings = get_base_settings()
     if settings.mongo_db_username and settings.mongo_db_password:
         # 环境变量中没有认证信息, 走认证连接
         db_client = MongoClient(

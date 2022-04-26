@@ -1,7 +1,7 @@
 from core.model import NoPaginate
 from core.validate import ObjIdParams, str_to_oid
 from core.database import get_collection, doc_create, doc_update
-from core.dependencies import get_api_routes, get_settings, revise_settings
+from core.dependencies import get_api_routes, get_base_settings, revise_settings
 from fastapi.encoders import jsonable_encoder
 from core.dynamic import set_role_permissions
 from fastapi import APIRouter, HTTPException, status, Depends
@@ -35,7 +35,7 @@ async def read_role(role_id: ObjIdParams):
         return {
             '_id': '100000000000000000000001',
             'title': 'Default',
-            'permissions': get_settings().user_default_permission,
+            'permissions': get_base_settings().user_default_permission,
         }
     if not role_col.count_documents({'_id': role_id}):
         raise HTTPException(

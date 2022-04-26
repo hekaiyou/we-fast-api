@@ -11,11 +11,11 @@ from fastapi import Depends, HTTPException, Query, status, Request, Cookie
 
 
 @lru_cache()
-def get_settings():
+def get_base_settings():
     '''
-    全局依赖项: 获取环境变量 (仅创建一次)
-    依赖项示例: settings: Settings = Depends(get_settings)
-    依赖项示例: settings = get_settings()
+    全局依赖项: 获取基础环境变量 (仅创建一次)
+    依赖项示例: settings: Settings = Depends(get_base_settings)
+    依赖项示例: settings = get_base_settings()
     '''
     return Settings()
 
@@ -112,5 +112,5 @@ async def verify_api_permission(request: Request, current_token: TokenData = Dep
             )
 
 
-async def get_view_request(request: Request, settings: Settings = Depends(get_settings)):
+async def get_view_request(request: Request, settings: Settings = Depends(get_base_settings)):
     return {'request': request, 'settings': settings}
