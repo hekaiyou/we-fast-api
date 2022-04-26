@@ -1,9 +1,9 @@
 from core.model import NoPaginate
 from core.validate import ObjIdParams, str_to_oid
 from core.database import get_collection, doc_create, doc_update
-from core.dependencies import get_api_routes, get_base_settings, revise_settings
+from core.dependencies import get_api_routes, get_base_settings
 from fastapi.encoders import jsonable_encoder
-from core.dynamic import set_role_permissions
+from core.dynamic import set_role_permissions, revise_settings
 from fastapi import APIRouter, HTTPException, status, Depends
 from .models import COL_ROLE, RoleRead, RoleUpdate, RoleCreate, COL_USER
 

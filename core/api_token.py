@@ -7,10 +7,9 @@ from core.validate import str_to_oid
 from core.storage import save_raw_file, FILES_PATH
 from core.model import Token, TokenData
 from fastapi.responses import FileResponse
-from core.dynamic import get_username_binding
 from fastapi.encoders import jsonable_encoder
-from core.dependencies import get_base_settings, Settings
 from fastapi.security import OAuth2PasswordRequestForm
+from core.dynamic import get_username_binding, get_apis_configs, get_role_permissions
 from core.database import get_collection, doc_create, doc_update
 from apis.users.models import UserGlobal, COL_USER, UserUpdateMe, COL_ROLE
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
@@ -27,7 +26,7 @@ router = APIRouter(
     response_model=Token,
     summary='登录以获取访问令牌',
 )
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), settings: Settings = Depends(get_base_settings)):
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     '''
     按照 **OAuth 2.0** 协议规定: 客户端/用户必须将 `username` 和 `password` 字段作为表单数据发送
     '''
@@ -48,7 +47,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail='账户已被禁用',
             headers={'WWW-Authenticate': 'Bearer'},
         )
-    role = {'title': 'Default', 'permissions': settings.user_default_permission}
+    role = {'title': 'Default', 'permissions': get_role_permissions(None)}
     if user.role_id:
         role = get_collection(COL_ROLE).find_one({
             '_id': str_to_oid(user.role_id),
@@ -191,9 +190,15 @@ async def read_token_avata_file(current_token: TokenData = Depends(get_token_dat
     response_model=Token,
     summary='微信登录以获取访问令牌',
 )
-async def login_for_access_token_wechat(code: str, settings: Settings = Depends(get_base_settings)):
+async def login_for_access_token_wechat(code: str):
+    configs = get_apis_configs('users')
+    if not configs.wechat_app_id or not configs.wechat_app_secret:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='未配置微信小程序相关变量',
+        )
     wechat_response = requests.get(
-        f'https://api.weixin.qq.com/sns/jscode2session?appid={settings.wechat_app_id}&secret={settings.wechat_app_secret}&js_code={code}&grant_type=authorization_code')
+        f'https://api.weixin.qq.com/sns/jscode2session?appid={configs.wechat_app_id}&secret={configs.wechat_app_secret}&js_code={code}&grant_type=authorization_code')
     if wechat_response.status_code != 200:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -225,7 +230,7 @@ async def login_for_access_token_wechat(code: str, settings: Settings = Depends(
             'bind': {'wechat': wechat_json['openid']},
         })
         user = user_col.find_one(user_filter)
-    role = {'title': 'Default', 'permissions': settings.user_default_permission}
+    role = {'title': 'Default', 'permissions': get_role_permissions(None)}
     if user['role_id']:
         role = get_collection(COL_ROLE).find_one({
             '_id': str_to_oid(user['role_id']),
