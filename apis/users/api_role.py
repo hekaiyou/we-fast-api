@@ -1,5 +1,5 @@
 from core.model import NoPaginate
-from core.validate import ObjIdParams, str_to_oid
+from core.validate import ObjIdParams
 from core.database import get_collection, doc_create, doc_update
 from core.dependencies import get_api_routes, get_base_settings
 from fastapi.encoders import jsonable_encoder
