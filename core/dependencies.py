@@ -91,11 +91,12 @@ async def verify_api_permission(request: Request, current_token: TokenData = Dep
         for param_k, param_v in request.path_params.items():
             path_key = path_key.replace(param_v, '{%s}' % (param_k))
     if current_token.role_id:
-        if not routes[path_key]['name'] in get_role_permissions(current_token.role_id):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f'No {routes[path_key]["summary"]} permission',
-            )
+        if '/open/' not in path_key:
+            if not routes[path_key]['name'] in get_role_permissions(current_token.role_id):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f'No {routes[path_key]["summary"]} permission',
+                )
 
 
 async def get_view_request(request: Request, settings: Settings = Depends(get_base_settings)):
