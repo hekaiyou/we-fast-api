@@ -27,7 +27,7 @@
     $(document).ready(function () {
         utilAjax(
             type = 'GET',
-            url = '/api/users/role/{{ role_id }}/',
+            url = '/api/bases/role/{{ role_id }}/',
             data = {},
             check = {},
             success = function (data, textStatus) {
@@ -41,7 +41,7 @@
                 });
                 utilAjax(
                     type = 'GET',
-                    url = '/api/users/permission/',
+                    url = '/api/bases/permission/',
                     data = {},
                     check = {},
                     success = function (data, textStatus) {
@@ -104,7 +104,7 @@
             }
             utilAjax(
                 type = 'PUT',
-                url = '/api/users/role/{{ role_id }}/',
+                url = '/api/bases/role/{{ role_id }}/',
                 data = {
                     'title': $('#title').val(),
                     'permissions': permissions,

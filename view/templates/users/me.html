@@ -36,7 +36,7 @@
     $(document).ready(function () {
         utilAjax(
             type = 'GET',
-            url = '/token/me/',
+            url = '/api/bases/me/free/',
             data = {},
             check = {},
             success = function (data, textStatus) {
@@ -50,7 +50,7 @@
         $('#submit').click(function () {
             utilAjax(
                 type = 'PUT',
-                url = '/token/me/',
+                url = '/api/bases/me/free/',
                 data = {
                     'username': $('#username').val(),
                     'full_name': $('#full_name').val(),

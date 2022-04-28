@@ -1,11 +1,9 @@
 from pydantic import BaseModel
 from core.logger import logger
-from functools import lru_cache
 from pymongo import MongoClient
 from functools import lru_cache
 from core.model import Paginate
 from datetime import datetime, timedelta
-from fastapi import HTTPException, status
 from pymongo.collection import Collection
 from core.dependencies import get_base_settings
 from core.security import get_password_hash

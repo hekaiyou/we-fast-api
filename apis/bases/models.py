@@ -16,6 +16,12 @@ class Token(BaseModel):
     incomplete: Optional[bool] = False
 
 
+class TokenData(BaseModel):
+    ''' 访问令牌的数据解析模型 '''
+    user_id: Optional[str] = None
+    role_id: Optional[str] = None
+
+
 class UserBase(BaseModel):
     ''' 用户数据的基础模型 '''
     full_name: Optional[str] = None

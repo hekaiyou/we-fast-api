@@ -1,4 +1,5 @@
 from . import api_token
+from . import api_me
 from . import api_wechat
 from . import api_user
 from . import api_permission
@@ -12,6 +13,7 @@ router = APIRouter(
 )
 
 router.include_router(api_token.router)
+router.include_router(api_me.router)
 router.include_router(api_wechat.router)
 router.include_router(api_user.router)
 router.include_router(api_permission.router)
