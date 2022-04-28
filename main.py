@@ -1,6 +1,5 @@
 import apis.apis_urls as apis_urls
 import view.view_urls as view_urls
-import core.api_token as token_urls
 from fastapi import FastAPI
 from core.dynamic import get_startup_task
 from core.dependencies import get_base_settings
@@ -14,7 +13,6 @@ app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
 )
-app.include_router(token_urls.router)
 app.include_router(apis_urls.router)
 app.include_router(view_urls.router)
 app.mount('/static', StaticFiles(directory='view/static'), name='static')
