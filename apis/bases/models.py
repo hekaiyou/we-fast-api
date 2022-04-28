@@ -7,6 +7,15 @@ COL_USER = 'user'
 COL_ROLE = 'role'
 
 
+class Token(BaseModel):
+    ''' 访问令牌的模型 '''
+    access_token: str
+    token_type: str
+    role_title: str
+    role_permissions: list
+    incomplete: Optional[bool] = False
+
+
 class UserBase(BaseModel):
     ''' 用户数据的基础模型 '''
     full_name: Optional[str] = None

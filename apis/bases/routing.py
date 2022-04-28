@@ -1,3 +1,4 @@
+from . import api_wechat
 from . import api_user
 from . import api_permission
 from . import api_role
@@ -9,6 +10,7 @@ router = APIRouter(
     tags=['bases'],
 )
 
+router.include_router(api_wechat.router)
 router.include_router(api_user.router)
 router.include_router(api_permission.router)
 router.include_router(api_role.router)
