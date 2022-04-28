@@ -11,7 +11,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordRequestForm
 from core.dynamic import get_username_binding, get_apis_configs, get_role_permissions
 from core.database import get_collection, doc_create, doc_update
-from apis.users.models import UserGlobal, COL_USER, UserUpdateMe, COL_ROLE
+from apis.bases.models import UserGlobal, COL_USER, UserUpdateMe, COL_ROLE
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from core.security import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_token_data, get_password_hash
 

@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from core.model import TokenData
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
-from apis.users.models import UserGlobal
+from apis.bases.models import UserGlobal
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import HTTPException, Depends, status, Request
 

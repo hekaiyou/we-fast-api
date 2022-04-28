@@ -5,8 +5,8 @@ from . import api_setup
 from fastapi import APIRouter
 
 router = APIRouter(
-    prefix='/users',
-    tags=['users'],
+    prefix='/bases',
+    tags=['bases'],
 )
 
 router.include_router(api_user.router)
