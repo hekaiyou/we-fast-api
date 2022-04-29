@@ -1,20 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List, Dict
-
-
-class Token(BaseModel):
-    ''' 访问令牌的模型 '''
-    access_token: str
-    token_type: str
-    role_title: str
-    role_permissions: list
-    incomplete: Optional[bool] = False
-
-
-class TokenData(BaseModel):
-    ''' 访问令牌的数据解析模型 '''
-    user_id: Optional[str] = None
-    role_id: Optional[str] = None
+from typing import List, Dict
 
 
 class Paginate(BaseModel):

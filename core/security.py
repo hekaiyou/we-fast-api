@@ -1,10 +1,9 @@
 from typing import Optional
 from config import Settings
 from jose import JWTError, jwt
-from core.model import TokenData
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
-from apis.bases.models import UserGlobal
+from apis.bases.models import UserGlobal, TokenData
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import HTTPException, Depends, status, Request
 

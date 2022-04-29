@@ -13,6 +13,7 @@ class Token(BaseModel):
     token_type: str
     role_title: str
     role_permissions: list
+    expires_minutes: int
     incomplete: Optional[bool] = False
 
 

@@ -11,7 +11,7 @@ router = APIRouter(
 @router.get(
     '/',
     response_model=NoPaginate,
-    summary='读取权限',
+    summary='读取权限 (全量)',
 )
 async def read_permission(routes: dict = Depends(get_api_routes)):
     all_item = []

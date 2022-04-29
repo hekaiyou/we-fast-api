@@ -6,7 +6,7 @@ from functools import lru_cache
 from pymongo import ASCENDING, DESCENDING
 from core.dynamic import get_role_permissions
 from core.security import get_token_data, TokenData
-from fastapi import Depends, HTTPException, Query, status, Request, Cookie
+from fastapi import Depends, HTTPException, Query, status, Request
 
 
 @lru_cache()
