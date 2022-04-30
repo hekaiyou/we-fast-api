@@ -95,7 +95,7 @@ async def verify_api_permission(request: Request, current_token: TokenData = Dep
             if not routes[path_key]['name'] in get_role_permissions(current_token.role_id):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f'No {routes[path_key]["summary"]} permission',
+                    detail=f'无 {routes[path_key]["summary"]} 权限',
                 )
 
 

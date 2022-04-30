@@ -80,23 +80,18 @@ class PermissionRead(BaseModel):
 
 class RoleBase(BaseModel):
     ''' 角色数据的基础模型 '''
-    title: str
-
-
-class RoleCreate(RoleBase):
-    ''' 角色数据的创建模型 '''
-    permissions: list
+    title: str = Field(title='角色名称', regex='^\S{2,}$',)
+    permissions: list = Field(title='权限列表',)
 
 
 class RoleUpdate(RoleBase):
     ''' 角色数据的更新模型 '''
-    title: Optional[str] = None
-    permissions: Optional[list] = None
+    title: Optional[str] = Field(title='角色名称', regex='^\S{2,}$',)
+    permissions: Optional[list] = Field(title='权限列表',)
 
 
 class RoleRead(RoleBase):
-    ''' 角色数据的读取模型 '''
-    id: ObjId = Field(..., alias='_id')
-    permissions: list
-    create_time: Optional[datetime] = None
-    update_time: Optional[datetime] = None
+    ''' 角色的读取模型 '''
+    id: ObjId = Field(alias='_id', title='角色ID',)
+    create_time: Optional[datetime] = datetime.utcnow()
+    update_time: Optional[datetime] = datetime.utcnow()

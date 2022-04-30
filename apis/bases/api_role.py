@@ -1,11 +1,12 @@
 from core.model import NoPaginate
 from core.validate import ObjIdParams
+from .validate import RoleObjIdParams, check_role_title, check_role_permissions
 from core.database import get_collection, doc_create, doc_update
-from core.dependencies import get_api_routes, get_base_settings
+from core.dependencies import get_base_settings, get_api_routes
 from fastapi.encoders import jsonable_encoder
 from core.dynamic import set_role_permissions, revise_settings
 from fastapi import APIRouter, HTTPException, status, Depends
-from .models import COL_ROLE, RoleRead, RoleUpdate, RoleCreate, COL_USER
+from .models import COL_ROLE, RoleRead, RoleUpdate, COL_USER, RoleBase
 
 router = APIRouter(
     prefix='/role',
@@ -29,19 +30,13 @@ async def read_role_all():
     response_model=RoleRead,
     summary='读取角色',
 )
-async def read_role(role_id: ObjIdParams):
-    role_col = get_collection(COL_ROLE)
+async def read_role(role_id: RoleObjIdParams):
     if str(role_id) == '100000000000000000000001':
         return {
             '_id': '100000000000000000000001',
             'title': 'Default',
             'permissions': get_base_settings().user_default_permission,
         }
-    if not role_col.count_documents({'_id': role_id}):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='找不到角色',
-        )
     return RoleRead(**(get_collection(COL_ROLE).find_one({'_id': role_id})))
 
 
@@ -50,27 +45,14 @@ async def read_role(role_id: ObjIdParams):
     response_model=RoleRead,
     summary='创建角色',
 )
-async def create_role(role: RoleCreate, routes: dict = Depends(get_api_routes)):
+async def create_role(role_create: RoleBase, routes: dict = Depends(get_api_routes)):
     role_col = get_collection(COL_ROLE)
     valid_permissions = []
     for path, route in routes.items():
         valid_permissions.append(route['name'])
-    if not set(role.permissions).issubset(set(valid_permissions)):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='权限列表中存在无效内容',
-        )
-    if role_col.count_documents({'title': role.title}):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='角色名称已经存在',
-        )
-    if 'Default' == role.title:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='角色名称想搞事情',
-        )
-    role_json = jsonable_encoder(role)
+    check_role_permissions(role_create.permissions)
+    check_role_title(role_create.title)
+    role_json = jsonable_encoder(role_create)
     doc_create(role_col, role_json)
     set_role_permissions(role_col)  # 刷新全局角色权限变量
     return RoleRead(**role_json)
@@ -80,13 +62,8 @@ async def create_role(role: RoleCreate, routes: dict = Depends(get_api_routes)):
     '/{role_id}/',
     summary='删除角色',
 )
-async def delete_role(role_id: ObjIdParams):
+async def delete_role(role_id: RoleObjIdParams):
     role_col = get_collection(COL_ROLE)
-    if not role_col.count_documents({'_id': role_id}):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='找不到角色',
-        )
     if get_collection(COL_USER).count_documents({'role_id': str(role_id)}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -102,27 +79,18 @@ async def delete_role(role_id: ObjIdParams):
     response_model=RoleUpdate,
     summary='更新角色',
 )
-async def update_role(role_id: ObjIdParams, role: RoleUpdate):
+async def update_role(role_id: ObjIdParams, role_update: RoleUpdate):
     role_col = get_collection(COL_ROLE)
     if str(role_id) == '100000000000000000000001':
-        revise_settings('user_default_permission', role.permissions)
+        revise_settings('user_default_permission', role_update.permissions)
         set_role_permissions(role_col)
-        return role
+        return role_update
     stored_role_data = role_col.find_one({'_id': role_id})
-    if not stored_role_data:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='找不到角色',
-        )
     stored_role_model = RoleUpdate(**stored_role_data)
-    update_role = role.dict(exclude_unset=True)
+    update_role = role_update.dict(exclude_unset=True)
     updated_role = stored_role_model.copy(update=update_role)
     if stored_role_model.title != updated_role.title:
-        if role_col.count_documents({'title': updated_role.title}):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='角色名称已经存在',
-            )
+        check_role_title(updated_role.title)
     doc_update(role_col, stored_role_data, jsonable_encoder(updated_role))
     set_role_permissions(role_col)  # 刷新全局角色权限变量
     return updated_role
