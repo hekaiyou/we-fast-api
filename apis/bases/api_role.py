@@ -1,12 +1,12 @@
 from core.model import NoPaginate
 from core.validate import ObjIdParams
-from .validate import RoleObjIdParams, check_role_title, check_role_permissions
-from core.database import get_collection, doc_create, doc_update
-from core.dependencies import get_base_settings, get_api_routes
 from fastapi.encoders import jsonable_encoder
-from core.dynamic import set_role_permissions, revise_settings
 from fastapi import APIRouter, HTTPException, status, Depends
+from core.dependencies import get_base_settings, get_api_routes
+from core.dynamic import set_role_permissions, revise_settings
+from core.database import get_collection, doc_create, doc_update
 from .models import COL_ROLE, RoleRead, RoleUpdate, COL_USER, RoleBase
+from .validate import RoleObjIdParams, check_role_title, check_role_permissions
 
 router = APIRouter(
     prefix='/role',

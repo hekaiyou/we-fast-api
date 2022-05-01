@@ -1,6 +1,7 @@
 import os
 from core.validate import str_to_oid
 from core.security import get_token_data
+from .utils import update_bind_username
 from core.dynamic import get_username_binding
 from fastapi.encoders import jsonable_encoder
 from core.database import get_collection, doc_update
@@ -68,33 +69,9 @@ async def update_me_info(user: UserUpdateMe, current_token: TokenData = Depends(
             )
     doc_update(user_col, stored_user_data, jsonable_encoder(updated_user))
     if stored_user_data['username'] != updated_user.username:
-        for binding_k, binding_v in get_username_binding().items():
-            for field in binding_v:
-                if ':array' in field:
-                    field = field.split(':')[0]
-                    change_item = get_collection(binding_k).find({
-                        field: {'$elemMatch': {
-                            '$in': [stored_user_data['username']]
-                        }}
-                    }, {field: 1, '_id': 1})
-                    for change in change_item:
-                        revise = change[field]
-                        for i, v in enumerate(revise):
-                            if v == stored_user_data['username']:
-                                revise[i] = updated_user.username
-                                break
-                        doc_update(
-                            collection=get_collection(binding_k),
-                            filter={'_id': change['_id']},
-                            update={field: revise},
-                        )
-                else:
-                    doc_update(
-                        collection=get_collection(binding_k),
-                        filter={field: stored_user_data['username']},
-                        update={field: updated_user.username},
-                        many=True
-                    )
+        update_bind_username(
+            stored_name=stored_user_data['username'], update_name=updated_user.username,
+        )
     return updated_user
 
 
@@ -137,6 +114,7 @@ async def read_me_avata_file(current_token: TokenData = Depends(get_token_data))
     else:
         path = os.path.join(FILES_PATH, 'avata', 'default')
         filename = 'default.png'
+
     def iter_file():
         with open(path, mode='rb') as file_like:
             yield from file_like

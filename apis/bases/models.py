@@ -25,8 +25,8 @@ class TokenData(BaseModel):
 
 class UserBase(BaseModel):
     ''' 用户数据的基础模型 '''
-    full_name: Optional[str] = None
-    disabled: Optional[bool] = False
+    full_name: Optional[str] = Field(title='完整姓名',)
+    disabled: Optional[bool] = Field(title='是否禁用',)
 
 
 class UserGlobal(UserBase):
@@ -72,10 +72,10 @@ class UserRead(UserBase):
 
 class PermissionRead(BaseModel):
     ''' 权限数据的读取模型 '''
-    name: str
-    path: str
-    tag: str
-    summary: str
+    name: str = Field(title='权限名称',)
+    path: str = Field(title='接口路径',)
+    tag: str = Field(title='接口标签',)
+    summary: str = Field(title='接口描述',)
 
 
 class RoleBase(BaseModel):
