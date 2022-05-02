@@ -25,47 +25,34 @@ class TokenData(BaseModel):
 
 class UserBase(BaseModel):
     ''' 用户数据的基础模型 '''
-    full_name: Optional[str] = Field(title='完整姓名',)
-    disabled: Optional[bool] = Field(title='是否禁用',)
-
-
-class UserGlobal(UserBase):
-    ''' 用户数据的全局模型 '''
-    id: ObjId = Field(..., alias='_id')
-    username: str
-    email: Optional[EmailStr] = None
-    password: str
-    role_id: str
+    username: Optional[str] = Field(title='用户名称',)
+    full_name: Optional[str] = Field(title='用户完整姓名',)
+    email: Optional[EmailStr] = Field(title='用户邮箱',)
+    disabled: Optional[bool] = Field(default=False, title='是否禁用',)
 
 
 class UserCreate(UserBase):
     ''' 用户数据的创建模型 '''
-    username: str
-    email: Optional[EmailStr] = None
-    password: str
-    role_id: Optional[str] = ''
+    username: str = Field(title='用户名称',)
+    password: str = Field(title='认证密码',)
+    role_id: Optional[str] = Field(default='', title='角色ID',)
+
+
+class UserGlobal(UserCreate):
+    ''' 用户数据的全局模型 '''
+    id: ObjId = Field(alias='_id', title='用户ID',)
 
 
 class UserUpdate(UserBase):
     ''' 用户数据的更新模型 '''
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
-    role_id: Optional[str] = None
-
-
-class UserUpdateMe(UserBase):
-    ''' 用户数据的更新模型 (我的) '''
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
+    role_id: Optional[str] = Field(title='角色ID',)
 
 
 class UserRead(UserBase):
     ''' 用户数据的读取模型 '''
-    id: ObjId = Field(..., alias='_id')
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
-    role_id: Optional[str] = None
-    source: Optional[str] = None
+    id: ObjId = Field(alias='_id', title='用户ID',)
+    role_id: Optional[str] = Field(title='角色ID',)
+    source: str = Field(title='用户来源',)
     create_time: datetime
     update_time: datetime
 

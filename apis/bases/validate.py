@@ -82,3 +82,15 @@ def check_user_email(v):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='电子邮箱地址已存在',
         )
+
+
+def get_me_user(v):
+    user = get_collection(COL_USER).find_one({
+        '_id': str_to_oid(v),
+    })
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='令牌无法匹配到用户',
+        )
+    return user

@@ -2,12 +2,13 @@ import os
 from core.validate import str_to_oid
 from core.security import get_token_data
 from .utils import update_bind_username
+from .validate import get_me_user, check_user_username, check_user_email
 from core.dynamic import get_username_binding
 from fastapi.encoders import jsonable_encoder
 from core.database import get_collection, doc_update
 from core.storage import save_raw_file, FILES_PATH
 from fastapi.responses import FileResponse, StreamingResponse
-from .models import TokenData, COL_USER, UserGlobal, UserUpdateMe
+from .models import TokenData, COL_USER, UserGlobal, UserBase
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 
 router = APIRouter(
@@ -21,52 +22,25 @@ router = APIRouter(
     summary='读取我的信息 (无权限)',
 )
 async def read_me_info(current_token: TokenData = Depends(get_token_data)):
-    user = get_collection(COL_USER).find_one({
-        '_id': str_to_oid(current_token.user_id),
-    })
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='令牌无法匹配到用户',
-        )
+    user = get_me_user(current_token.user_id)
     return UserGlobal(**user)
 
 
 @router.put(
     '/free/',
-    response_model=UserUpdateMe,
+    response_model=UserBase,
     summary='更新我的信息 (无权限)',
 )
-async def update_me_info(user: UserUpdateMe, current_token: TokenData = Depends(get_token_data)):
+async def update_me_info(user_update: UserBase, current_token: TokenData = Depends(get_token_data)):
     user_col = get_collection(COL_USER)
-    stored_user_data = user_col.find_one({
-        '_id': str_to_oid(current_token.user_id),
-    })
-    if stored_user_data is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='令牌无法匹配到用户',
-        )
-    stored_user_model = UserUpdateMe(**stored_user_data)
-    update_data = user.dict(exclude_unset=True)
+    stored_user_data = get_me_user(current_token.user_id)
+    stored_user_model = UserBase(**stored_user_data)
+    update_data = user_update.dict(exclude_unset=True)
     updated_user = stored_user_model.copy(update=update_data)
     if stored_user_model.username != updated_user.username:
-        if user_col.count_documents({'username': updated_user.username}):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='用户名已存在',
-            )
-    if 'deleted' in updated_user.username:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='用户名想搞事情',
-        )
+        check_user_username(updated_user.username)
     if stored_user_model.email != updated_user.email:
-        if user_col.count_documents({'email': updated_user.email}):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='电子邮箱地址已存在',
-            )
+        check_user_email(updated_user.email)
     doc_update(user_col, stored_user_data, jsonable_encoder(updated_user))
     if stored_user_data['username'] != updated_user.username:
         update_bind_username(
@@ -81,13 +55,11 @@ async def update_me_info(user: UserUpdateMe, current_token: TokenData = Depends(
 )
 async def create_me_avata_file(file: UploadFile = File(...), current_token: TokenData = Depends(get_token_data)):
     user_col = get_collection(COL_USER)
-    user = user_col.find_one({
-        '_id': str_to_oid(current_token.user_id),
-    })
-    if user is None:
+    user = get_me_user(current_token.user_id)
+    if file.content_type.split('/')[0] != 'image':
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='令牌无法匹配到用户',
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='文件不是图像类型',
         )
     save_result = await save_raw_file(file, ['avata'], current_token.user_id)
     doc_update(user_col, user, {'avata': save_result['filename']})
@@ -100,14 +72,7 @@ async def create_me_avata_file(file: UploadFile = File(...), current_token: Toke
 )
 async def read_me_avata_file(current_token: TokenData = Depends(get_token_data)):
     user_col = get_collection(COL_USER)
-    user = user_col.find_one({
-        '_id': str_to_oid(current_token.user_id),
-    })
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='令牌无法匹配到用户',
-        )
+    user = get_me_user(current_token.user_id)
     if user['avata']:
         path = os.path.join(FILES_PATH, 'avata', current_token.user_id)
         filename = user['avata']
@@ -119,4 +84,3 @@ async def read_me_avata_file(current_token: TokenData = Depends(get_token_data))
         with open(path, mode='rb') as file_like:
             yield from file_like
     return StreamingResponse(iter_file(), media_type=f'image/{filename.split(".")[-1]}')
-    # return FileResponse(path=path, filename=filename)
