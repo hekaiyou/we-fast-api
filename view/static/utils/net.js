@@ -1,10 +1,10 @@
 if (!Cookies.get('token_s')) {
-    if (window.location.href.indexOf('/view/users/token') == -1) {
-        window.location.href = '/view/users/token/';
+    if (window.location.href.indexOf('/view/bases/token') == -1) {
+        window.location.href = '/view/bases/token/';
     }
 } else {
-    if (window.location.href.indexOf('/view/users/token') != -1) {
-        window.location.href = '/view/users/dashboard/';
+    if (window.location.href.indexOf('/view/bases/token') != -1) {
+        window.location.href = '/view/bases/dashboard/';
     }
 }
 

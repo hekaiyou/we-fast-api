@@ -26,7 +26,7 @@
                     $('#details-content').append('<details onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['title'] + ' <sup>有' + value['permissions'].length + '个权限</sup></summary></details>');
                 });
                 $('details').click(function () {
-                    window.location.href = '/view/users/role/update/' + $(this).attr('id') + '/';
+                    window.location.href = '/view/bases/role/update/' + $(this).attr('id') + '/';
                 });
             },
             success_reminder = false,

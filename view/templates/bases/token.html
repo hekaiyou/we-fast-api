@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'basal.html' %}
 {% block title %}登录{% endblock %}
 
 {% block head %}
@@ -120,7 +120,7 @@
                     Cookies.set('token_s', data.access_token, { expires: cookiesExpiresDay, path: '/' });
                     Cookies.set('role', data.role_title, { expires: cookiesExpiresDay, path: '/' });
                     Cookies.set('permissions', data.role_permissions, { expires: cookiesExpiresDay, path: '/' });
-                    window.location.href = '/view/users/dashboard/';
+                    window.location.href = '/view/bases/dashboard/';
                 },
                 success_reminder = false,
                 not_close = false,

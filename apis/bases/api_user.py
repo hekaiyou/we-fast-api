@@ -3,6 +3,7 @@ from typing import Optional
 from .utils import update_bind_username
 from core.security import get_password_hash
 from fastapi.encoders import jsonable_encoder
+from core.storage import remove_file, FILES_PATH
 from core.dependencies import get_paginate_parameters
 from fastapi import APIRouter, Depends, HTTPException, status
 from .models import COL_USER, COL_ROLE, UserRead, UserCreate, UserUpdate
@@ -105,4 +106,7 @@ async def delete_user(user_id: UserObjIdParams):
         update_bind_username(
             stored_name=stored_user_data['username'], update_name=update_name,
         )
+    if stored_user_data['avata']:
+        # 删除头像文件
+        await remove_file([FILES_PATH, 'avata', str(user_id)])
     return {}

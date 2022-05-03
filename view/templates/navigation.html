@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'basal.html' %}
 
 {% block head %}
 <!-- AMP runtime -->
@@ -28,7 +28,7 @@
             </button>
             <ul id="nav-content">
                 <li>
-                    <h3><a href="/view/users/dashboard/">仪表板</a></h3>
+                    <h3><a href="/view/bases/dashboard/">仪表板</a></h3>
                 </li>
             </ul>
         </nav>
@@ -58,7 +58,7 @@
     <ul>
         <li>
             {% block operate_right_top %}
-            <a href="/view/users/me/" aria-label="我的信息">
+            <a href="/view/bases/me/" aria-label="我的信息">
                 <img src="/api/bases/me/avata/free/" alt="头像图片" height="30px" width="30px" />
             </a>
             {% endblock %}

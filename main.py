@@ -26,7 +26,7 @@ app.add_middleware(
 
 @app.get('/', include_in_schema=False)
 async def redirect_view():
-    return RedirectResponse('/view/users/token/')
+    return RedirectResponse('/view/bases/token/')
 
 
 @app.on_event('startup')
