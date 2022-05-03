@@ -100,4 +100,5 @@ async def verify_api_permission(request: Request, current_token: TokenData = Dep
 
 
 async def get_view_request(request: Request, settings: Settings = Depends(get_base_settings)):
+    ''' 全局依赖项: 获取页面访问的请求内容 '''
     return {'request': request, 'settings': settings}

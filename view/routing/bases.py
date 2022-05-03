@@ -39,6 +39,11 @@ async def page_bases_role(request: dict = Depends(get_view_request)):
     return templates.TemplateResponse('bases/role.html', {**request})
 
 
+@router.get('/role/create/', response_class=HTMLResponse, include_in_schema=False)
+async def page_bases_role_create(role_id: ObjIdParams, request: dict = Depends(get_view_request)):
+    return templates.TemplateResponse('bases/role-edit.html', {'role_id': str(role_id), **request})
+
+
 @router.get('/role/update/{role_id}/', response_class=HTMLResponse, include_in_schema=False)
 async def page_bases_role_update(role_id: ObjIdParams, request: dict = Depends(get_view_request)):
     return templates.TemplateResponse('bases/role-edit.html', {'role_id': str(role_id), **request})

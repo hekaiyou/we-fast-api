@@ -18,9 +18,6 @@ function generalErrorHandling(request) {
     } else if (request.status == 405) {
         var errText = '请求方法不被允许';
         var errIcon = 'error';
-    } else if (request.status == 400) {
-        var errText = '无法解析的请求信息';
-        var errIcon = 'error';
     } else {
         var errText = request.responseJSON.detail;
         var errIcon = 'warning';
