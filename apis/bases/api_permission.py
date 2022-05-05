@@ -13,7 +13,7 @@ router = APIRouter(
     response_model=NoPaginate,
     summary='读取权限 (全量)',
 )
-async def read_permission(routes: dict = Depends(get_api_routes)):
+async def read_permission_all(routes: dict = Depends(get_api_routes)):
     all_item = []
     for path, route in routes.items():
         all_item.append(PermissionRead(

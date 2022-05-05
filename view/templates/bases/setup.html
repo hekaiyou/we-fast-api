@@ -1,0 +1,37 @@
+{% extends 'navigation.html' %}
+{% block title %}参数设置{% endblock %}
+
+{% block operate_right_top %}
+{% endblock %}
+
+{% block main %}
+<div id="details-content">
+    <details onclick="event.preventDefault()" id="core">
+        <summary>模块 core 相关变量</summary>
+    </details>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        utilAjax(
+            type = 'GET',
+            url = '/api/bases/setup/module/',
+            data = {},
+            data_format = 'query',
+            check = {},
+            success = function (data, textStatus) {
+                data['all_item'].forEach(function (value, index) {
+                    $('#details-content').append('<details onclick="event.preventDefault()" id="' + value.name + '"><summary>模块 ' + value.name + ' 相关变量</sup></summary></details>');
+                });
+                $('details').click(function () {
+                    window.location.href = '/view/bases/setup/update/' + $(this).attr('id') + '/';
+                });
+            },
+            success_reminder = false,
+            not_close = false,
+        );
+    });
+</script>
+{% endblock %}

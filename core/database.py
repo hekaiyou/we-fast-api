@@ -33,7 +33,7 @@ def whether_to_initialize(apis_urls):
             if not role_result:
                 role_result = role_col.insert_one({
                     'title': 'SuperAdministrator',
-                    'permissions': ['read_permission', 'read_role_all', 'read_role', 'create_role', 'delete_role', 'update_role', 'create_user', 'read_user_page', 'delete_user', 'update_user', 'update_setup'],
+                    'permissions': ['read_permission_all', 'read_role_all', 'read_role', 'create_role', 'delete_role', 'update_role', 'create_user', 'read_user_page', 'delete_user', 'update_user', 'read_setup_module_all', 'read_setup', 'update_setup'],
                     'create_time': datetime.utcnow(),
                     'update_time': datetime.utcnow(),
                 })
