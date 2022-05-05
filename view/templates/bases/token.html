@@ -112,6 +112,7 @@
                     'username': $('#username').val(),
                     'password': $('#password').val(),
                 },
+                data_format = 'form',
                 check = {
                     'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名称需要3-20位以字母开头(可带数字,下划线和小数点)'],
                     'password': [/^\S{6,}$/, '登录密码的长度需要大于6位'],

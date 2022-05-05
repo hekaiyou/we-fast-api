@@ -34,7 +34,11 @@ def check_role_title(v):
 
 
 def check_role_permissions(v):
-    if not set(v).issubset(set(get_api_routes())):
+    routes = get_api_routes()
+    valid_permissions = []
+    for path, route in routes.items():
+        valid_permissions.append(route['name'])
+    if not set(v).issubset(set(valid_permissions)):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='权限列表中存在无效权限ID',

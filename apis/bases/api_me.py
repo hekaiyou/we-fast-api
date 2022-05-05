@@ -1,13 +1,11 @@
 import os
-from core.validate import str_to_oid
 from core.security import get_token_data
 from .utils import update_bind_username
 from .validate import get_me_user, check_user_username, check_user_email
-from core.dynamic import get_username_binding
 from fastapi.encoders import jsonable_encoder
 from core.database import get_collection, doc_update
 from core.storage import save_raw_file, FILES_PATH
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import StreamingResponse
 from .models import TokenData, COL_USER, UserGlobal, UserBase
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 

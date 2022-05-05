@@ -1,8 +1,7 @@
 from core.model import NoPaginate
-from core.validate import ObjIdParams
 from fastapi.encoders import jsonable_encoder
-from fastapi import APIRouter, HTTPException, status, Depends
-from core.dependencies import get_base_settings, get_api_routes
+from fastapi import APIRouter, HTTPException, status
+from core.dependencies import get_base_settings
 from core.dynamic import set_role_permissions, revise_settings
 from core.database import get_collection, doc_create, doc_update
 from .models import COL_ROLE, RoleRead, RoleUpdate, COL_USER, RoleBase
@@ -45,11 +44,8 @@ async def read_role(role_id: RoleObjIdParams):
     response_model=RoleRead,
     summary='创建角色',
 )
-async def create_role(role_create: RoleBase, routes: dict = Depends(get_api_routes)):
+async def create_role(role_create: RoleBase):
     role_col = get_collection(COL_ROLE)
-    valid_permissions = []
-    for path, route in routes.items():
-        valid_permissions.append(route['name'])
     check_role_permissions(role_create.permissions)
     check_role_title(role_create.title)
     role_json = jsonable_encoder(role_create)
@@ -79,8 +75,10 @@ async def delete_role(role_id: RoleObjIdParams):
     response_model=RoleUpdate,
     summary='更新角色',
 )
-async def update_role(role_id: ObjIdParams, role_update: RoleUpdate):
+async def update_role(role_id: RoleObjIdParams, role_update: RoleUpdate):
     role_col = get_collection(COL_ROLE)
+    if role_update.permissions:
+        check_role_permissions(role_update.permissions)
     if str(role_id) == '100000000000000000000001':
         revise_settings('user_default_permission', role_update.permissions)
         set_role_permissions(role_col)

@@ -38,6 +38,7 @@
             type = 'GET',
             url = '/api/bases/me/free/',
             data = {},
+            data_format = 'query',
             check = {},
             success = function (data, textStatus) {
                 $('#username').val(data.username)
@@ -56,6 +57,7 @@
                     'full_name': $('#full_name').val(),
                     'email': $('#email').val(),
                 },
+                data_format = 'json',
                 check = {
                     'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
                     'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位'],

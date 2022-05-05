@@ -30,7 +30,7 @@ function generalErrorHandling(request) {
     });
 }
 
-function utilAjax(type, url, data, check, success, success_reminder, not_close) {
+function utilAjax(type, url, data, data_format, check, success, success_reminder, not_close) {
     var checkResult = true;
     $.each(check, function (key, value) {
         if (!value[0].test(data[key])) {
@@ -48,7 +48,8 @@ function utilAjax(type, url, data, check, success, success_reminder, not_close) 
         return;
     }
     var headers = { 'Accept': 'application/json' }
-    if (type == 'PUT') {
+    // data_format: query, json
+    if (data_format == 'json') {
         data = JSON.stringify(data);
         headers['Content-Type'] = 'application/json';
     }

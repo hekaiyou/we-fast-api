@@ -1,11 +1,5 @@
-from . import api_token
-from . import api_me
-from . import api_wechat
-from . import api_user
-from . import api_permission
-from . import api_role
-from . import api_setup
 from fastapi import APIRouter
+from . import api_token, api_me, api_wechat, api_user, api_permission, api_role, api_setup
 
 router = APIRouter(
     prefix='/bases',

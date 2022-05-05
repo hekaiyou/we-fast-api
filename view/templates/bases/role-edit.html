@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block operate_left %}
-<a href="javascript:history.back(-1)">返回</a>
+<a href="/view/bases/role/">返回</a>
 {% endblock %}
 {% block operate_right_top %}
 {% if role_id %}
@@ -36,11 +36,13 @@
 {% block javascript %}
 <script>
     var tagSelectDict = {};
+    var tagSelectArray = [];
     function loadPage() {
         utilAjax(
             type = 'GET',
             url = '/api/bases/permission/',
             data = {},
+            data_format = 'query',
             check = {},
             success = function (data, textStatus) {
                 var tagDict = {};
@@ -69,6 +71,7 @@
                         } else {
                             tagSelectDict[value['name']] = false;
                         }
+                        tagSelectArray.push(value['name'])
                     });
                     $('[name="' + keyName + '"]:checkbox').on('click', function () {
                         tagSelectDict[$(this).val()] = !tagSelectDict[$(this).val()];
@@ -96,6 +99,7 @@
             type = 'GET',
             url = '/api/bases/role/{{ role_id }}/',
             data = {},
+            data_format = 'query',
             check = {},
             success = function (data, textStatus) {
                 $('#title').val(data.title);
@@ -114,11 +118,11 @@
         );
         $('#submit').click(function () {
             let permissions = [];
-            for (var key in tagSelectDict) {
-                if (tagSelectDict[key]) {
-                    permissions.push(key);
+            tagSelectArray.forEach(function (value, index) {
+                if (tagSelectDict[value]) {
+                    permissions.push(value);
                 }
-            }
+            });
             utilAjax(
                 type = 'PUT',
                 url = '/api/bases/role/{{ role_id }}/',
@@ -126,6 +130,7 @@
                     'title': $('#title').val(),
                     'permissions': permissions,
                 },
+                data_format = 'json',
                 check = {
                     'title': [/^\S{2,}$/, '角色名称的长度需要大于2位'],
                 },
@@ -140,9 +145,10 @@
                 type = 'DELETE',
                 url = '/api/bases/role/{{ role_id }}/',
                 data = {},
+                data_format = 'json',
                 check = {},
                 success = function (data, textStatus) {
-                    window: history.back();
+                    window.location.href = '/view/bases/role/';
                 },
                 success_reminder = false,
                 not_close = false,
@@ -152,6 +158,30 @@
     //{% else %}
     $(document).ready(function () {
         loadPage();
+        $('#submit').click(function () {
+            let permissions = [];
+            for (var key in tagSelectDict) {
+                if (tagSelectDict[key]) {
+                    permissions.push(key);
+                }
+            }
+            utilAjax(
+                type = 'POST',
+                url = '/api/bases/role/',
+                data = {
+                    'title': $('#title').val(),
+                    'permissions': permissions,
+                },
+                data_format = 'json',
+                check = {
+                    'title': [/^\S{2,}$/, '角色名称的长度需要大于2位'],
+                },
+                success = function (data, textStatus) {
+                    window.location.href = '/view/bases/role/update/' + data._id + '/';
+                },
+                success_reminder = true,
+            );
+        });
     });
     //{% endif %}
 </script>
