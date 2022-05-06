@@ -91,7 +91,7 @@
                     autocomplete="current-password" required>
                 <fieldset>
                     <label for="remember">
-                        <input type="checkbox" role="switch" id="remember" name="remember">
+                        <input type="checkbox" role="switch" id="rememberUsername" name="remember">
                         记住账户
                     </label>
                 </fieldset>
@@ -104,6 +104,10 @@
 
 <script>
     $(document).ready(function () {
+        if (Cookies.get('remember_username')) {
+            $('#username').val(Cookies.get('remember_username'));
+            $('#rememberUsername').attr('checked', 'checked');
+        }
         $('button').click(function () {
             utilAjax(
                 type = 'POST',
@@ -123,6 +127,13 @@
                     Cookies.set('token_s', data.access_token, { expires: cookiesExpiresDay, path: '/' });
                     Cookies.set('role', data.role_title, { expires: cookiesExpiresDay, path: '/' });
                     Cookies.set('permissions', data.role_permissions, { expires: cookiesExpiresDay, path: '/' });
+                    if ($('#rememberUsername').is(':checked')) {
+                        Cookies.set('remember_username', data.username, { path: '/' });
+                    } else {
+                        if (Cookies.get('remember_username')) {
+                            Cookies.remove('remember_username');
+                        }
+                    }
                     window.location.href = '/view/bases/dashboard/';
                 },
                 success_reminder = false,

@@ -41,6 +41,16 @@ $ uvicorn main:app --host 0.0.0.0 --port 8083 --reload
 
 ## Ubuntu 部署
 
+在 Ubuntu 系统下配置环境变量.
+
+```shell
+$ sudo vim ~/.bashrc
+export MONGO_DB_HOST=127.0.0.1
+export MONGO_DB_PORT=27017
+export MONGO_DB_NAME=test_database
+$ source ~/.bashrc
+```
+
 创建自启动服务配置文件.
 
 ```shell
@@ -55,8 +65,8 @@ Description=WeFastAPI
 
 [Service]
 Type=simple
-WorkingDirectory=/home/ecs-user/we-fast-api
-ExecStart=/home/ecs-user/we-fast-api/env/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8083 --workers 4
+WorkingDirectory=/home/.../.../we-fast-api
+ExecStart=/home/.../.../we-fast-api/env/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8083 --workers 4
 Restart=on-failure
 RestartSec=30s
 
@@ -66,7 +76,7 @@ WantedBy=multi-user.target
 
 完成配置文件后，就可以执行下列命令配置和管理服务:
 
-- 注册服务: sudo systemctl enable /home/ecs-user/we-fast-api/wefast.service
+- 注册服务: sudo systemctl enable /home/.../.../we-fast-api/wefast.service
 - 启动服务: sudo systemctl start wefast
 - 重新启动服务: sudo systemctl restart wefast
 - 查看服务启动状态: sudo service wefast status

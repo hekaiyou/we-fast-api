@@ -62,13 +62,14 @@
                 <summary aria-haspopup="listbox" role="link" id="nav-username"></summary>
                 <ul role="listbox">
                     <li><a href="/view/bases/me/">我的信息</a></li>
+                    <li><a id="signout" href="javascript:void(0);">退出登录</a></li>
                 </ul>
             </details>
             {% endblock %}
         </li>
     </ul>
 </nav>
-<script src="{{ url_for('static', path='/pico/navigation.js') }}"></script>
+<script src="{{ url_for('static', path='/utils/navigation.js') }}"></script>
 <main>
     {% block main %}{% endblock %}
 </main>
