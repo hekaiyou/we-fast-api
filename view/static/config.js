@@ -1,4 +1,3 @@
-var cookiesExpiresDay = 0.5;
 var navigationBar = [
     {
         'path': '/view/bases/role/',

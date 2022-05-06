@@ -58,9 +58,12 @@
     <ul>
         <li>
             {% block operate_right_top %}
-            <a href="/view/bases/me/" aria-label="我的信息">
-                <img src="/api/bases/me/avata/free/" alt="头像图片" height="30px" width="30px" />
-            </a>
+            <details role="list" dir="rtl">
+                <summary aria-haspopup="listbox" role="link" id="nav-username"></summary>
+                <ul role="listbox">
+                    <li><a href="/view/bases/me/">我的信息</a></li>
+                </ul>
+            </details>
             {% endblock %}
         </li>
     </ul>
