@@ -15,6 +15,7 @@
 
 {% block javascript %}
 <script>
+    var setupInputArray = [];
     $(document).ready(function () {
         utilAjax(
             type = 'GET',
@@ -38,30 +39,29 @@
                     }
                     formHtml += '</label>';
                     $('#form-content').append(formHtml);
+                    setupInputArray.push(value);
                 });
             },
             success_reminder = false,
             not_close = false,
         );
         $('#submit').click(function () {
+            let data = {};
+            setupInputArray.forEach(function (value, index) {
+                if (value.type == 'str') {
+                    data[value.key] = $('#' + value.key).val();
+                } else if (value.type == 'int') {
+                    data[value.key] = parseInt($('#' + value.key).val());
+                }
+            });
             utilAjax(
                 type = 'PUT',
                 url = '/api/bases/setup/particle-' + '{{ module_name }}' + '/',
-                data = {
-                    'username': $('#username').val(),
-                    'full_name': $('#full_name').val(),
-                    'email': $('#email').val(),
-                },
+                data = data,
                 data_format = 'json',
-                check = {
-                    'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
-                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位'],
-                    'email': [/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/, '电子邮箱地址的格式不正确'],
-                },
+                check = {},
                 success = function (data, textStatus) {
-                    $('#username').val(data.username);
-                    $('#full_name').val(data.full_name);
-                    $('#email').val(data.email);
+
                 },
                 success_reminder = true,
             );

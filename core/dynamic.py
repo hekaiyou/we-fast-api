@@ -32,7 +32,11 @@ def set_apis_configs(module, key, vlaue):
     ''' 设置动态全局变量: 接口配置 '''
     revise_settings(key, vlaue, env_path=f'apis/{module}/.env')
     global DYNAMIC_APIS_CONFIGS
-    del DYNAMIC_APIS_CONFIGS[module]
+    meta_class = importlib.import_module(f'apis.{module}.config')
+    DYNAMIC_APIS_CONFIGS[module] = meta_class.Settings(
+        _env_file=f'apis/{module}/.env',
+        _env_file_encoding='utf-8',
+    )
 
 
 def set_role_permissions(role_col):

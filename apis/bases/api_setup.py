@@ -50,11 +50,12 @@ async def read_setup(module_name: str):
     summary='更新设置',
 )
 async def update_setup(module_name: str, setups: Dict):
-    print(setups)
     configs = get_apis_configs(module_name[9:])
     if not configs:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='找不到模块',
         )
+    for key, value in setups.items():
+        set_apis_configs(module=module_name[9:], key=key, vlaue=value)
     return {}
