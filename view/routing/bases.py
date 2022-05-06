@@ -56,4 +56,4 @@ async def page_bases_setup(request: dict = Depends(get_view_request)):
 
 @router.get('/setup/update/{module_name}/', response_class=HTMLResponse, include_in_schema=False)
 async def page_bases_setup_update(module_name: str, request: dict = Depends(get_view_request)):
-    return templates.TemplateResponse('bases/setup-edit.html', {'module_name': module_name, **request})
+    return templates.TemplateResponse('bases/setup-edit.html', {'module_name': module_name[9:], **request})

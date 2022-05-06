@@ -4,7 +4,7 @@ from typing import Optional
 from datetime import datetime
 from functools import lru_cache
 from pymongo import ASCENDING, DESCENDING
-from core.dynamic import get_role_permissions
+from core.dynamic import get_role_permissions, get_apis_configs
 from core.security import get_token_data, TokenData
 from fastapi import Depends, HTTPException, Query, status, Request
 
@@ -99,6 +99,6 @@ async def verify_api_permission(request: Request, current_token: TokenData = Dep
                 )
 
 
-async def get_view_request(request: Request, settings: Settings = Depends(get_base_settings)):
+async def get_view_request(request: Request):
     ''' 全局依赖项: 获取页面访问的请求内容 '''
-    return {'request': request, 'settings': settings}
+    return {'request': request, 'settings': get_apis_configs('bases')}

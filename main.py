@@ -1,14 +1,14 @@
 import apis.apis_urls as apis_urls
 import view.view_urls as view_urls
 from fastapi import FastAPI
-from core.dynamic import get_startup_task
+from core.dynamic import get_startup_task, get_apis_configs
 from core.dependencies import get_base_settings
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from core.database import create_db_client, close_db_client
 
-settings = get_base_settings()
+settings = get_apis_configs('bases')
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
@@ -18,7 +18,7 @@ app.include_router(view_urls.router)
 app.mount('/static', StaticFiles(directory='view/static'), name='static')
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allow_origins,
+    allow_origins=get_base_settings().allow_origins,
     allow_methods=['*'],
     allow_headers=['*'],
 )

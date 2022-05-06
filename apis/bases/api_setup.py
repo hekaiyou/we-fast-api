@@ -1,4 +1,5 @@
 import os
+from typing import Dict
 from fastapi import APIRouter, HTTPException, status
 from core.model import NoPaginate
 from core.dynamic import set_apis_configs, get_apis_configs
@@ -19,10 +20,7 @@ async def read_setup_module_all():
     for dir_path in os.listdir('apis/'):
         if not dir_path in exclude_dir_path:
             if os.path.exists(f'apis/{dir_path}/config.py'):
-                if dir_path == 'bases':
-                    all_item.append({'name': 'basal'})
-                else:
-                    all_item.append({'name': dir_path})
+                all_item.append({'name': f'particle-{dir_path}'})
     return NoPaginate(all_item=all_item, total=len(all_item))
 
 
@@ -32,18 +30,17 @@ async def read_setup_module_all():
     summary='读取设置',
 )
 async def read_setup(module_name: str):
-    if module_name == 'basal':
-        module_name = 'bases'
-    configs = get_apis_configs(module_name)
+    configs = get_apis_configs(module_name[9:])
     if not configs:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='找不到模块',
         )
     all_item = []
+    configs_describe = get_apis_configs(f'{module_name[9:]}_describe')
     for config in configs:
         all_item.append({
-            'key': config[0], 'value': config[1], 'type': str(type(config[1]))[8:-2],
+            'key': config[0], 'value': config[1], 'type': str(type(config[1]))[8:-2], 'describe': configs_describe.get(config[0], ''),
         })
     return NoPaginate(all_item=all_item, total=len(all_item))
 
@@ -52,10 +49,9 @@ async def read_setup(module_name: str):
     '/{module_name}/',
     summary='更新设置',
 )
-async def update_setup(module_name: str):
-    if module_name == 'basal':
-        module_name = 'bases'
-    configs = get_apis_configs(module_name)
+async def update_setup(module_name: str, setups: Dict):
+    print(setups)
+    configs = get_apis_configs(module_name[9:])
     if not configs:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

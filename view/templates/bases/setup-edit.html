@@ -1,5 +1,5 @@
 {% extends 'navigation.html' %}
-{% block title %}更新设置{% endblock %}
+{% block title %}更新 {{ module_name }} 设置{% endblock %}
 
 {% block operate_left %}
 <a href="/view/bases/setup/">返回</a>
@@ -18,7 +18,7 @@
     $(document).ready(function () {
         utilAjax(
             type = 'GET',
-            url = '/api/bases/setup/' + '{{ module_name }}' + '/',
+            url = '/api/bases/setup/particle-' + '{{ module_name }}' + '/',
             data = {},
             data_format = 'query',
             check = {},
@@ -26,11 +26,17 @@
                 let reg = new RegExp('_', 'g');
                 data['all_item'].forEach(function (value, index) {
                     let keyTitle = value.key.replace(reg, ' ');
-                    let formHtml = '<label for="' + value.key + '">' + keyTitle.slice(0, 1).toUpperCase() + keyTitle.slice(1) + '<input type="';
+                    let formHtml = '<label for="' + value.key + '">' + keyTitle.slice(0, 1).toUpperCase() + keyTitle.slice(1) + '<input ';
                     if (value.type == 'str') {
-                        formHtml += 'text';
+                        formHtml += 'type="text"';
+                    } else if (value.type == 'int') {
+                        formHtml += 'type="number"';
                     }
-                    formHtml += '" id="' + value.key + '" value="' + value.value + '" required></label>';
+                    formHtml += ' id="' + value.key + '" value="' + value.value + '" required>';
+                    if (value.describe) {
+                        formHtml += '<small>' + value.describe + '</small>';
+                    }
+                    formHtml += '</label>';
                     $('#form-content').append(formHtml);
                 });
             },
@@ -40,7 +46,7 @@
         $('#submit').click(function () {
             utilAjax(
                 type = 'PUT',
-                url = '/api/bases/me/free/',
+                url = '/api/bases/setup/particle-' + '{{ module_name }}' + '/',
                 data = {
                     'username': $('#username').val(),
                     'full_name': $('#full_name').val(),
