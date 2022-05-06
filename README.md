@@ -36,11 +36,4 @@ $ uvicorn main:app --host 0.0.0.0 --port 8083 --reload
 
 ### 微信小程序
 
-在 `.env` 文件中添加微信小程序的的连接配置:
-
-```shell
-WECHAT_APP_ID='wxxxxxxxxxxxxxxxxx'
-WECHAT_APP_SECRET='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-```
-
-保存配置后微信小程序就可以调用 *GET /token/* 接口获取凭证.
+访问 http://127.0.0.1:8083/view/bases/setup/update/particle-bases/ 地址打开 **更新 BASES 设置** 页面, 编辑 *Wechat app id* 和 *Wechat app secret* 输入框完成微信小程序配置, 就可以调用 `GET /api/bases/wechat/token/open/`*` 接口获取微信登录凭证.
