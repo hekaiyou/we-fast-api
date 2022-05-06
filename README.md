@@ -8,6 +8,7 @@
 
 ```shell
 $ python3 -m venv env
+$ source env/bin/activate
 $ pip install -r requirements.txt
 ```
 
@@ -37,3 +38,36 @@ $ uvicorn main:app --host 0.0.0.0 --port 8083 --reload
 ### 微信小程序
 
 访问 http://127.0.0.1:8083/view/bases/setup/update/particle-bases/ 地址打开 **更新 BASES 设置** 页面, 编辑 *Wechat app id* 和 *Wechat app secret* 输入框完成微信小程序配置, 就可以调用 `GET /api/bases/wechat/token/open/`*` 接口获取微信登录凭证.
+
+## Ubuntu 部署
+
+创建自启动服务配置文件.
+
+```shell
+$ vim wefast.service
+```
+
+编辑自启动服务配置文件 `wefast.service` 的内容.
+
+```shell
+[Unit]
+Description=WeFastAPI
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ecs-user/we-fast-api
+ExecStart=/home/ecs-user/we-fast-api/env/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8083 --workers 4
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target
+```
+
+完成配置文件后，就可以执行下列命令配置和管理服务:
+
+- 注册服务: sudo systemctl enable /home/ecs-user/we-fast-api/wefast.service
+- 启动服务: sudo systemctl start wefast
+- 重新启动服务: sudo systemctl restart wefast
+- 查看服务启动状态: sudo service wefast status
+- 查看服务日志: sudo journalctl -u wefast
