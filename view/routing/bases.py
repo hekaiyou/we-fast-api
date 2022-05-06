@@ -5,7 +5,7 @@ from core.dependencies import get_base_settings
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from core.dependencies import get_view_request
-from fastapi import APIRouter, Request, Cookie, Depends
+from fastapi import APIRouter, Cookie, Depends
 
 router = APIRouter(
     prefix='/bases',
@@ -14,14 +14,11 @@ templates = Jinja2Templates(directory='view/templates')
 
 
 @router.get('/token/', response_class=HTMLResponse, include_in_schema=False)
-async def page_token(request: Request, token_s: Optional[str] = Cookie(None)):
+async def page_token(request: dict = Depends(get_view_request), token_s: Optional[str] = Cookie(None)):
     settings = get_base_settings()
     if token_s:
         return RedirectResponse('/view/bases/dashboard/')
-    return templates.TemplateResponse('bases/token.html', {
-        'request': request,
-        'settings': settings,
-    })
+    return templates.TemplateResponse('bases/token.html', {**request})
 
 
 @router.get('/dashboard/', response_class=HTMLResponse, include_in_schema=False)
