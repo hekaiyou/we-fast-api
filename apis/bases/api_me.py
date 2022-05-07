@@ -69,7 +69,6 @@ async def create_me_avata_file(file: UploadFile = File(...), current_token: Toke
     summary='读取我的头像文件 (无权限)',
 )
 async def read_me_avata_file(current_token: TokenData = Depends(get_token_data)):
-    user_col = get_collection(COL_USER)
     user = get_me_user(current_token.user_id)
     if user['avata']:
         path = os.path.join(FILES_PATH, 'avata', current_token.user_id)

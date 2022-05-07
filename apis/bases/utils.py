@@ -1,4 +1,4 @@
-from core.database import get_collection
+from core.database import get_collection, doc_update
 from core.dynamic import get_username_binding
 
 

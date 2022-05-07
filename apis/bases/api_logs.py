@@ -50,7 +50,6 @@ logger.add(
     summary='读取日志文件',
 )
 async def read_logs_file(log_date: date):
-    all_item = []
     if os.path.exists(f'{log_path}/{log_date}.log'):
         return FileResponse(
             path=f'{log_path}/{log_date}.log',
