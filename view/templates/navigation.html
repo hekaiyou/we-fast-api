@@ -2,15 +2,15 @@
 
 {% block head %}
 <!-- AMP runtime -->
-<script async src="{{ url_for('static', path='/amp/v0.js') }}"></script>
+<script async src="/static/amp/v0.js"></script>
 <!-- AMP components -->
 <script async custom-element="amp-social-share"
-    src="{{ url_for('static', path='/amp/amp-social-share-0.1.js') }}"></script>
-<script async custom-element="amp-sidebar" src="{{ url_for('static', path='/amp/amp-sidebar-0.1.js') }}"></script>
-<script async custom-element="amp-form" src="{{ url_for('static', path='/amp/amp-form-0.1.js') }}"></script>
+    src="/static/amp/amp-social-share-0.1.js"></script>
+<script async custom-element="amp-sidebar" src="/static/amp/amp-sidebar-0.1.js"></script>
+<script async custom-element="amp-form" src="/static/amp/amp-form-0.1.js"></script>
 <!-- Google font: Calistoga -->
-<link href="{{ url_for('static', path='/amp/css2') }}" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', path='/pico/navigation.css') }}">
+<link href="/static/amp/css2" rel="stylesheet">
+<link rel="stylesheet" href="/static/pico/navigation.css">
 {% endblock %}
 
 {% block body %}
@@ -69,7 +69,7 @@
         </li>
     </ul>
 </nav>
-<script src="{{ url_for('static', path='/utils/navigation.js') }}"></script>
+<script src="/static/utils/navigation.js"></script>
 <main>
     {% block main %}{% endblock %}
 </main>
