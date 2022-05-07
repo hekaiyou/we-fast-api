@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from core.logger import logger
+from loguru import logger
 from pymongo import MongoClient
 from functools import lru_cache
 from core.model import Paginate

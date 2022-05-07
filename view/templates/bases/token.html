@@ -134,7 +134,11 @@
                             Cookies.remove('remember_username');
                         }
                     }
-                    window.location.href = '/view/bases/dashboard/';
+                    if (data.incomplete) {
+                        window.location.href = '/view/bases/me/';
+                    } else {
+                        window.location.href = '/view/bases/dashboard/';
+                    }
                 },
                 success_reminder = false,
                 not_close = false,
