@@ -39,9 +39,11 @@ $ uvicorn main:app --host 0.0.0.0 --port 8083 --reload
 
 访问 http://127.0.0.1:8083/view/bases/setup/update/particle-bases/ 地址打开 **更新 BASES 设置** 页面, 编辑 *Wechat app id* 和 *Wechat app secret* 输入框完成微信小程序配置, 就可以调用 `GET /api/bases/wechat/token/open/`*` 接口获取微信登录凭证.
 
-## Ubuntu 部署
+## 部署
 
-在 Ubuntu 系统下配置环境变量.
+### 手动部署
+
+以下操作在 Ubuntu 系统下进行, 首先配置环境变量.
 
 ```shell
 $ sudo vim ~/.bashrc
@@ -74,10 +76,55 @@ RestartSec=30s
 WantedBy=multi-user.target
 ```
 
-完成配置文件后，就可以执行下列命令配置和管理服务:
+完成配置文件后, 就可以执行下列命令配置和管理服务:
 
 - 注册服务: sudo systemctl enable /home/.../.../we-fast-api/wefast.service
 - 启动服务: sudo systemctl start wefast
+- 更新配置文件: sudo systemctl daemon-reload
 - 重新启动服务: sudo systemctl restart wefast
 - 查看服务启动状态: sudo service wefast status
 - 查看服务日志: sudo journalctl -u wefast
+
+如果需要配置域名访问, 到 Nginx 配置目录下创建一个新配置.
+
+```shell
+cd /etc/nginx/conf.d
+sudo touch xxxxxx.conf
+sudo vim xxxxxx.conf
+```
+
+编辑以下内容以完成反向代理配置.
+
+```shell
+server {
+    listen  80;
+    server_name  xxxxxx.com;
+    # 把 http 域名请求转成 https
+    return  301  https://$host$request_uri;
+}
+server {
+    listen  443  ssl;
+    server_name  xxxxxx.com;
+    access_log  /data/nginx-logs/wefast-access.log;
+    error_log  /data/nginx-logs/wefast-error.log;
+    # ssl  on;
+    ssl_certificate  /.../.../xxxxxx.com.crt;
+    ssl_certificate_key  /.../.../xxxxxx.com.key;
+    client_body_buffer_size  256K;
+    client_header_buffer_size  12k;
+    client_max_body_size  100m;
+    large_client_header_buffers  4  12k;
+    location / {
+        proxy_pass  http://127.0.0.1:8083;
+        proxy_set_header  Host  $host;
+        proxy_set_header  X-Real-IP  $remote_addr;
+        proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Protocol  $scheme;
+    }
+}
+```
+
+完成域名配置后, 验证和更新 Nginx 服务:
+
+- 验证配置是否正确: sudo nginx -t
+- 更新配置并重启服务: sudo nginx -s reload
