@@ -38,7 +38,7 @@ log_path_info = os.path.join(
 # 每天凌晨创建新文件, 保留 30 天的日志文件, 开启异步记录
 logger.add(
     log_path_info,
-    rotation='00:01',
+    rotation='00:00',
     retention='30 days',
     enqueue=True,
     level='DEBUG',
