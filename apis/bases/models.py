@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from core.validate import ObjId
 from pydantic import BaseModel, EmailStr, Field
@@ -25,7 +25,7 @@ class TokenData(BaseModel):
 
 
 class UserBase(BaseModel):
-    ''' 用户数据的基础模型 '''
+    ''' 用户的基础模型 '''
     username: Optional[str] = Field(title='用户名称',)
     full_name: Optional[str] = Field(title='用户完整姓名',)
     email: Optional[EmailStr] = Field(title='用户邮箱',)
@@ -33,24 +33,24 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    ''' 用户数据的创建模型 '''
+    ''' 用户的创建模型 '''
     username: str = Field(title='用户名称',)
     password: str = Field(title='认证密码',)
     role_id: Optional[str] = Field(default='', title='角色ID',)
 
 
 class UserGlobal(UserCreate):
-    ''' 用户数据的全局模型 '''
+    ''' 用户的全局模型 '''
     id: ObjId = Field(alias='_id', title='用户ID',)
 
 
 class UserUpdate(UserBase):
-    ''' 用户数据的更新模型 '''
+    ''' 用户的更新模型 '''
     role_id: Optional[str] = Field(title='角色ID',)
 
 
 class UserRead(UserBase):
-    ''' 用户数据的读取模型 '''
+    ''' 用户的读取模型 '''
     id: ObjId = Field(alias='_id', title='用户ID',)
     role_id: Optional[str] = Field(title='角色ID',)
     source: str = Field(title='用户来源',)
@@ -59,7 +59,7 @@ class UserRead(UserBase):
 
 
 class PermissionRead(BaseModel):
-    ''' 权限数据的读取模型 '''
+    ''' 权限的读取模型 '''
     name: str = Field(title='权限名称',)
     path: str = Field(title='接口路径',)
     tag: str = Field(title='接口标签',)
@@ -73,7 +73,7 @@ class RoleBase(BaseModel):
 
 
 class RoleUpdate(RoleBase):
-    ''' 角色数据的更新模型 '''
+    ''' 角色的更新模型 '''
     title: Optional[str] = Field(title='角色名称', regex='^\S{2,}$',)
     permissions: Optional[list] = Field(title='权限列表',)
 
@@ -83,3 +83,14 @@ class RoleRead(RoleBase):
     id: ObjId = Field(alias='_id', title='角色ID',)
     create_time: Optional[datetime] = datetime.utcnow()
     update_time: Optional[datetime] = datetime.utcnow()
+
+
+class SetupUpdate(BaseModel):
+    ''' 设置的更新模型 '''
+    synced_wids: List[str] = Field(title='已同步进程ID列表',)
+    setups: dict = Field(title='设置内容',)
+
+
+class SyncedWorkerRead(BaseModel):
+    ''' 同步工作进程的读取模型 '''
+    wid: str = Field(title='进程ID',)

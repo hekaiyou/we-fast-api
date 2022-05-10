@@ -1,7 +1,8 @@
 import os
-from typing import Dict
-from fastapi import APIRouter, HTTPException, status
+from core.dynamic import get_worker_id
 from core.model import NoPaginate
+from .models import SetupUpdate, SyncedWorkerRead
+from fastapi import APIRouter, HTTPException, status
 from core.dynamic import set_apis_configs, get_apis_configs
 
 router = APIRouter(
@@ -47,15 +48,16 @@ async def read_setup(module_name: str):
 
 @router.put(
     '/{module_name}/',
+    response_model=SyncedWorkerRead,
     summary='更新设置',
 )
-async def update_setup(module_name: str, setups: Dict):
+async def update_setup(module_name: str, setup_update: SetupUpdate):
     configs = get_apis_configs(module_name[9:])
     if not configs:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='找不到模块',
         )
-    for key, value in setups.items():
+    for key, value in setup_update.setups.items():
         set_apis_configs(module=module_name[9:], key=key, vlaue=value)
-    return {}
+    return {'wid': get_worker_id(setup_update.synced_wids)}

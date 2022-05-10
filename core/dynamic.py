@@ -2,11 +2,21 @@ import os
 import importlib
 from json import dumps
 from config import Settings
+from time import time
 
+DYNAMIC_WORKER_ID = str(time())
 DYNAMIC_APIS_CONFIGS = {}
 DYNAMIC_ROLE_PERMISSIONS = {}
 DYNAMIC_USERNAME_BINDING = {}
 DYNAMIC_STARTUP_TASK = []
+
+
+def get_worker_id(wid_list):
+    global DYNAMIC_WORKER_ID
+    if DYNAMIC_WORKER_ID not in wid_list:
+        DYNAMIC_WORKER_ID = str(time())
+        return DYNAMIC_WORKER_ID
+    return ''
 
 
 def get_apis_configs(module):

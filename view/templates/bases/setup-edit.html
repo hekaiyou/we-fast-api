@@ -15,6 +15,34 @@
 
 {% block javascript %}
 <script>
+    var synced_wids = [];
+    var setups = {};
+    function putSetup() {
+        utilAjax(
+            type = 'PUT',
+            url = '/api/bases/setup/particle-' + '{{ module_name }}' + '/',
+            data = {
+                'synced_wids': synced_wids,
+                'setups': setups,
+            },
+            data_format = 'json',
+            check = {},
+            success = function (data, textStatus) {
+                if (data.wid != '') {
+                    synced_wids.push(data.wid);
+                } else {
+                    console.log('已同步 ' + synced_wids.length);
+                }
+                if (synced_wids.length < parseInt('{{ settings.app_workers_num }}')) {
+                    setTimeout(function () { putSetup() }, 5000);
+                } else {
+                    swal('请求成功', { icon: 'success', buttons: false, timer: 1500, });
+                }
+            },
+            success_reminder = false,
+            not_close = true,
+        );
+    }
     var setupInputArray = [];
     $(document).ready(function () {
         utilAjax(
@@ -46,25 +74,14 @@
             not_close = false,
         );
         $('#submit').click(function () {
-            let data = {};
             setupInputArray.forEach(function (value, index) {
                 if (value.type == 'str') {
-                    data[value.key] = $('#' + value.key).val();
+                    setups[value.key] = $('#' + value.key).val();
                 } else if (value.type == 'int') {
-                    data[value.key] = parseInt($('#' + value.key).val());
+                    setups[value.key] = parseInt($('#' + value.key).val());
                 }
             });
-            utilAjax(
-                type = 'PUT',
-                url = '/api/bases/setup/particle-' + '{{ module_name }}' + '/',
-                data = data,
-                data_format = 'json',
-                check = {},
-                success = function (data, textStatus) {
-
-                },
-                success_reminder = true,
-            );
+            putSetup();
         });
     });
 </script>
