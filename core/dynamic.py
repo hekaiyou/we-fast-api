@@ -33,7 +33,10 @@ def get_apis_configs(module):
                 )
             else:
                 DYNAMIC_APIS_CONFIGS[module] = meta_class.Settings()
-            DYNAMIC_APIS_CONFIGS[f'{module}_describe'] = meta_class.settings_describe
+            try:
+                DYNAMIC_APIS_CONFIGS[f'{module}_describe'] = meta_class.settings_describe
+            except AttributeError:
+                DYNAMIC_APIS_CONFIGS[f'{module}_describe'] = {}
             return DYNAMIC_APIS_CONFIGS[module]
 
 
