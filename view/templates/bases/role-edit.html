@@ -37,6 +37,47 @@
 <script>
     var tagSelectDict = {};
     var tagSelectArray = [];
+    var synced_wids = [];
+    var synchronizations_i = 0;
+    var app_workers_num = parseInt('{{ settings.app_workers_num }}');
+    var synchronizations = 20;
+    function putRole() {
+        let permissions = [];
+        tagSelectArray.forEach(function (value, index) {
+            if (tagSelectDict[value]) {
+                permissions.push(value);
+            }
+        });
+        utilAjax(
+            type = 'PUT',
+            url = '/api/bases/role/{{ role_id }}/',
+            data = {
+                'title': $('#title').val(),
+                'permissions': permissions,
+            },
+            data_format = 'json',
+            check = {
+                'title': [/^\S{2,}$/, '角色名称的长度需要大于2位'],
+            },
+            success = function (data, textStatus) {
+                synchronizations_i++;
+                if (!synced_wids.includes(data.wid)) {
+                    synced_wids.push(data.wid);
+                } else {
+                    console.log('已同步 ' + synced_wids.length + ' 个进程 (' + synchronizations_i + ')');
+                }
+                if (synced_wids.length < app_workers_num) {
+                    if (synchronizations_i < synchronizations * app_workers_num) {
+                        setTimeout(function () { putRole() }, 5000);
+                    }
+                } else {
+                    swal('请求成功', { icon: 'success', buttons: false, timer: 1500, });
+                }
+            },
+            success_reminder = false,
+            not_close = true,
+        );
+    }
     function loadPage() {
         utilAjax(
             type = 'GET',
@@ -117,28 +158,9 @@
             not_close = true,
         );
         $('#submit').click(function () {
-            let permissions = [];
-            tagSelectArray.forEach(function (value, index) {
-                if (tagSelectDict[value]) {
-                    permissions.push(value);
-                }
-            });
-            utilAjax(
-                type = 'PUT',
-                url = '/api/bases/role/{{ role_id }}/',
-                data = {
-                    'title': $('#title').val(),
-                    'permissions': permissions,
-                },
-                data_format = 'json',
-                check = {
-                    'title': [/^\S{2,}$/, '角色名称的长度需要大于2位'],
-                },
-                success = function (data, textStatus) {
-                    $('#title').val(data.title);
-                },
-                success_reminder = true,
-            );
+            synced_wids = [];
+            synchronizations_i = 0;
+            putRole();
         });
         $('#delete').click(function () {
             utilAjax(

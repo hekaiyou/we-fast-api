@@ -2,9 +2,9 @@ from core.model import NoPaginate
 from fastapi.encoders import jsonable_encoder
 from fastapi import APIRouter, HTTPException, status
 from core.dependencies import get_base_settings
-from core.dynamic import set_role_permissions, revise_settings
+from core.dynamic import set_role_permissions, revise_settings, get_worker_id
 from core.database import get_collection, doc_create, doc_update
-from .models import COL_ROLE, RoleRead, RoleUpdate, COL_USER, RoleBase
+from .models import COL_ROLE, RoleRead, RoleUpdate, COL_USER, RoleBase, SyncedWorkerRead
 from .validate import RoleObjIdParams, check_role_title, check_role_permissions
 
 router = APIRouter(
@@ -72,7 +72,7 @@ async def delete_role(role_id: RoleObjIdParams):
 
 @router.put(
     '/{role_id}/',
-    response_model=RoleUpdate,
+    response_model=SyncedWorkerRead,
     summary='更新角色',
 )
 async def update_role(role_id: RoleObjIdParams, role_update: RoleUpdate):
@@ -82,7 +82,7 @@ async def update_role(role_id: RoleObjIdParams, role_update: RoleUpdate):
     if str(role_id) == '100000000000000000000001':
         revise_settings('user_default_permission', role_update.permissions)
         set_role_permissions(role_col)
-        return role_update
+        return {'wid': get_worker_id([])}
     stored_role_data = role_col.find_one({'_id': role_id})
     stored_role_model = RoleUpdate(**stored_role_data)
     update_role = role_update.dict(exclude_unset=True)
@@ -91,4 +91,4 @@ async def update_role(role_id: RoleObjIdParams, role_update: RoleUpdate):
         check_role_title(updated_role.title)
     doc_update(role_col, stored_role_data, jsonable_encoder(updated_role))
     set_role_permissions(role_col)  # 刷新全局角色权限变量
-    return updated_role
+    return {'wid': get_worker_id([])}
