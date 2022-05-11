@@ -14,7 +14,6 @@ DYNAMIC_STARTUP_TASK = []
 def get_worker_id(wid_list):
     global DYNAMIC_WORKER_ID
     if DYNAMIC_WORKER_ID not in wid_list:
-        DYNAMIC_WORKER_ID = str(time())
         return DYNAMIC_WORKER_ID
     return ''
 

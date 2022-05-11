@@ -16,7 +16,10 @@
 {% block javascript %}
 <script>
     var synced_wids = [];
+    var synchronizations_i = 0;
     var setups = {};
+    var app_workers_num = parseInt('{{ settings.app_workers_num }}');
+    var synchronizations = 20;
     function putSetup() {
         utilAjax(
             type = 'PUT',
@@ -28,13 +31,16 @@
             data_format = 'json',
             check = {},
             success = function (data, textStatus) {
+                synchronizations_i++;
                 if (data.wid != '') {
                     synced_wids.push(data.wid);
                 } else {
-                    console.log('已同步 ' + synced_wids.length);
+                    console.log('已同步 ' + synced_wids.length + ' 个进程 (' + synchronizations_i + ')');
                 }
-                if (synced_wids.length < parseInt('{{ settings.app_workers_num }}')) {
-                    setTimeout(function () { putSetup() }, 5000);
+                if (synced_wids.length < app_workers_num) {
+                    if (synchronizations_i < synchronizations * app_workers_num) {
+                        setTimeout(function () { putSetup() }, 5000);
+                    }
                 } else {
                     swal('请求成功', { icon: 'success', buttons: false, timer: 1500, });
                 }
@@ -81,6 +87,11 @@
                     setups[value.key] = parseInt($('#' + value.key).val());
                 }
             });
+            if ('{{ module_name }}' == 'bases') {
+                app_workers_num = setups['app_workers_num'];
+            }
+            synced_wids = [];
+            synchronizations_i = 0;
             putSetup();
         });
     });
