@@ -59,7 +59,7 @@ async def read_wechat_access_token(code: str):
             'bind': {'wechat': wechat_json['openid']},
         })
         user = user_col.find_one(user_filter)
-    if user.get('disabled', False):
+    if user.disabled:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='账户已被禁用',
