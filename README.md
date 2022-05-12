@@ -76,6 +76,8 @@ RestartSec=30s
 WantedBy=multi-user.target
 ```
 
+*参数 `--workers` 指定的工作进程数需要同步在 **更新 BASES 设置** 页面编辑 "App workers num" 值.*
+
 完成配置文件后, 就可以执行下列命令配置和管理服务:
 
 - 注册服务: sudo systemctl enable /home/.../.../we-fast-api/wefast.service
