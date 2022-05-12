@@ -59,6 +59,12 @@ async def read_wechat_access_token(code: str):
             'bind': {'wechat': wechat_json['openid']},
         })
         user = user_col.find_one(user_filter)
+    if user.disabled:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='账户已被禁用',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
     role = {'title': 'Default', 'permissions': get_role_permissions(None)}
     if user['role_id']:
         role = get_collection(COL_ROLE).find_one({
