@@ -1,7 +1,6 @@
 from typing import Optional
 from core.validate import ObjIdParams
 from fastapi.responses import HTMLResponse
-from core.dependencies import get_base_settings
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from core.dependencies import get_view_request
@@ -15,7 +14,6 @@ templates = Jinja2Templates(directory='view/templates')
 
 @router.get('/token/', response_class=HTMLResponse, include_in_schema=False)
 async def page_token(request: dict = Depends(get_view_request), token_s: Optional[str] = Cookie(None)):
-    settings = get_base_settings()
     if token_s:
         return RedirectResponse('/view/bases/dashboard/')
     return templates.TemplateResponse('bases/token.html', {**request})

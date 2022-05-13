@@ -1,7 +1,6 @@
 from core.model import NoPaginate
 from fastapi.encoders import jsonable_encoder
 from fastapi import APIRouter, HTTPException, status
-from core.dependencies import get_base_settings
 from core.database import get_collection, doc_create, doc_update
 from .validate import RoleObjIdParams, check_role_title, check_role_permissions
 from .models import COL_ROLE, RoleRead, RoleUpdate, COL_USER, RoleBase, SyncedWorkerRead
