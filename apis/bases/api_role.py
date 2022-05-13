@@ -2,10 +2,10 @@ from core.model import NoPaginate
 from fastapi.encoders import jsonable_encoder
 from fastapi import APIRouter, HTTPException, status
 from core.dependencies import get_base_settings
-from core.dynamic import set_role_permissions, revise_settings, get_worker_id
 from core.database import get_collection, doc_create, doc_update
-from .models import COL_ROLE, RoleRead, RoleUpdate, COL_USER, RoleBase, SyncedWorkerRead
 from .validate import RoleObjIdParams, check_role_title, check_role_permissions
+from .models import COL_ROLE, RoleRead, RoleUpdate, COL_USER, RoleBase, SyncedWorkerRead
+from core.dynamic import set_role_permissions, revise_settings, get_worker_id, get_role_permissions
 
 router = APIRouter(
     prefix='/role',
@@ -34,7 +34,7 @@ async def read_role(role_id: RoleObjIdParams):
         return {
             '_id': '100000000000000000000001',
             'title': 'Default',
-            'permissions': get_base_settings().user_default_permission,
+            'permissions': get_role_permissions(''),
         }
     return RoleRead(**(get_collection(COL_ROLE).find_one({'_id': role_id})))
 
