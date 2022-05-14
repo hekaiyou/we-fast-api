@@ -28,7 +28,7 @@ class UserBase(BaseModel):
     ''' 用户的基础模型 '''
     username: Optional[str] = Field(title='用户名称',)
     full_name: Optional[str] = Field(title='用户完整姓名',)
-    email: Optional[EmailStr] = Field(title='用户邮箱',)
+    email: Optional[EmailStr] = Field(title='电子邮箱',)
     disabled: Optional[bool] = Field(default=False, title='是否禁用',)
 
 

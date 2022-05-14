@@ -60,16 +60,30 @@
             success = function (data, textStatus) {
                 let reg = new RegExp('_', 'g');
                 data['all_item'].forEach(function (value, index) {
-                    let keyTitle = value.key.replace(reg, ' ');
-                    let formHtml = '<label for="' + value.key + '">' + keyTitle.slice(0, 1).toUpperCase() + keyTitle.slice(1) + '<input ';
-                    if (value.type == 'str') {
-                        formHtml += 'type="text"';
-                    } else if (value.type == 'int') {
-                        formHtml += 'type="number"';
-                    }
-                    formHtml += ' id="' + value.key + '" value="' + value.value + '" required>';
+                    let keyTitle = '';
                     if (value.describe) {
-                        formHtml += '<small>' + value.describe + '</small>';
+                        keyTitle = value.describe;
+                    } else {
+                        let keyTitleReg = value.key.replace(reg, ' ');
+                        keyTitle = keyTitle.slice(0, 1).toUpperCase() + keyTitle.slice(1);
+                    }
+                    let formHtml = '<label for="' + value.key + '">';
+                    if (value.type == 'str') {
+                        formHtml += keyTitle + '<input ';
+                        formHtml += 'type="text"';
+                        formHtml += ' id="' + value.key + '" value="' + value.value + '" required>';
+                    } else if (value.type == 'int') {
+                        formHtml += keyTitle + '<input ';
+                        formHtml += 'type="number"';
+                        formHtml += ' id="' + value.key + '" value="' + value.value + '" required>';
+                    } else if (value.type == 'bool') {
+                        formHtml += '<input ';
+                        formHtml += 'type="checkbox" role="switch"';
+                        if (value.value) {
+                            formHtml += 'checked="checked"';
+                        }
+                        formHtml += ' id="' + value.key + '" required>';
+                        formHtml += keyTitle + '<br /><br />';
                     }
                     formHtml += '</label>';
                     $('#form-content').append(formHtml);
@@ -85,6 +99,12 @@
                     setups[value.key] = $('#' + value.key).val();
                 } else if (value.type == 'int') {
                     setups[value.key] = parseInt($('#' + value.key).val());
+                } else if (value.type == 'bool') {
+                    if ($('#' + value.key + ':checked').val()) {
+                        setups[value.key] = true;
+                    } else {
+                        setups[value.key] = false;
+                    }
                 }
             });
             if ('{{ module_name }}' == 'bases') {

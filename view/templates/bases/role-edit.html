@@ -163,18 +163,27 @@
             putRole();
         });
         $('#delete').click(function () {
-            utilAjax(
-                type = 'DELETE',
-                url = '/api/bases/role/{{ role_id }}/',
-                data = {},
-                data_format = 'json',
-                check = {},
-                success = function (data, textStatus) {
-                    window.location.href = '/view/bases/role/';
-                },
-                success_reminder = false,
-                not_close = false,
-            );
+            swal({
+                title: '你正在删除角色',
+                icon: 'warning',
+                buttons: ['取消', '确认删除'],
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    utilAjax(
+                        type = 'DELETE',
+                        url = '/api/bases/role/{{ role_id }}/',
+                        data = {},
+                        data_format = 'json',
+                        check = {},
+                        success = function (data, textStatus) {
+                            window.location.href = '/view/bases/role/';
+                        },
+                        success_reminder = false,
+                        not_close = false,
+                    );
+                }
+            });
         });
     });
     //{% else %}

@@ -1,5 +1,6 @@
 import os
 from core.security import get_token_data
+from core.emails import send_simple_mail
 from .utils import update_bind_username
 from .validate import get_me_user, check_user_username, check_user_email
 from fastapi.encoders import jsonable_encoder
@@ -45,6 +46,16 @@ async def update_me_info(user_update: UserBase, current_token: TokenData = Depen
             stored_name=stored_user_data['username'], update_name=updated_user.username,
         )
     return updated_user
+
+
+@router.put(
+    '/email/free/',
+    summary='验证我的电子邮箱 (无权限)',
+)
+async def verify_me_email(current_token: TokenData = Depends(get_token_data)):
+    send_simple_mail(['何小有<hekaiyou@qq.com>'], '测试邮件',
+                     ['测试<a href="http://baidu.com"><span>百度</span></a>内容内容内容', '第二行'])
+    return {}
 
 
 @router.post(
