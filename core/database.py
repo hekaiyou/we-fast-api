@@ -49,7 +49,8 @@ def whether_to_initialize(apis_urls):
                 'role_id': role_id,
                 'source': 'Initialization',
                 'avata': '',
-                'bind': {'wechat': ''},
+                'bind': {'wechat': '', 'email': ''},
+                'verify': {'email': {'code': '', 'create': None, 'value': ''}},
                 'create_time': datetime.utcnow(),
                 'update_time': datetime.utcnow(),
             })

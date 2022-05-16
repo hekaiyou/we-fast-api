@@ -32,11 +32,11 @@ def send_mail(to_addrs: list, subject: str, msg: MIMEBase):
         return True
     except smtplib.SMTPAuthenticationError as e:
         logger.error(f'发送邮件异常, {e}')
-        logger.info('建议: 确认授权码是否正确')
-        logger.info('建议: 检查一下服务器地址')
+        logger.debug('建议: 确认授权码是否正确')
+        logger.debug('建议: 检查一下服务器地址')
     except smtplib.SMTPServerDisconnected as e:
         logger.error(f'发送邮件异常, {e}')
-        logger.info('建议: 可能需要开启 SSL 加密')
+        logger.debug('建议: 可能需要开启 SSL 加密')
 
 
 def send_base_mail(to_addrs, subject, text):

@@ -1,8 +1,9 @@
-from core.validate import ObjIdParams, ObjectId, str_to_oid
-from core.database import get_collection
+from datetime import datetime
 from .models import COL_ROLE, COL_USER
 from fastapi import HTTPException, status
 from core.dependencies import get_api_routes
+from core.database import get_collection, doc_update
+from core.validate import ObjIdParams, ObjectId, str_to_oid
 
 
 class RoleObjIdParams(ObjIdParams):
@@ -98,3 +99,38 @@ def get_me_user(v):
             detail='令牌无法匹配到用户',
         )
     return user
+
+
+def check_verify_code(code: str, username: str, verify_key: str):
+    if not code or len(code) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='无效的验证码',
+        )
+    if not username or len(username) < 2:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='无效的用户名',
+        )
+    user_col = get_collection(COL_USER)
+    user = user_col.find_one({'username': username})
+    if not user['verify'][verify_key]['code']:
+        return False
+    if (datetime.utcnow() - user['verify'][verify_key]['create']).seconds > 3600:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='过期的验证码',
+        )
+    if user['verify'][verify_key]['code'] != code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='错误的验证码',
+        )
+    doc_update(
+        user_col, {'_id': user['_id']},
+        {
+            f'verify.{verify_key}.code': '', f'verify.{verify_key}.create': None, f'verify.{verify_key}.value': '',
+            f'bind.{verify_key}': user['verify'][verify_key]['value'],
+        },
+    )
+    return True

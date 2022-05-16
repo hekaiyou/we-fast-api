@@ -56,7 +56,8 @@ async def read_wechat_access_token(code: str):
             'role_id': '',
             'source': 'WeChat',
             'avata': '',
-            'bind': {'wechat': wechat_json['openid']},
+            'bind': {'wechat': wechat_json['openid'], 'email': ''},
+            'verify': {'email': {'code': '', 'create': None, 'value': ''}},
         })
         user = user_col.find_one(user_filter)
     if user.get('disabled', False):

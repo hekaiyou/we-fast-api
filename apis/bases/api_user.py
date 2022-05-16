@@ -31,7 +31,8 @@ async def create_user(user_create: UserCreate):
     user_json['password'] = get_password_hash(user_create.password)
     user_json['source'] = 'Admin'
     user_json['avata'] = ''
-    user_json['bind'] = {'wechat': ''}
+    user_json['bind'] = {'wechat': '', 'email': ''}
+    user_json['verify'] = {'email': {'code': '', 'create': None, 'value': ''}}
     doc_create(user_col, user_json)
     return user_json
 
