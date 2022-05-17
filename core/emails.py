@@ -1,6 +1,5 @@
 import smtplib
 from loguru import logger
-from email.header import Header
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from core.dynamic import get_apis_configs
