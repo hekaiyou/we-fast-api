@@ -12,6 +12,8 @@ settings = get_apis_configs('bases')
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
+    docs_url='/docs' if settings.app_docs else None,
+    redoc_url='/redoc' if settings.app_redoc else None,
 )
 app.include_router(apis_urls.router)
 app.include_router(view_urls.router)
