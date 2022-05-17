@@ -31,8 +31,13 @@
 </form>
 {% endblock %}
 
+{% block operate_right_bottom %}
+<button id="verifyEmail" style="display:none">验证电子邮箱地址</button>
+{% endblock %}
+
 {% block javascript %}
 <script>
+    var originalEmail = '';
     $(document).ready(function () {
         utilAjax(
             type = 'GET',
@@ -44,6 +49,12 @@
                 $('#username').val(data.username)
                 $('#full_name').val(data.full_name)
                 $('#email').val(data.email)
+                originalEmail = data.email;
+                if (data.email) {
+                    if (!data.bind.email || data.email != data.bind.email) {
+                        $('#verifyEmail').show();
+                    }
+                }
             },
             success_reminder = false,
             not_close = false,
@@ -64,11 +75,14 @@
                     'email': [/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/, '电子邮箱地址的格式不正确'],
                 },
                 success = function (data, textStatus) {
+                    if (originalEmail != $('#email').val()) {
+                        location.reload();
+                    }
                     $('#username').val(data.username);
                     $('#full_name').val(data.full_name);
                     $('#email').val(data.email);
                 },
-                success_reminder = true,
+                success_reminder = (originalEmail == $('#email').val()),
             );
         });
         $('#file').change(function () {
@@ -81,6 +95,21 @@
                     success_reminder = true,
                 );
             }
+        });
+        $('#verifyEmail').click(function () {
+            utilAjax(
+                type = 'PUT',
+                url = '/api/bases/me/email/verify/free/',
+                data = {},
+                data_format = 'json',
+                check = {},
+                success = function (data, textStatus) {
+                    swal('已发送验证邮件到 ' + originalEmail + ' 邮箱', { icon: 'success', buttons: false, });
+                    $('#verifyEmail').attr('disabled', true);
+                },
+                success_reminder = false,
+                not_close = true,
+            );
         });
     });
 </script>

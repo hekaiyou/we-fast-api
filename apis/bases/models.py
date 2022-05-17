@@ -42,6 +42,7 @@ class UserCreate(UserBase):
 class UserGlobal(UserCreate):
     ''' 用户的全局模型 '''
     id: ObjId = Field(alias='_id', title='用户ID',)
+    bind: dict = Field(title='用户绑定信息',)
 
 
 class UserUpdate(UserBase):

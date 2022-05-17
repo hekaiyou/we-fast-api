@@ -1,10 +1,9 @@
 import os
 from loguru import logger
 from datetime import datetime
-from random import randint, choice
+from .utils import update_bind_username
 from core.security import get_token_data
 from core.emails import send_simple_mail
-from .utils import update_bind_username
 from core.dynamic import get_apis_configs
 from fastapi.encoders import jsonable_encoder
 from core.storage import save_raw_file, FILES_PATH
@@ -12,7 +11,7 @@ from core.database import get_collection, doc_update
 from .models import TokenData, COL_USER, UserGlobal, UserBase
 from fastapi.responses import StreamingResponse, RedirectResponse
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from .validate import get_me_user, check_user_username, check_user_email, check_verify_code
+from .validate import get_me_user, check_user_username, check_user_email, check_verify_code, get_verify_code, UserObjIdParams
 
 router = APIRouter(
     prefix='/me',
@@ -60,7 +59,10 @@ async def verify_me_email_verify(current_token: TokenData = Depends(get_token_da
     user = get_me_user(current_token.user_id)
     if user['verify']['email']['code']:
         if (datetime.utcnow() - user['verify']['email']['create']).seconds < 3600:
-            return {'detail': '成功发送验证邮件'}
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='验证邮件已经发送',
+            )
     if not user.get('email', None):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -68,37 +70,30 @@ async def verify_me_email_verify(current_token: TokenData = Depends(get_token_da
         )
     if user['bind'].get('email', None):
         if user['bind']['email'] == user['email']:
-            return {'detail': '电子邮箱已通过验证'}
-    code = ''
-    for i in range(6):
-        n = randint(0, 9)
-        b = chr(randint(65, 90))
-        s = chr(randint(97, 122))
-        code += str(choice([n, b, s]))
-    doc_update(
-        get_collection(COL_USER), {'_id': user['_id']},
-        {'verify.email.code': code,
-            'verify.email.value': user['email'], 'verify.email.create': datetime.utcnow(), },
-    )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='电子邮箱已通过验证',
+            )
+    code = get_verify_code(user['email'], user['_id'], 'email')
     configs = get_apis_configs('bases')
     send_simple_mail(
         [f'{user["username"]}<{user["email"]}>'],
         '验证电子邮箱',
         [
             f'尊敬的 <b>{user["username"]}({user["full_name"]})</b> :',
-            f'请点击 <a href="{configs.app_host}api/bases/me/email/verify/open/?code={code}&username={user["username"]}"><span>验证链接</span></a> 以完成操作!',
+            f'请点击 <a href="{configs.app_host}api/bases/me/email/verify/open/?code={code}&user_id={current_token.user_id}"><span>验证链接</span></a> 以完成操作!',
             '<i>请保管好您的邮箱, 避免账号被他人盗用</i>',
         ])
     logger.info(f'向 {user["username"]}<{user["email"]}> 发送验证电子邮箱的 {code} 验证码')
-    return {'detail': '成功发送验证邮件'}
+    return {}
 
 
 @router.get(
     '/email/verify/open/',
     summary='读取我的电子邮箱验证 (开放)',
 )
-async def read_me_email_verify(code: str, username: str):
-    check_verify_code(code, username, 'email')
+async def read_me_email_verify(code: str, user_id: UserObjIdParams):
+    check_verify_code(code, user_id, 'email')
     return RedirectResponse('/view/bases/token/')
 
 

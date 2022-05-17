@@ -1,4 +1,5 @@
 from datetime import datetime
+from random import randint, choice
 from .models import COL_ROLE, COL_USER
 from fastapi import HTTPException, status
 from core.dependencies import get_api_routes
@@ -101,19 +102,31 @@ def get_me_user(v):
     return user
 
 
-def check_verify_code(code: str, username: str, verify_key: str):
+def get_verify_code(value, user_id, verify_key):
+    code = ''
+    for i in range(6):
+        n = randint(0, 9)
+        b = chr(randint(65, 90))
+        s = chr(randint(97, 122))
+        code += str(choice([n, b, s]))
+    doc_update(
+        get_collection(COL_USER), {'_id': user_id}, {
+            f'verify.{verify_key}.code': code,
+            f'verify.{verify_key}.value': value,
+            f'verify.{verify_key}.create': datetime.utcnow(),
+        },
+    )
+    return code
+
+
+def check_verify_code(code, user_id, verify_key):
     if not code or len(code) < 6:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='无效的验证码',
         )
-    if not username or len(username) < 2:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='无效的用户名',
-        )
     user_col = get_collection(COL_USER)
-    user = user_col.find_one({'username': username})
+    user = user_col.find_one({'_id': user_id})
     if not user['verify'][verify_key]['code']:
         return False
     if (datetime.utcnow() - user['verify'][verify_key]['create']).seconds > 3600:
@@ -126,11 +139,10 @@ def check_verify_code(code: str, username: str, verify_key: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='错误的验证码',
         )
-    doc_update(
-        user_col, {'_id': user['_id']},
-        {
-            f'verify.{verify_key}.code': '', f'verify.{verify_key}.create': None, f'verify.{verify_key}.value': '',
-            f'bind.{verify_key}': user['verify'][verify_key]['value'],
-        },
-    )
+    update_dict = {
+        f'verify.{verify_key}.code': '', f'verify.{verify_key}.create': None, f'verify.{verify_key}.value': '',
+    }
+    if verify_key == 'email':
+        update_dict[f'bind.{verify_key}'] = user['verify'][verify_key]['value']
+    doc_update(user_col, {'_id': user['_id']}, update_dict)
     return True
