@@ -1,6 +1,7 @@
 import os
 import shutil
 import hashlib
+from PIL import Image
 from datetime import datetime
 from tempfile import NamedTemporaryFile
 
@@ -48,6 +49,9 @@ async def remove_file(path: list):
     # 判断文件是否存在, 再删除文件
     if os.path.exists(remove_path):
         os.remove(remove_path)
+    other_path = os.path.join(FILES_PATH, *path[:-1])
+    if os.path.exists(os.path.join(other_path, f'{path[-1:][0]}_t')):
+        os.remove(os.path.join(other_path, f'{path[-1:][0]}_t'))
 
 
 async def remove_dirs(path: list):
@@ -56,3 +60,15 @@ async def remove_dirs(path: list):
     # 判断文件夹是否存在, 再删除文件夹
     if os.path.exists(remove_path):
         shutil.rmtree(remove_path)
+
+
+async def generate_thumbnail(path: list, size: tuple):
+    ''' 生成图像文件的缩略图文件 '''
+    original_path = os.path.join(FILES_PATH, *path)
+    thumbnail_path = os.path.join(FILES_PATH, *path[:-1], f'{path[-1:][0]}_t')
+    if os.path.exists(thumbnail_path):
+        return thumbnail_path
+    im = Image.open(original_path)
+    im.thumbnail(size)
+    im.save(thumbnail_path, im.format)
+    return thumbnail_path
