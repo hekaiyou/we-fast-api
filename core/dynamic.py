@@ -11,7 +11,7 @@ DYNAMIC_USERNAME_BINDING = {}
 DYNAMIC_STARTUP_TASK = []
 
 
-def get_worker_id(wid_list):
+def get_worker_id(wid_list: list = []):
     global DYNAMIC_WORKER_ID
     if DYNAMIC_WORKER_ID not in wid_list:
         return DYNAMIC_WORKER_ID

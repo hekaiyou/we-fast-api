@@ -1,5 +1,6 @@
 import apis.apis_urls as apis_urls
 import view.view_urls as view_urls
+from loguru import logger
 from fastapi import FastAPI
 from core.dynamic import get_startup_task, get_apis_configs
 from core.dependencies import get_base_settings
@@ -33,6 +34,7 @@ async def redirect_view():
 
 @app.on_event('startup')
 async def startup_event():
+    logger.info('服务进程启动')
     create_db_client(apis_urls)
     for task in get_startup_task():
         task()
@@ -40,4 +42,5 @@ async def startup_event():
 
 @app.on_event('shutdown')
 async def shutdown_event():
+    logger.info('服务进程结束')
     close_db_client()

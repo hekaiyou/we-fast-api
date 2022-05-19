@@ -81,7 +81,7 @@ async def update_role(role_id: RoleObjIdParams, role_update: RoleUpdate):
     if str(role_id) == '100000000000000000000001':
         revise_settings('user_default_permission', role_update.permissions)
         set_role_permissions(role_col)
-        return {'wid': get_worker_id([])}
+        return {'wid': get_worker_id()}
     stored_role_data = role_col.find_one({'_id': role_id})
     stored_role_model = RoleUpdate(**stored_role_data)
     update_role = role_update.dict(exclude_unset=True)
@@ -90,4 +90,4 @@ async def update_role(role_id: RoleObjIdParams, role_update: RoleUpdate):
         check_role_title(updated_role.title)
     doc_update(role_col, stored_role_data, jsonable_encoder(updated_role))
     set_role_permissions(role_col)  # 刷新全局角色权限变量
-    return {'wid': get_worker_id([])}
+    return {'wid': get_worker_id()}

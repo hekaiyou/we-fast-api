@@ -42,6 +42,7 @@ logger.add(
     retention='30 days',
     enqueue=True,
     level='DEBUG',
+    serialize=True,
 )
 
 
