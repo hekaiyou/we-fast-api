@@ -100,8 +100,8 @@ class SyncedWorkerRead(BaseModel):
 class UserUpdatePassword(BaseModel):
     ''' 用户的更新密码模型 '''
     current_password: str = Field(
-        title='当前密码', regex='^(?![A-Za-z]+$)(?!\\d+$)(?![\\W_]+$)\\S{6,32}$',)
+        title='当前密码', regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',)
     new_password: str = Field(
-        title='新密码', regex='^(?![A-Za-z]+$)(?!\\d+$)(?![\\W_]+$)\\S{6,32}$',)
+        title='新密码', regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',)
     repeat_new_password: str = Field(
-        title='重复新密码', regex='^(?![A-Za-z]+$)(?!\\d+$)(?![\\W_]+$)\\S{6,32}$',)
+        title='重复新密码', regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',)

@@ -45,7 +45,7 @@ def whether_to_initialize(apis_urls):
                 'email': 'admin@admin.com',
                 'full_name': 'Administrator',
                 'disabled': False,
-                'password': get_password_hash('123D456'),
+                'password': get_password_hash('i23D456'),
                 'role_id': role_id,
                 'source': 'Initialization',
                 'avata': '',
