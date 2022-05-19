@@ -42,7 +42,7 @@ logger.add(
     retention='30 days',
     enqueue=True,
     level='DEBUG',
-    serialize=True,
+    format='{process} | {thread} | {time:%Y-%m-%d %H:%M:%S.%f} | {level} | {name}:{function}:{line} - {message}',
 )
 
 
