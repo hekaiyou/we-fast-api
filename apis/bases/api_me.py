@@ -2,13 +2,13 @@ import os
 from loguru import logger
 from datetime import datetime
 from .utils import update_bind_username
-from core.security import get_token_data
 from core.emails import send_simple_mail
 from core.dynamic import get_apis_configs
 from fastapi.encoders import jsonable_encoder
 from core.storage import save_raw_file, FILES_PATH
 from core.database import get_collection, doc_update
 from fastapi.responses import StreamingResponse, RedirectResponse
+from core.security import get_token_data, get_password_hash, verify_password
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from .models import TokenData, COL_USER, UserGlobal, UserBase, UserUpdatePassword
 from .validate import get_me_user, check_user_username, check_user_email, check_verify_code, get_verify_code, UserObjIdParams
@@ -56,7 +56,21 @@ async def update_me_info(user_update: UserBase, current_token: TokenData = Depen
     summary='更新我的密码 (无权限)',
 )
 async def update_me_password(update_password: UserUpdatePassword, current_token: TokenData = Depends(get_token_data)):
-    print(update_password)
+    if update_password.new_password != update_password.repeat_new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='重复新密码不一致',
+        )
+    user = get_me_user(current_token.user_id)
+    if not verify_password(update_password.current_password, user['password']):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='当前密码错误',
+        )
+    doc_update(
+        get_collection(COL_USER), user,
+        {'password': get_password_hash(update_password.new_password)},
+    )
     return {}
 
 
