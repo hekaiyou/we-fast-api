@@ -95,3 +95,13 @@ class SetupUpdate(BaseModel):
 class SyncedWorkerRead(BaseModel):
     ''' 同步工作进程的读取模型 '''
     wid: str = Field(title='进程ID',)
+
+
+class UserUpdatePassword(BaseModel):
+    ''' 用户的更新密码模型 '''
+    current_password: str = Field(
+        title='当前密码', regex='^(?![A-Za-z]+$)(?!\\d+$)(?![\\W_]+$)\\S{6,32}$',)
+    new_password: str = Field(
+        title='新密码', regex='^(?![A-Za-z]+$)(?!\\d+$)(?![\\W_]+$)\\S{6,32}$',)
+    repeat_new_password: str = Field(
+        title='重复新密码', regex='^(?![A-Za-z]+$)(?!\\d+$)(?![\\W_]+$)\\S{6,32}$',)

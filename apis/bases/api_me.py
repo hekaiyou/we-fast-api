@@ -8,9 +8,9 @@ from core.dynamic import get_apis_configs
 from fastapi.encoders import jsonable_encoder
 from core.storage import save_raw_file, FILES_PATH
 from core.database import get_collection, doc_update
-from .models import TokenData, COL_USER, UserGlobal, UserBase
 from fastapi.responses import StreamingResponse, RedirectResponse
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from .models import TokenData, COL_USER, UserGlobal, UserBase, UserUpdatePassword
 from .validate import get_me_user, check_user_username, check_user_email, check_verify_code, get_verify_code, UserObjIdParams
 
 router = APIRouter(
@@ -49,6 +49,15 @@ async def update_me_info(user_update: UserBase, current_token: TokenData = Depen
             stored_name=stored_user_data['username'], update_name=updated_user.username,
         )
     return updated_user
+
+
+@router.put(
+    '/password/free/',
+    summary='更新我的密码 (无权限)',
+)
+async def update_me_password(update_password: UserUpdatePassword, current_token: TokenData = Depends(get_token_data)):
+    print(update_password)
+    return {}
 
 
 @router.put(
