@@ -54,7 +54,7 @@ async def read_logs_file(log_date: date):
     if os.path.exists(f'{log_path}/{log_date}.log'):
         return FileResponse(
             path=f'{log_path}/{log_date}.log',
-            media_type='text/log',
+            media_type='text/plain',
             filename=f'{log_date}.log',
         )
     else:

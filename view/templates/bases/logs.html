@@ -1,17 +1,50 @@
 {% extends 'navigation.html' %}
 {% block title %}服务日志{% endblock %}
 
-{% block operate_right_top %}
+{% block main %}
+<form>
+    <div class="grid">
+        <label for="recordDate">
+            记录日期
+            <input type="date" id="recordDate" placeholder="记录日期">
+        </label>
+        <label for="time">
+            开始时间
+            <input type="time" id="time" placeholder="账户名">
+        </label>
+        <label for="time">
+            结束时间
+            <input type="time" id="time" placeholder="账户名">
+        </label>
+    </div>
+    <pre>
+        <code id="details-content"></code>
+    </pre>
+</form>
 {% endblock %}
 
-{% block main %}
-<div id="details-content">
-</div>
+{% block operate_right_bottom %}
+<button id="download">下载日志</button>
 {% endblock %}
 
 {% block javascript %}
 <script>
     $(document).ready(function () {
+        let date = new Date();
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        if (month < 10) { month = '0' + month; }
+        if (day < 10) { day = '0' + day; }
+        $('#recordDate').val(year + '-' + month + '-' + day);
+        $('#details-content').append('<div>sdadsfassdafasdd</div>');
+        $('#details-content').append('<div>sdadsfassdafasdd</div>');
+        $('#details-content').append('<div>sdadsfassdafasdd</div>');
+        $('#download').click(function () {
+            if ($('#recordDate').val()) {
+                window.location.href = '/api/bases/logs/file/' + $('#recordDate').val() + '/';
+            }
+        });
     });
 </script>
 {% endblock %}

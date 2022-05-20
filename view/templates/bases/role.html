@@ -1,16 +1,16 @@
 {% extends 'navigation.html' %}
 {% block title %}角色与权限{% endblock %}
 
-{% block operate_right_top %}
-<a id="submit" role="button" href="javascript:void(0);">创建</a>
-{% endblock %}
-
 {% block main %}
 <div id="details-content">
-    <details onclick="event.preventDefault()" id="100000000000000000000001">
+    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
         <summary>Default</summary>
     </details>
 </div>
+{% endblock %}
+
+{% block operate_right_bottom %}
+<button id="submit">创建</button>
 {% endblock %}
 
 {% block javascript %}
@@ -24,9 +24,9 @@
             check = {},
             success = function (data, textStatus) {
                 data['all_item'].forEach(function (value, index) {
-                    $('#details-content').append('<details onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['title'] + ' <sup>有' + value['permissions'].length + '个权限</sup></summary></details>');
+                    $('#details-content').append('<details class="itemRole" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['title'] + ' <sup>有' + value['permissions'].length + '个权限</sup></summary></details>');
                 });
-                $('details').click(function () {
+                $('.itemRole').click(function () {
                     window.location.href = '/view/bases/role/update/' + $(this).attr('id') + '/';
                 });
             },
