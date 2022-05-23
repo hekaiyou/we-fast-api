@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     app_workers_num: int = 1
     app_docs: bool = True
     app_redoc: bool = True
+    uvicorn_host: str = '0.0.0.0'
+    uvicorn_port: int = 8083
+    uvicorn_workers: int = 1
+    uvicorn_reload: bool = False
     token_expire_minute: int = 720
     token_secret_key: str = '2203a6a1be54a1ab3afad0e5ca16de1dfe2ee384f13fe4b710c0b16359db9983'
     mail_smtp_host: str = 'smtp.163.com'
@@ -23,9 +27,13 @@ settings_describe = {
     'app_name': '服务的标题',
     'app_version': '服务的版本号',
     'app_host': '服务的主机地址',
-    'app_workers_num': '服务的工作进程数 (workers)',
+    'app_workers_num': '服务的工作进程总数 (workers)',
     'app_docs': '服务的 Swagger 文档 <需重启>',
     'app_redoc': '服务的 ReDoc 文档 <需重启>',
+    'uvicorn_host': 'Uvicorn 监听地址 <需重启>',
+    'uvicorn_port': 'Uvicorn 监听端口 <需重启>',
+    'uvicorn_workers': 'Uvicorn 工作进程 <需重启>',
+    'uvicorn_reload': 'Uvicorn 重新加载 <需重启>',
     'token_expire_minute': '令牌的有效时间 (分钟) <需重启>',
     'token_secret_key': '令牌的密钥 (openssl rand -hex 32) <需重启>',
     'mail_smtp_host': '邮件 SMTP 服务器主机地址',

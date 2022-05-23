@@ -68,7 +68,7 @@ Description=WeFastAPI
 [Service]
 Type=simple
 WorkingDirectory=/home/.../.../we-fast-api
-ExecStart=/home/.../.../we-fast-api/env/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8083 --workers 4
+ExecStart=/home/.../.../we-fast-api/env/bin/python main.py
 Restart=on-failure
 RestartSec=30s
 

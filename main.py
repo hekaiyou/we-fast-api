@@ -1,3 +1,4 @@
+import uvicorn
 import apis.apis_urls as apis_urls
 import view.view_urls as view_urls
 from loguru import logger
@@ -44,3 +45,10 @@ async def startup_event():
 async def shutdown_event():
     logger.info('服务进程结束')
     close_db_client()
+
+if __name__ == '__main__':
+    uvicorn.run(
+        'main:app',
+        host=settings.uvicorn_host, port=settings.uvicorn_port,
+        workers=settings.uvicorn_workers, reload=settings.uvicorn_reload,
+    )
