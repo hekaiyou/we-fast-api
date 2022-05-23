@@ -25,7 +25,7 @@ MONGO_DB_NAME='test_database'
 使用指定的地址和端口启动项目:
 
 ```shell
-$ uvicorn main:app --host 0.0.0.0 --port 8083 --reload
+$ python main.py
 ```
 
 访问以下文档和服务地址:

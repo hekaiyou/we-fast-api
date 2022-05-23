@@ -37,14 +37,15 @@
         if (month < 10) { month = '0' + month; }
         if (day < 10) { day = '0' + day; }
         $('#recordDate').val(year + '-' + month + '-' + day);
-        $('#details-content').append('<div>sdadsfassdafasdd</div>');
-        $('#details-content').append('<div>sdadsfassdafasdd</div>');
-        $('#details-content').append('<div>sdadsfassdafasdd</div>');
+        $('#details-content').load('/api/bases/logs/file/' + $('#recordDate').val() + '/');
         $('#download').click(function () {
             if ($('#recordDate').val()) {
                 window.location.href = '/api/bases/logs/file/' + $('#recordDate').val() + '/';
             }
         });
+        // $('#details-content').append('<div>sdadsfassdafasdd</div>');
+        // $('#details-content').append('<div>sdadsfassdafasdd</div>');
+        // $('#details-content').append('<div>sdadsfassdafasdd</div>');
     });
 </script>
 {% endblock %}
