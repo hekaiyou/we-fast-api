@@ -5,9 +5,10 @@ from core.security import get_password_hash
 from fastapi.encoders import jsonable_encoder
 from core.storage import remove_file, FILES_PATH
 from core.dependencies import get_paginate_parameters
+from apis.bases.models import Paginate
 from fastapi import APIRouter, Depends
 from .models import COL_USER, UserRead, UserCreate, UserUpdate
-from core.database import get_collection, paginate_find, Paginate, doc_create, doc_update
+from core.database import get_collection, paginate_find, doc_create, doc_update
 from .validate import UserObjIdParams, check_user_username, check_role_id, check_user_email
 
 router = APIRouter(
