@@ -1,10 +1,22 @@
-from typing import Optional, List
 from datetime import datetime
 from core.validate import ObjId
+from typing import Optional, List, Dict
 from pydantic import BaseModel, EmailStr, Field
 
 COL_USER = 'user'
 COL_ROLE = 'role'
+
+
+class Paginate(BaseModel):
+    ''' 分页数据响应的模型 '''
+    items: List[Dict]
+    total: int
+
+
+class NoPaginate(BaseModel):
+    ''' 不分页数据响应的模型 '''
+    all_item: List[Dict]
+    total: int
 
 
 class Token(BaseModel):

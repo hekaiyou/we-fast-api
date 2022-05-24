@@ -102,3 +102,20 @@ async def verify_api_permission(request: Request, current_token: TokenData = Dep
 async def get_view_request(request: Request):
     ''' 全局依赖项: 获取页面访问的请求内容 '''
     return {'request': request, 'settings': get_apis_configs('bases')}
+
+
+class aiwrap:
+    ''' 全局依赖项: 提取解析后再还原 FastAPI 响应 '''
+
+    def __init__(self, obj):
+        self._it = iter(obj)
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        try:
+            value = next(self._it)
+        except StopIteration:
+            raise StopAsyncIteration
+        return value

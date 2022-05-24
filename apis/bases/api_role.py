@@ -1,4 +1,4 @@
-from core.model import NoPaginate
+from apis.bases.models import NoPaginate
 from fastapi.encoders import jsonable_encoder
 from fastapi import APIRouter, HTTPException, status
 from core.database import get_collection, doc_create, doc_update

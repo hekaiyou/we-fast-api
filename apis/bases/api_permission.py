@@ -1,4 +1,4 @@
-from core.model import NoPaginate
+from apis.bases.models import NoPaginate
 from .models import PermissionRead
 from fastapi import APIRouter, Depends
 from core.dependencies import get_api_routes

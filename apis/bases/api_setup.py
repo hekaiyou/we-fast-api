@@ -1,6 +1,6 @@
 import os
 from core.dynamic import get_worker_id
-from core.model import NoPaginate
+from apis.bases.models import NoPaginate
 from .models import SetupUpdate, SyncedWorkerRead
 from fastapi import APIRouter, HTTPException, status
 from core.dynamic import set_apis_configs, get_apis_configs

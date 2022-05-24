@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from loguru import logger
 from pymongo import MongoClient
 from functools import lru_cache
-from core.model import Paginate
+from apis.bases.models import Paginate
 from datetime import datetime, timedelta
 from pymongo.collection import Collection
 from core.dependencies import get_base_settings

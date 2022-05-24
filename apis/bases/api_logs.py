@@ -36,13 +36,13 @@ log_path_info = os.path.join(
     f'{time.strftime("%Y-%m-%d")}.log'
 )
 # 每天凌晨创建新文件, 保留 30 天的日志文件, 开启异步记录
+# format='{process} | {thread} | {time:%Y-%m-%d %H:%M:%S.%f} | {level} | {name}:{function}:{line} - {message}',
 logger.add(
     log_path_info,
     rotation='00:00',
     retention='30 days',
     enqueue=True,
     level='DEBUG',
-    format='{process} | {thread} | {time:%Y-%m-%d %H:%M:%S.%f} | {level} | {name}:{function}:{line} - {message}',
 )
 
 
