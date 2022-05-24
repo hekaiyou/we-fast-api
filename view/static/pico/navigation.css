@@ -12,3 +12,15 @@ suspended button {
     box-shadow: var(--card-box-shadow);
     text-align: right;
 }
+INFO {
+    color: #93CEA8;
+}
+DEBUG {
+    color: #499CD6;
+}
+WARNING {
+    color: #CE9178;
+}
+ERROR {
+    color: #DB6A6A;
+}

@@ -53,7 +53,7 @@ async def add_response_middleware(request: Request, call_next):
     # 请求开始前的处理
     response = await call_next(request)
     # 请求完成后的处理
-    if response.status_code not in [200, 307, 404, 403, 401]:
+    if response.status_code not in [200, 307, 304, 404, 403, 401]:
         # 提前解析响应
         resp_body = [section async for section in response.__dict__['body_iterator']]
         # 修复 FastAPI 响应

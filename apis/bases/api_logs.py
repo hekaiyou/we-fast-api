@@ -15,7 +15,6 @@ from loguru import logger
 # 再选择输出什么级别的消息
 logger.debug('调试日志')
 logger.info('信息日志')
-logger.success('成功日志')
 logger.warning('警告日志')
 logger.error('异常日志')
 '''
@@ -43,6 +42,7 @@ logger.add(
     retention='30 days',
     enqueue=True,
     level='DEBUG',
+    format='<{level}><em>{time:%Y-%m-%d %H:%M:%S.%f}</em> {name}:{function}:{line} - {message}</{level}>',
 )
 
 
