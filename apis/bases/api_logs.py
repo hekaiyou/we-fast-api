@@ -42,7 +42,7 @@ logger.add(
     retention='30 days',
     enqueue=True,
     level='DEBUG',
-    format='<{level}><em>{time:%Y-%m-%d %H:%M:%S.%f}</em> {name}:{function}:{line} - {message}</{level}>',
+    format='{time:%Y-%m-%d %H:%M:%S.%f} - {name}:{function}:{line}\n<{level}>{message}</{level}>',
 )
 
 

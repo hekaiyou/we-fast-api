@@ -1,3 +1,4 @@
+import os
 import json
 import uvicorn
 import apis.apis_urls as apis_urls
@@ -36,7 +37,7 @@ async def redirect_view():
 
 @app.on_event('startup')
 async def startup_event():
-    logger.info('服务进程启动')
+    logger.info(f'服务进程 {os.getpid()} 启动')
     create_db_client(apis_urls)
     for task in get_startup_task():
         task()
@@ -44,7 +45,6 @@ async def startup_event():
 
 @app.on_event('shutdown')
 async def shutdown_event():
-    logger.info('服务进程结束')
     close_db_client()
 
 

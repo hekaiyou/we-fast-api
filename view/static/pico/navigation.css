@@ -12,15 +12,44 @@ suspended button {
     box-shadow: var(--card-box-shadow);
     text-align: right;
 }
-INFO {
+.logContent {
+    color: #a2afb9;
+    font-style: italic;
+    font-size: .75em;
+    bottom: -.25em;
+    position: relative;
+    line-height: 0;
+    vertical-align: baseline;
+}
+.logContent info {
     color: #93CEA8;
+    font-style: normal;
+    font-size: 1.25em;
+    bottom: 0em;
+    position: static;
+    line-height: 2.1em;
 }
-DEBUG {
+.logContent debug {
     color: #499CD6;
+    font-style: normal;
+    font-size: 1.25em;
+    bottom: 0em;
+    position: static;
+    line-height: 2.1em;
 }
-WARNING {
+.logContent warning {
     color: #CE9178;
+    font-style: normal;
+    font-size: 1.25em;
+    bottom: 0em;
+    position: static;
+    line-height: 2.1em;
 }
-ERROR {
+.logContent error {
     color: #DB6A6A;
+    font-style: normal;
+    font-size: 1.25em;
+    bottom: 0em;
+    position: static;
+    line-height: 2.1em;
 }
