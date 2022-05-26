@@ -1,3 +1,4 @@
+import os
 import json
 import uvicorn
 import apis.apis_urls as apis_urls
@@ -20,7 +21,8 @@ app = FastAPI(
 )
 app.include_router(apis_urls.router)
 app.include_router(view_urls.router)
-app.mount('/static', StaticFiles(directory='view/static'), name='static')
+app.mount('/static', StaticFiles(
+    directory=f'{os.path.dirname(os.path.realpath(__file__))}/view/static'), name='static')
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_base_settings().allow_origins,

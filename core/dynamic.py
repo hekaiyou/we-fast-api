@@ -24,11 +24,12 @@ def get_apis_configs(module):
     if module in DYNAMIC_APIS_CONFIGS:
         return DYNAMIC_APIS_CONFIGS[module]
     else:
-        if os.path.exists(f'apis/{module}/config.py'):
+        work_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        if os.path.exists(f'{work_path}/apis/{module}/config.py'):
             meta_class = importlib.import_module(f'apis.{module}.config')
-            if os.path.exists(f'apis/{module}/.env'):
+            if os.path.exists(f'{work_path}/apis/{module}/.env'):
                 DYNAMIC_APIS_CONFIGS[module] = meta_class.Settings(
-                    _env_file=f'apis/{module}/.env',
+                    _env_file=f'{work_path}/apis/{module}/.env',
                     _env_file_encoding='utf-8',
                 )
             else:
@@ -42,11 +43,12 @@ def get_apis_configs(module):
 
 def set_apis_configs(module, key, vlaue):
     ''' 设置动态全局变量: 接口配置 '''
-    revise_settings(key, vlaue, env_path=f'apis/{module}/.env')
+    work_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    revise_settings(key, vlaue, env_path=f'{work_path}/apis/{module}/.env')
     global DYNAMIC_APIS_CONFIGS
     meta_class = importlib.import_module(f'apis.{module}.config')
     DYNAMIC_APIS_CONFIGS[module] = meta_class.Settings(
-        _env_file=f'apis/{module}/.env',
+        _env_file=f'{work_path}/apis/{module}/.env',
         _env_file_encoding='utf-8',
     )
 

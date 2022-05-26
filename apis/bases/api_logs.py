@@ -22,7 +22,7 @@ logger.error('异常日志')
 # 定位到项目根目录, 再定位到 logs 日志目录
 log_path = os.path.join(
     os.path.dirname(os.path.dirname(
-        os.path.dirname(os.path.abspath(__file__))
+        os.path.dirname(os.path.realpath(__file__))
     )),
     'logs',
 )

@@ -18,9 +18,11 @@ router = APIRouter(
 async def read_setup_module_all():
     all_item = []
     exclude_dir_path = ['apis_urls.py', '__init__.py', '__pycache__']
-    for dir_path in os.listdir('apis/'):
+    work_path = os.path.dirname(os.path.dirname(
+        os.path.dirname(os.path.realpath(__file__))))
+    for dir_path in os.listdir(f'{work_path}/apis/'):
         if not dir_path in exclude_dir_path:
-            if os.path.exists(f'apis/{dir_path}/config.py'):
+            if os.path.exists(f'{work_path}/apis/{dir_path}/config.py'):
                 all_item.append({'name': f'particle-{dir_path}'})
     return NoPaginate(all_item=all_item, total=len(all_item))
 

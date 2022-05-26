@@ -28,7 +28,7 @@ async def create_api_access_token(form_data: OAuth2PasswordRequestForm = Depends
     )
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_c_UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail='账户名或密码错误',
             headers={'WWW-Authenticate': 'Bearer'},
         )

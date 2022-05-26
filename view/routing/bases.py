@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 from core.validate import ObjIdParams
 from fastapi.responses import HTMLResponse
@@ -9,7 +10,8 @@ from fastapi import APIRouter, Cookie, Depends
 router = APIRouter(
     prefix='/bases',
 )
-templates = Jinja2Templates(directory='view/templates')
+templates = Jinja2Templates(
+    directory=f'{os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))}/view/templates')
 
 
 @router.get('/token/', response_class=HTMLResponse, include_in_schema=False)

@@ -1,3 +1,4 @@
+import os
 import apis.apis_urls as apis_urls
 from config import Settings
 from typing import Optional
@@ -16,7 +17,10 @@ def get_base_settings():
     依赖项示例: settings: Settings = Depends(get_base_settings)
     依赖项示例: settings = get_base_settings()
     '''
-    return Settings()
+    return Settings(
+        _env_file=f'{os.path.dirname(os.path.dirname(os.path.realpath(__file__)))}/.env',
+        _env_file_encoding='utf-8',
+    )
 
 
 @lru_cache()

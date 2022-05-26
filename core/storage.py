@@ -5,7 +5,7 @@ from PIL import Image
 from datetime import datetime
 from tempfile import NamedTemporaryFile
 
-FILES_PATH = os.path.join(os.getcwd(), 'files')
+FILES_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'files')
 
 
 async def save_raw_file(file: NamedTemporaryFile, directory: list, filename: str = None):

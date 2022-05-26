@@ -10,9 +10,10 @@ router = APIRouter(
 
 exclude_dir_path = ['apis_urls.py', '__init__.py', '__pycache__']
 # 自动查找可用的 API 模块并添加路由
-for dir_path in os.listdir('apis/'):
+work_path_apis = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+for dir_path in os.listdir(f'{work_path_apis}/apis/'):
     if not dir_path in exclude_dir_path:
-        if os.path.exists(f'apis/{dir_path}/routing.py'):
+        if os.path.exists(f'{work_path_apis}/apis/{dir_path}/routing.py'):
             module_name = f'apis.{dir_path}.routing'
             meta_class = importlib.import_module(module_name)
             router.include_router(meta_class.router)
