@@ -48,9 +48,13 @@ logger.add(
     summary='读取日志文件',
 )
 async def read_logs_file(log_date: date):
-    if os.path.exists(f'{log_path}/{log_date}.log'):
+    if time.strftime('%Y-%m-%d', time.localtime(time.time())) == str(log_date):
+        path = f'{log_path}/loguru.log'
+    else:
+        path = f'{log_path}/{log_date}.log'
+    if os.path.exists(path):
         return FileResponse(
-            path=f'{log_path}/{log_date}.log',
+            path=path,
             media_type='text/plain',
             filename=f'{log_date}.log',
         )

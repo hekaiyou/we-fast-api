@@ -63,8 +63,11 @@ async def add_response_middleware(request: Request, call_next):
             resp_body = json.loads(resp_body[0].decode())
         except:
             resp_body = str(resp_body)
-        logger.error(
-            f'{request["method"]} {request["path"]} 请求响应 {response.status_code} {resp_body}')
+        log = f'{request["method"]} {request["path"]} 请求响应 {response.status_code} {resp_body}'
+        if response.status_code >= 500:
+            logger.error(log)
+        else:
+            logger.warning(log)
     return response
 
 if __name__ == '__main__':
