@@ -30,10 +30,7 @@ log_path = os.path.join(
 if not os.path.exists(log_path):
     os.mkdir(log_path)
 # 生成当天的日志文件路径
-log_path_info = os.path.join(
-    log_path,
-    f'{time.strftime("%Y-%m-%d")}.log'
-)
+log_path_info = os.path.join(log_path, 'loguru.log')
 # 每天凌晨创建新文件, 保留 30 天的日志文件, 开启异步记录
 # format='{process} | {thread} | {time:%Y-%m-%d %H:%M:%S.%f} | {level} | {name}:{function}:{line} - {message}',
 logger.add(
