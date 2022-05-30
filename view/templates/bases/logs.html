@@ -8,13 +8,10 @@
             记录日期
             <input type="date" id="recordDate" placeholder="记录日期">
         </label>
-        <label for="time">
-            开始时间
-            <input type="time" id="time" placeholder="账户名">
-        </label>
-        <label for="time">
-            结束时间
-            <input type="time" id="time" placeholder="账户名">
+        <label for="logSnippet">
+            进程 {{ ppid }} 片段
+            <select id="logSnippet" required>
+            </select>
         </label>
     </div>
     <pre style="background-color: #1E1E1E;">
@@ -24,11 +21,32 @@
 {% endblock %}
 
 {% block operate_right_bottom %}
-<button id="download">下载日志</button>
+<button id="download" style="display:none">下载日志</button>
 {% endblock %}
 
 {% block javascript %}
 <script>
+    function selectRecordDate() {
+        utilAjax(
+            type = 'GET',
+            url = '/api/bases/logs/',
+            data = { 'log_date': $('#recordDate').val(), },
+            data_format = 'query',
+            check = {},
+            success = function (data, textStatus) {
+                $('#logSnippet').append('<option value="" selected>选择记录片段</option>');
+                data['all_item'].forEach(function (value, index) {
+                    $('#logSnippet').append('<option value="' + value.file + '">' + value.file + '</option>');
+                });
+            },
+            success_reminder = false,
+            not_close = false,
+        );
+    }
+    function selectLogSnippet() {
+        $('#details-content').load('/api/bases/logs/file/?snippet=' + $('#logSnippet').val());
+        $('#download').show();
+    }
     $(document).ready(function () {
         let date = new Date();
         let year = date.getFullYear();
@@ -37,15 +55,27 @@
         if (month < 10) { month = '0' + month; }
         if (day < 10) { day = '0' + day; }
         $('#recordDate').val(year + '-' + month + '-' + day);
-        $('#details-content').load('/api/bases/logs/file/' + $('#recordDate').val() + '/');
-        $('#download').click(function () {
+        selectRecordDate();
+        $('#recordDate').change(function (value) {
             if ($('#recordDate').val()) {
-                window.location.href = '/api/bases/logs/file/' + $('#recordDate').val() + '/';
+                $('#logSnippet').empty();
+                $('#details-content').empty();
+                $('#download').hide();
+                selectRecordDate();
             }
         });
-        // $('#details-content').append('<div>sdadsfassdafasdd</div>');
-        // $('#details-content').append('<div>sdadsfassdafasdd</div>');
-        // $('#details-content').append('<div>sdadsfassdafasdd</div>');
+        $('#logSnippet').change(function (value) {
+            $('#details-content').empty();
+            $('#download').hide();
+            if ($('#logSnippet').val()) {
+                selectLogSnippet();
+            }
+        });
+        $('#download').click(function () {
+            if ($('#logSnippet').val()) {
+                window.location.href = '/api/bases/logs/file/?snippet=' + $('#logSnippet').val();
+            }
+        });
     });
 </script>
 {% endblock %}

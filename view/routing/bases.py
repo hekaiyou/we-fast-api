@@ -58,7 +58,7 @@ async def page_bases_setup_update(module_name: str, request: dict = Depends(get_
 
 @router.get('/logs/', response_class=HTMLResponse, include_in_schema=False)
 async def page_bases_logs(request: dict = Depends(get_view_request)):
-    return templates.TemplateResponse('bases/logs.html', {**request})
+    return templates.TemplateResponse('bases/logs.html', {**request, 'ppid': os.getppid(), })
 
 
 @router.get('/password/update/', response_class=HTMLResponse, include_in_schema=False)

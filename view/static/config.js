@@ -1,7 +1,7 @@
 var navigationBar = [
     {
         'path': '/view/bases/logs/',
-        'permission': ['read_logs_file',],
+        'permission': ['read_logs_all', 'read_logs_file'],
         'text': '服务日志',
     },
     {

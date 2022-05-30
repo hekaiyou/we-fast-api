@@ -2,6 +2,7 @@ import os
 import time
 from loguru import logger
 from datetime import date
+from apis.bases.models import NoPaginate
 from fastapi.responses import FileResponse
 from fastapi import APIRouter, HTTPException, status
 
@@ -44,19 +45,32 @@ logger.add(
 
 
 @router.get(
-    '/file/{log_date}/',
+    '/',
+    summary='读取日志 (全量)',
+)
+async def read_logs_all(log_date: date):
+    all_item = []
+    if time.strftime('%Y-%m-%d', time.localtime(time.time())) == str(log_date):
+        all_item.append({'file': 'loguru'})
+    exclude_file_path = ['.gitignore', 'loguru.log']
+    for file_path in os.listdir(log_path):
+        if not file_path in exclude_file_path:
+            if str(log_date) in file_path:
+                all_item.append({'file': file_path[:-4]})
+    return NoPaginate(all_item=all_item, total=len(all_item))
+
+
+@router.get(
+    '/file/',
     summary='读取日志文件',
 )
-async def read_logs_file(log_date: date):
-    if time.strftime('%Y-%m-%d', time.localtime(time.time())) == str(log_date):
-        path = f'{log_path}/loguru.log'
-    else:
-        path = f'{log_path}/{log_date}.log'
+async def read_logs_file(snippet: str):
+    path = f'{log_path}/{snippet}.log'
     if os.path.exists(path):
         return FileResponse(
             path=path,
             media_type='text/plain',
-            filename=f'{log_date}.log',
+            filename=f'{snippet}.log',
         )
     else:
         raise HTTPException(
