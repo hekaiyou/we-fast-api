@@ -4,6 +4,7 @@ import uvicorn
 import apis.apis_urls as apis_urls
 import view.view_urls as view_urls
 from loguru import logger
+from core.tasks import repeat_task
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
@@ -41,6 +42,12 @@ async def startup_event():
     create_db_client(apis_urls)
     for task in get_startup_task():
         task()
+
+
+@app.on_event('startup')
+@repeat_task(seconds=60*60, wait_first=True)
+def repeat_task_aggregate_request_records() -> None:
+    logger.info('触发重复任务: 聚合请求记录')
 
 
 @app.on_event('shutdown')
