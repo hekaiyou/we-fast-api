@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     mongo_db_host: str = '127.0.0.1'
     mongo_db_port: int = 27017
     mongo_db_name: str = 'test_database'
+    # 令牌的密钥 (openssl rand -hex 32)
+    token_secret_key: str = '2203a6a1be54a1ab3afad0e5ca16de1dfe2ee384f13fe4b710c0b16359db9983'
     # MongoDB 连接: 认证信息
     mongo_db_username: str = ''
     mongo_db_password: str = ''
