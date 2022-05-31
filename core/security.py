@@ -2,6 +2,7 @@ from typing import Optional
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
+from core.dependencies import get_base_settings
 from apis.bases.models import UserGlobal, TokenData
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import HTTPException, Depends, status, Request
@@ -11,7 +12,7 @@ settings = get_apis_configs('bases')
 # 用于哈希和校验密码的 PassLib 上下文
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 # 使用命令生成一个安全的随机密钥: `openssl rand -hex 32`
-SECRET_KEY = settings.token_secret_key
+SECRET_KEY = get_base_settings().token_secret_key
 # 设定 JWT 令牌签名算法
 ALGORITHM = 'HS256'
 # 设置令牌过期时间 (默认720分钟即12小时)
