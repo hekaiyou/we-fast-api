@@ -1,7 +1,9 @@
 import os
 import time
+from main import app
 from loguru import logger
 from datetime import date
+from core.tasks import repeat_task
 from apis.bases.models import NoPaginate
 from fastapi.responses import FileResponse
 from fastapi import APIRouter, HTTPException, status
@@ -42,6 +44,12 @@ logger.add(
     level='DEBUG',
     format='{time:%Y-%m-%d %H:%M:%S.%f} - {name}:{function}:{line}\n<{level}>{message}</{level}>',
 )
+
+
+@app.on_event('startup')
+@repeat_task(seconds=60*60, wait_first=True)
+def repeat_task_aggregate_request_records() -> None:
+    logger.info('触发重复任务: 聚合请求记录')
 
 
 @router.get(
