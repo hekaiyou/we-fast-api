@@ -3,6 +3,7 @@ import json
 import uvicorn
 import apis.apis_urls as apis_urls
 import view.view_urls as view_urls
+from time import time
 from loguru import logger
 from core.tasks import repeat_task
 from fastapi import FastAPI, Request
@@ -11,7 +12,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from core.dependencies import get_base_settings, aiwrap
 from core.database import create_db_client, close_db_client
-from core.dynamic import get_startup_task, get_apis_configs
+from core.dynamic import get_startup_task, get_apis_configs, set_request_record, get_request_record
 
 settings = get_apis_configs('bases')
 app = FastAPI(
@@ -45,9 +46,12 @@ async def startup_event():
 
 
 @app.on_event('startup')
-@repeat_task(seconds=60*60, wait_first=True)
+@repeat_task(seconds=60, wait_first=True)
 def repeat_task_aggregate_request_records() -> None:
-    logger.info('触发重复任务: 聚合请求记录')
+    while True:
+        record = get_request_record()
+        if not record:
+            break
 
 
 @app.on_event('shutdown')
@@ -57,11 +61,10 @@ async def shutdown_event():
 
 @app.middleware('http')
 async def add_response_middleware(request: Request, call_next):
-    # 请求开始前的处理
-    # ip = request.client.host
-    # print(ip)
+    start = time()  # 请求开始前获取开始时间
     response = await call_next(request)
-    # 请求完成后的处理
+    end = time()  # 请求完成后获取结束时间
+    set_request_record(request, end-start, response)
     if response.status_code not in [200, 307, 304, 422, 405, 404, 403, 401]:
         # 提前解析响应
         resp_body = [section async for section in response.__dict__['body_iterator']]

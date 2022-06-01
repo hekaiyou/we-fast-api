@@ -9,6 +9,7 @@ DYNAMIC_APIS_CONFIGS = {}
 DYNAMIC_ROLE_PERMISSIONS = {}
 DYNAMIC_USERNAME_BINDING = {}
 DYNAMIC_STARTUP_TASK = []
+DYNAMIC_REQUEST_RECORD = []
 
 
 def get_worker_id(wid_list: list = []):
@@ -24,7 +25,8 @@ def get_apis_configs(module):
     if module in DYNAMIC_APIS_CONFIGS:
         return DYNAMIC_APIS_CONFIGS[module]
     else:
-        work_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        work_path = os.path.dirname(
+            os.path.dirname(os.path.realpath(__file__)))
         if os.path.exists(f'{work_path}/apis/{module}/config.py'):
             meta_class = importlib.import_module(f'apis.{module}.config')
             if os.path.exists(f'{work_path}/apis/{module}/.env'):
@@ -119,3 +121,38 @@ def revise_settings(key, value, env_path: str = '.env'):
             contents += f'{key.upper()}={value}'
     with open(env_path, 'w', encoding='utf-8') as file_obj:
         file_obj.write(contents)
+
+
+def get_request_record():
+    ''' 获取动态全局变量: 请求记录 '''
+    global DYNAMIC_REQUEST_RECORD
+    if DYNAMIC_REQUEST_RECORD:
+        return DYNAMIC_REQUEST_RECORD.pop()
+    else:
+        return {}
+
+
+def set_request_record(request, spend_sec, response):
+    ''' 设置动态全局变量: 请求记录 '''
+    if response.status_code in [404, 405, 307]:
+        return
+    global DYNAMIC_REQUEST_RECORD
+    path_key = f'{request.scope["method"]} {request.scope["path"]}'
+    if request['root_path'] == '/static':
+        path_key = 'GET /static/'
+    elif 'GET /docs' in path_key:
+        path_key = 'GET /docs/'
+    elif 'GET /redoc' in path_key:
+        path_key = 'GET /redoc/'
+    else:
+        if request.path_params:
+            for param_k, param_v in request.path_params.items():
+                path_key = path_key.replace(param_v, '{%s}' % (param_k))
+    byte = 0
+    for header in response.raw_headers:
+        if header[0] == b'content-length':
+            byte = int(header[1])
+            break
+    DYNAMIC_REQUEST_RECORD.append({
+        'ip': request.client.host, 'path': path_key, 'spend_sec': spend_sec, 'byte': byte, 'status': response.status_code,
+    })
