@@ -6,14 +6,35 @@ import view.view_urls as view_urls
 from time import time
 from loguru import logger
 from core.tasks import repeat_task
-from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request, applications
 from core.dependencies import get_base_settings, aiwrap
 from core.database import create_db_client, close_db_client
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from core.dynamic import get_startup_task, get_apis_configs, set_request_record, get_request_record
 
+
+def swagger_monkey_patch(*args, **kwargs):
+    return get_swagger_ui_html(
+        *args, **kwargs,
+        swagger_js_url='/static/swagger-ui/4/swagger-ui-bundle.js',
+        swagger_css_url='/static/swagger-ui/4/swagger-ui.css',
+        swagger_favicon_url='/static/image/favicon.png',
+    )
+
+
+def redoc_monkey_patch(*args, **kwargs):
+    return get_redoc_html(
+        *args, **kwargs,
+        redoc_js_url='/static/redoc/next/redoc.standalone.js',
+        redoc_favicon_url='/static/image/favicon.png',
+    )
+
+
+applications.get_swagger_ui_html = swagger_monkey_patch
+applications.get_redoc_html = redoc_monkey_patch
 settings = get_apis_configs('bases')
 app = FastAPI(
     title=settings.app_name,
