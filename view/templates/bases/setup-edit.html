@@ -84,6 +84,11 @@
                         }
                         formHtml += ' id="' + value.key + '" required>';
                         formHtml += keyTitle + '<br /><br />';
+                    } else if (value.type == 'list') {
+                        formHtml += keyTitle + '<input ';
+                        formHtml += 'type="text"';
+                        formHtml += ' id="' + value.key + '" value="' + value.value.join(',') + '" required>';
+                        formHtml += '<small>列表值之间使用逗号 <strong>,</strong> 分隔</small>';
                     }
                     formHtml += '</label>';
                     $('#form-content').append(formHtml);
@@ -104,6 +109,12 @@
                         setups[value.key] = true;
                     } else {
                         setups[value.key] = false;
+                    }
+                } else if (value.type == 'list') {
+                    if ($('#' + value.key).val()) {
+                        setups[value.key] = $('#' + value.key).val().split(',');
+                    } else {
+                        setups[value.key] = [];
                     }
                 }
             });

@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     uvicorn_workers: int = 1
     uvicorn_reload: bool = False
     token_expire_minute: int = 720
+    token_exempt_ip: list = []
     mail_smtp_host: str = 'smtp.163.com'
     mail_smtp_use_ssl: bool = True
     mail_smtp_port: int = 465
@@ -32,8 +33,9 @@ settings_describe = {
     'uvicorn_host': '单 Uvicorn 监听地址 <需重启>',
     'uvicorn_port': '单 Uvicorn 监听端口 <需重启>',
     'uvicorn_workers': '单 Uvicorn 工作进程 <需重启>',
-    'uvicorn_reload': '单 Uvicorn 重新加载 <需重启>',
+    'uvicorn_reload': '单 Uvicorn 代码变更重新加载 <需重启>',
     'token_expire_minute': '令牌的有效时间 (分钟) <需重启>',
+    'token_exempt_ip': '令牌豁免 IP 列表 (注意安全) <需重启>',
     'mail_smtp_host': '邮件 SMTP 服务器主机地址',
     'mail_smtp_use_ssl': '邮件 SMTP 服务器 SSL 加密',
     'mail_smtp_port': '邮件 SMTP 服务器主机端口',

@@ -90,6 +90,8 @@ async def get_paginate_parameters(
 
 async def verify_api_permission(request: Request, current_token: TokenData = Depends(get_token_data), routes: dict = Depends(get_api_routes)):
     ''' 全局依赖项: 验证 API 访问权限 '''
+    if current_token.user_id == 'ExemptIP' and current_token.role_id == 'ExemptIP':
+        return
     path_key = f'{request.scope["method"]} {request.scope["path"]}'
     if request.path_params:
         for param_k, param_v in request.path_params.items():

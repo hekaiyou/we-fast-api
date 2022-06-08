@@ -74,31 +74,34 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 async def get_token_data(request: Request, token: str = Depends(oauth2_scheme)):
     ''' 依赖项: 获取当前令牌数据 '''
-    if not token:
-        if not request.cookies.get('token_s', None):
-            if not '/open/' in str(request.url):
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail='未认证',
-                    headers={'WWW-Authenticate': 'Bearer'},
-                )
-            else:
-                return TokenData(user_id='', role_id='')
-        token = request.cookies.get('token_s')
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail='无法验证凭据',
-        headers={'WWW-Authenticate': 'Bearer'},
-    )
-    try:
-        # 验证 JWT 字符串的签名并解码凭证信息
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        # 在复杂情况下可能需要多个标识, 为避免 ID 冲突, 可以在 `sub` 键的值前加上前缀
-        sub_valud: str = payload.get('sub')
-        if sub_valud is None:
+    if request.client.host in settings.token_exempt_ip:
+        return TokenData(user_id='ExemptIP', role_id='ExemptIP')
+    else:
+        if not token:
+            if not request.cookies.get('token_s', None):
+                if not '/open/' in str(request.url):
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail='未认证',
+                        headers={'WWW-Authenticate': 'Bearer'},
+                    )
+                else:
+                    return TokenData(user_id='', role_id='')
+            token = request.cookies.get('token_s')
+        credentials_exception = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='无法验证凭据',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+        try:
+            # 验证 JWT 字符串的签名并解码凭证信息
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            # 在复杂情况下可能需要多个标识, 为避免 ID 冲突, 可以在 `sub` 键的值前加上前缀
+            sub_valud: str = payload.get('sub')
+            if sub_valud is None:
+                raise credentials_exception
+            # 解析出用户及其角色的 ID 字符串
+            sub_list = sub_valud.split(':')
+            return TokenData(user_id=sub_list[0], role_id=sub_list[1])
+        except JWTError:
             raise credentials_exception
-        # 解析出用户及其角色的 ID 字符串
-        sub_list = sub_valud.split(':')
-        return TokenData(user_id=sub_list[0], role_id=sub_list[1])
-    except JWTError:
-        raise credentials_exception
