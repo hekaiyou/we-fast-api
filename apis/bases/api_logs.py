@@ -10,7 +10,7 @@ router = APIRouter(
     prefix='/logs',
 )
 
-'''
+"""
 # 调用参考代码, 先导入模块
 from loguru import logger
 # 再选择输出什么级别的消息
@@ -18,7 +18,7 @@ logger.debug('调试日志')
 logger.info('信息日志')
 logger.warning('警告日志')
 logger.error('异常日志')
-'''
+"""
 
 # 定位到项目根目录, 再定位到 logs 日志目录
 log_path = os.path.join(
@@ -54,7 +54,7 @@ async def read_logs_all(log_date: date):
         all_item.append({'file': 'loguru'})
     exclude_file_path = ['.gitignore', 'loguru.log']
     for file_path in os.listdir(log_path):
-        if not file_path in exclude_file_path:
+        if file_path not in exclude_file_path:
             if str(log_date) in file_path:
                 all_item.append({'file': file_path[:-4]})
     return NoPaginate(all_item=all_item, total=len(all_item))

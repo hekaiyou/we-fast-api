@@ -79,7 +79,7 @@ async def get_token_data(request: Request, token: str = Depends(oauth2_scheme)):
     else:
         if not token:
             if not request.cookies.get('token_s', None):
-                if not '/open/' in str(request.url):
+                if '/open/' not in str(request.url):
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail='未认证',

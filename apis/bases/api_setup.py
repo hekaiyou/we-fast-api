@@ -21,7 +21,7 @@ async def read_setup_module_all():
     work_path = os.path.dirname(os.path.dirname(
         os.path.dirname(os.path.realpath(__file__))))
     for dir_path in os.listdir(f'{work_path}/apis/'):
-        if not dir_path in exclude_dir_path:
+        if dir_path not in exclude_dir_path:
             if os.path.exists(f'{work_path}/apis/{dir_path}/config.py'):
                 all_item.append({'name': f'particle-{dir_path}'})
     return NoPaginate(all_item=all_item, total=len(all_item))
