@@ -11,8 +11,8 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request, applications
 from core.dependencies import get_base_settings, aiwrap
-from core.database import create_db_client, close_db_client
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from core.database import create_db_client, close_db_client, get_collection, doc_create
 from core.dynamic import get_startup_task, get_apis_configs, set_request_record, get_request_record
 
 
@@ -69,10 +69,22 @@ async def startup_event():
 @app.on_event('startup')
 @repeat_task(seconds=60, wait_first=True)
 def repeat_task_aggregate_request_records() -> None:
+    operate_path_col = get_collection('operate_path')
+    current_temp = []
     while True:
         record = get_request_record()
         if not record:
             break
+        current_data = {'date': record['date'], 'path': record['path']}
+        if f'{record["date"]}{record["path"]}' not in current_temp:
+            if not operate_path_col.count_documents(current_data):
+                doc_create(operate_path_col, {
+                           'total': 0, 'byte_m': 0.0, 'spend_s': 0.0, **current_data,
+                           })
+            current_temp.append(f'{record["date"]}{record["path"]}')
+        operate_path_col.update_one(current_data, {
+            '$inc': {'total': 1, 'byte_m': record['byte']/1024/1024, 'spend_s': record['spend_sec'], },
+        })
 
 
 @app.on_event('shutdown')
