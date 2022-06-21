@@ -78,11 +78,10 @@ def repeat_task_aggregate_request_records() -> None:
         current_data = {'date': record['date'], 'path': record['path']}
         if f'{record["date"]}{record["path"]}' not in current_temp:
             if not operate_path_col.count_documents(current_data):
-                doc_create(operate_path_col,
-                           {'total': 0, 'byte_m': 0.0, 'spend_s': 0.0, **current_data, 'hours': {}})
+                doc_create(operate_path_col, {'hours': {}, **current_data})
             current_temp.append(f'{record["date"]}{record["path"]}')
         operate_path_col.update_one(current_data, {
-            '$inc': {'total': 1, 'byte_m': record['byte']/1024/1024, 'spend_s': record['spend_sec'], f'hours.{record["hour"]}': 1, },
+            '$inc': {f'hours.{record["hour"]}.total': 1, f'hours.{record["hour"]}.spend_s':  record['spend_sec'], f'hours.{record["hour"]}.byte_m': record['byte']/1024/1024, },
         })
 
 
