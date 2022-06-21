@@ -3,7 +3,7 @@ import importlib
 from json import dumps
 from config import Settings
 from time import time
-from datetime import date
+from datetime import datetime
 
 DYNAMIC_WORKER_ID = str(time())
 DYNAMIC_APIS_CONFIGS = {}
@@ -154,7 +154,8 @@ def set_request_record(request, spend_sec, response):
         if header[0] == b'content-length':
             byte = int(header[1])
             break
+    now_dt = datetime.now()
     # 'ip': request.client.host, 'status': response.status_code,
     DYNAMIC_REQUEST_RECORD.append({
-        'path': path_key, 'spend_sec': spend_sec, 'byte': byte, 'date': str(date.today()),
+        'path': path_key, 'spend_sec': spend_sec, 'byte': byte, 'date': str(now_dt.date()), 'hour': now_dt.time().hour,
     })
