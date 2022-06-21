@@ -81,7 +81,10 @@ def repeat_task_aggregate_request_records() -> None:
                 doc_create(operate_path_col, {'hours': {}, **current_data})
             current_temp.append(f'{record["date"]}{record["path"]}')
         operate_path_col.update_one(current_data, {
-            '$inc': {f'hours.{record["hour"]}.total': 1, f'hours.{record["hour"]}.spend_s':  record['spend_sec'], f'hours.{record["hour"]}.byte_m': record['byte']/1024/1024, },
+            '$inc': {
+                f'hours.{record["hour"]}.total': 1, f'hours.{record["hour"]}.spend_s':  record['spend_sec'],
+                f'hours.{record["hour"]}.byte_m': record['byte']/1024/1024, f'hours.{record["hour"]}.c_{record["status"]}': 1,
+            },
         })
 
 

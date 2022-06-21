@@ -155,7 +155,7 @@ def set_request_record(request, spend_sec, response):
             byte = int(header[1])
             break
     now_dt = datetime.now()
-    # 'ip': request.client.host, 'status': response.status_code,
+    # 'ip': request.client.host,
     DYNAMIC_REQUEST_RECORD.append({
-        'path': path_key, 'spend_sec': spend_sec, 'byte': byte, 'date': str(now_dt.date()), 'hour': now_dt.time().hour,
+        'path': path_key, 'spend_sec': spend_sec, 'byte': byte, 'date': str(now_dt.date()), 'hour': now_dt.time().hour, 'status': response.status_code,
     })
