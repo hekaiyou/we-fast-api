@@ -4,7 +4,7 @@ if (!Cookies.get('token_s')) {
     }
 } else {
     if (window.location.href.indexOf('/view/bases/token') != -1) {
-        window.location.href = '/view/bases/dashboard/';
+        window.location.href = '/view/bases/home/';
     }
 }
 

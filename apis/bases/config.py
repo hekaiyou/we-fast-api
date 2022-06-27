@@ -2,9 +2,10 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    app_name: str = 'We FastAPI'
+    app_name: str = 'WeFastAPI'
     app_version: str = '0.0.1'
     app_host: str = 'http://127.0.0.1:8083/'
+    app_home_path: str = '/view/bases/home/'
     app_workers_num: int = 1
     app_docs: bool = True
     app_redoc: bool = True
@@ -27,6 +28,7 @@ settings_describe = {
     'app_name': '服务的标题',
     'app_version': '服务的版本号',
     'app_host': '服务的主机地址',
+    'app_home_path': '服务的主页路径',
     'app_workers_num': '服务的工作进程总数 (workers)',
     'app_docs': '服务的 Swagger 文档 <需重启>',
     'app_redoc': '服务的 ReDoc 文档 <需重启>',

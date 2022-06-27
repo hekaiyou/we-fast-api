@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 from core.validate import ObjIdParams
+from core.dynamic import get_apis_configs
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
@@ -17,13 +18,23 @@ templates = Jinja2Templates(
 @router.get('/token/', response_class=HTMLResponse, include_in_schema=False)
 async def page_token(request: dict = Depends(get_view_request), token_s: Optional[str] = Cookie(None)):
     if token_s:
-        return RedirectResponse('/view/bases/dashboard/')
+        configs = get_apis_configs('bases')
+        return RedirectResponse(configs.app_home_path)
     return templates.TemplateResponse('bases/token.html', {**request})
 
 
-@router.get('/dashboard/', response_class=HTMLResponse, include_in_schema=False)
-async def page_bases_dashboard(request: dict = Depends(get_view_request)):
-    return templates.TemplateResponse('bases/dashboard.html', {**request})
+@router.get('/home/', response_class=HTMLResponse, include_in_schema=False)
+async def page_bases_statistics(request: dict = Depends(get_view_request)):
+    configs = get_apis_configs('bases')
+    if configs.app_home_path != '/view/bases/home/':
+        return RedirectResponse(configs.app_home_path)
+    else:
+        return templates.TemplateResponse('bases/home.html', {**request})
+
+
+@router.get('/statistics/', response_class=HTMLResponse, include_in_schema=False)
+async def page_bases_statistics(request: dict = Depends(get_view_request)):
+    return templates.TemplateResponse('bases/statistics.html', {**request})
 
 
 @router.get('/me/', response_class=HTMLResponse, include_in_schema=False)
