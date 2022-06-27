@@ -124,6 +124,7 @@
                 success = function (data, textStatus) {
                     let cookiesExpiresDay = data.expires_minutes / 60 / 24;
                     Cookies.set('username', data.username, { expires: cookiesExpiresDay, path: '/' });
+                    Cookies.set('full_name', data.full_name, { expires: cookiesExpiresDay, path: '/' });
                     Cookies.set('token_s', data.access_token, { expires: cookiesExpiresDay, path: '/' });
                     Cookies.set('role', data.role_title, { expires: cookiesExpiresDay, path: '/' });
                     Cookies.set('permissions', data.role_permissions, { expires: cookiesExpiresDay, path: '/' });

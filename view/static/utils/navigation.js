@@ -1,6 +1,7 @@
 $('#nav-username').append(Cookies.get('username'));
 $('#signout').click(function () {
     Cookies.remove('username');
+    Cookies.remove('full_name');
     Cookies.remove('token_s');
     Cookies.remove('role');
     Cookies.remove('permissions');

@@ -24,6 +24,7 @@ class Token(BaseModel):
     access_token: str = Field(title='令牌',)
     token_type: str = Field(title='令牌类型',)
     username: str = Field(title='用户名',)
+    full_name: str = Field(title='账户昵称',)
     role_title: str = Field(title='角色名称',)
     role_permissions: list = Field(title='权限列表',)
     expires_minutes: int = Field(title='令牌超时分钟数',)

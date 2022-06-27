@@ -10,7 +10,11 @@
 
 {% block javascript %}
 <script>
-    $('#home-username').append(Cookies.get('username'));
+    if (Cookies.get('full_name')) {
+        $('#home-username').append(Cookies.get('full_name'));
+    } else {
+        $('#home-username').append(Cookies.get('username'));
+    }
     $('#home-role').append(Cookies.get('role'));
     let getTimeState = () => {
         // 获取当前时间

@@ -52,6 +52,6 @@ async def create_api_access_token(form_data: OAuth2PasswordRequestForm = Depends
     )
     return Token(
         access_token=access_token, token_type='Bearer', username=user.username, role_title=role['title'], role_permissions=role['permissions'],
-        expires_minutes=ACCESS_TOKEN_EXPIRE_MINUTES,
+        expires_minutes=ACCESS_TOKEN_EXPIRE_MINUTES, full_name=user.full_name,
         incomplete=(not user.email),
     )

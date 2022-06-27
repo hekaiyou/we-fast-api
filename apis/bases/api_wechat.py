@@ -79,7 +79,7 @@ async def read_wechat_access_token(code: str):
     )
     return Token(
         access_token=access_token, token_type='Bearer', username=user['username'], role_title=role['title'], role_permissions=role['permissions'],
-        expires_minutes=ACCESS_TOKEN_EXPIRE_MINUTES,
+        expires_minutes=ACCESS_TOKEN_EXPIRE_MINUTES, full_name=user['full_name'],
         incomplete=(user['username'] == user['bind']['wechat']
                     or not user['email']),
     )
