@@ -74,7 +74,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 async def get_token_data(request: Request, token: str = Depends(oauth2_scheme)):
     ''' 依赖项: 获取当前令牌数据 '''
-    if request.client.host in settings.token_exempt_ip:
+    if request.client.host[:request.client.host.rfind('.')] in settings.token_exempt_ip:
         return TokenData(user_id='ExemptIP', role_id='ExemptIP')
     else:
         if not token:
