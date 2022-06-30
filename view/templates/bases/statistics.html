@@ -1,4 +1,187 @@
 {% extends 'navigation.html' %}
-{% block title %}请求统计{% endblock %}
+{% block title %}访问统计{% endblock %}
 
-{% block main %}请求统计页面{% endblock %}
+{% block main %}
+<form>
+    <div class="grid">
+        <label for="startDate">
+            开始日期
+            <input type="date" id="startDate" placeholder="开始日期">
+        </label>
+        <label for="endDate">
+            结束日期
+            <input type="date" id="endDate" placeholder="结束日期">
+        </label>
+    </div>
+</form>
+<article style="padding-left:15px;padding-right:15px;padding-top:35px;padding-bottom:0px;margin-top:0px;">
+    <div id="baidu" style="height:400px;"></div>
+</article>
+<form>
+    <div class="grid">
+        <label for="sortValue">
+            排序依据
+            <select id="sortValue" required>
+                <option value="" selected>平均响应</option>
+                <option value="" selected>出口流量</option>
+                <option value="" selected>请求次数</option>
+                <option value="" selected>失败请求</option>
+            </select>
+        </label>
+        <label for="sortOrder">
+            排序方式
+            <select id="sortOrder" required>
+                <option value="" selected>降序 (从大到小)</option>
+                <option value="" selected>升序 (从小到大)</option>
+            </select>
+        </label>
+    </div>
+</form>
+<div id="details-content">
+    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
+        <summary>GET /api/bases/permission/</summary>
+    </details>
+    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
+        <summary>GET /view/bases/setup/update/{modu...</summary>
+    </details>
+    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
+        <summary>GET /view/bases/password/update/</summary>
+    </details>
+    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
+        <summary>POST /api/bases/token/open/</summary>
+    </details>
+    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
+        <summary>GET /docs/</summary>
+    </details>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src='/static/echarts/echarts.min.js'></script>
+<script>
+    var chartDom = document.getElementById('baidu');
+    var myChart = echarts.init(chartDom);
+    var option;
+    const colors = ['#5470C6', '#91CC75', '#EE6666'];
+    option = {
+        color: colors,
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross'
+            }
+        },
+        grid: {
+            right: ($('#baidu').width() >= 500) ? '20%' : ($('#baidu').width() >= 400) ? '30%' : '40%',
+            left: ($('#baidu').width() >= 500) ? '10%' : ($('#baidu').width() >= 400) ? '10%' : '15%',
+        },
+        toolbox: {
+            feature: {
+                dataView: { show: true, readOnly: false },
+                restore: { show: true },
+                saveAsImage: { show: true }
+            }
+        },
+        legend: {
+            data: ['总请求', '成功请求', '出口流量']
+        },
+        xAxis: [
+            {
+                type: 'category',
+                axisTick: {
+                    alignWithLabel: true
+                },
+                // prettier-ignore
+                data: ['2022-06-19', '2022-06-20', '2022-06-21', '2022-06-22', '2022-06-23', '2022-06-24', '2022-06-25', '2022-06-26', '2022-06-27', '2022-06-28', '2022-06-29', '2022-06-30']
+            }
+        ],
+        yAxis: [
+            {
+                type: 'value',
+                name: '总请求',
+                position: 'right',
+                alignTicks: true,
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: colors[0]
+                    }
+                },
+                axisLabel: {
+                    formatter: '{value} 次'
+                }
+            },
+            {
+                type: 'value',
+                name: '成功请求',
+                position: 'right',
+                alignTicks: true,
+                offset: 80,
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: colors[1]
+                    }
+                },
+                axisLabel: {
+                    formatter: '{value} 次'
+                }
+            },
+            {
+                type: 'value',
+                name: '出口流量',
+                position: 'left',
+                alignTicks: true,
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: colors[2]
+                    }
+                },
+                axisLabel: {
+                    formatter: '{value} MB'
+                }
+            }
+        ],
+        series: [
+            {
+                name: '总请求',
+                type: 'bar',
+                data: [
+                    2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
+                ]
+            },
+            {
+                name: '成功请求',
+                type: 'bar',
+                yAxisIndex: 1,
+                data: [
+                    2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
+                ]
+            },
+            {
+                name: '出口流量',
+                type: 'line',
+                yAxisIndex: 2,
+                data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
+            }
+        ]
+    };
+    myChart.setOption(option);
+    function getBeforeDay(before) {
+        let beforeTime = before * 24 * 60 * 60 * 1000;
+        let time = (new Date).getTime() - beforeTime;
+        let date = new Date(time);
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        if (month < 10) { month = '0' + month; }
+        if (day < 10) { day = '0' + day; }
+        return year + '-' + month + '-' + day;
+    }
+    $(document).ready(function () {
+        $('#startDate').val(getBeforeDay(0));
+        $('#endDate').val(getBeforeDay(0));
+    });
+</script>
+{% endblock %}

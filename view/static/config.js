@@ -1,5 +1,10 @@
 var navigationBar = [
     {
+        'path': '/view/bases/statistics/',
+        'permission': ['read_statistics_page'],
+        'text': '访问统计',
+    },
+    {
         'path': '/view/bases/logs/',
         'permission': ['read_logs_all', 'read_logs_file'],
         'text': '服务日志',
