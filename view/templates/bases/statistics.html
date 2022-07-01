@@ -15,7 +15,7 @@
     </div>
 </form>
 <article style="padding-left:15px;padding-right:15px;padding-top:35px;padding-bottom:0px;margin-top:0px;">
-    <div id="baidu" style="height:400px;"></div>
+    <div id="summaryGraph" style="height:400px;"></div>
 </article>
 <form>
     <div class="grid">
@@ -59,115 +59,112 @@
 {% block javascript %}
 <script src='/static/echarts/echarts.min.js'></script>
 <script>
-    var chartDom = document.getElementById('baidu');
+    var chartDom = document.getElementById('summaryGraph');
     var myChart = echarts.init(chartDom);
     var option;
-    const colors = ['#5470C6', '#91CC75', '#EE6666'];
-    option = {
-        color: colors,
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'cross'
-            }
-        },
-        grid: {
-            right: ($('#baidu').width() >= 500) ? '20%' : ($('#baidu').width() >= 400) ? '30%' : '40%',
-            left: ($('#baidu').width() >= 500) ? '10%' : ($('#baidu').width() >= 400) ? '10%' : '15%',
-        },
-        toolbox: {
-            feature: {
-                dataView: { show: true, readOnly: false },
-                restore: { show: true },
-                saveAsImage: { show: true }
-            }
-        },
-        legend: {
-            data: ['总请求', '成功请求', '出口流量']
-        },
-        xAxis: [
-            {
-                type: 'category',
-                axisTick: {
-                    alignWithLabel: true
-                },
-                // prettier-ignore
-                data: ['2022-06-19', '2022-06-20', '2022-06-21', '2022-06-22', '2022-06-23', '2022-06-24', '2022-06-25', '2022-06-26', '2022-06-27', '2022-06-28', '2022-06-29', '2022-06-30']
-            }
-        ],
-        yAxis: [
-            {
-                type: 'value',
-                name: '总请求',
-                position: 'right',
-                alignTicks: true,
-                axisLine: {
-                    show: true,
-                    lineStyle: {
-                        color: colors[0]
-                    }
-                },
-                axisLabel: {
-                    formatter: '{value} 次'
+    function drawSummaryGraph(xAxisData, yTotalData, yC200Data, yByteMData) {
+        const colors = ['#5470C6', '#91CC75', '#EE6666'];
+        option = {
+            color: colors,
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross'
                 }
             },
-            {
-                type: 'value',
-                name: '成功请求',
-                position: 'right',
-                alignTicks: true,
-                offset: 80,
-                axisLine: {
-                    show: true,
-                    lineStyle: {
-                        color: colors[1]
-                    }
-                },
-                axisLabel: {
-                    formatter: '{value} 次'
+            grid: {
+                right: ($('#summaryGraph').width() >= 500) ? '20%' : ($('#summaryGraph').width() >= 400) ? '30%' : '40%',
+                left: ($('#summaryGraph').width() >= 500) ? '10%' : ($('#summaryGraph').width() >= 400) ? '10%' : '15%',
+            },
+            toolbox: {
+                feature: {
+                    dataView: { show: true, readOnly: false },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
                 }
             },
-            {
-                type: 'value',
-                name: '出口流量',
-                position: 'left',
-                alignTicks: true,
-                axisLine: {
-                    show: true,
-                    lineStyle: {
-                        color: colors[2]
+            legend: {
+                data: ['总请求', '成功请求', '出口流量']
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    axisTick: {
+                        alignWithLabel: true,
+                    },
+                    data: xAxisData,
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '总请求',
+                    position: 'right',
+                    alignTicks: true,
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: colors[0]
+                        }
+                    },
+                    axisLabel: {
+                        formatter: '{value} 次'
                     }
                 },
-                axisLabel: {
-                    formatter: '{value} MB'
+                {
+                    type: 'value',
+                    name: '成功请求',
+                    position: 'right',
+                    alignTicks: true,
+                    offset: 80,
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: colors[1]
+                        }
+                    },
+                    axisLabel: {
+                        formatter: '{value} 次'
+                    }
+                },
+                {
+                    type: 'value',
+                    name: '出口流量',
+                    position: 'left',
+                    alignTicks: true,
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: colors[2]
+                        }
+                    },
+                    axisLabel: {
+                        formatter: '{value} MB'
+                    }
                 }
-            }
-        ],
-        series: [
-            {
-                name: '总请求',
-                type: 'bar',
-                data: [
-                    2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-                ]
-            },
-            {
-                name: '成功请求',
-                type: 'bar',
-                yAxisIndex: 1,
-                data: [
-                    2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
-                ]
-            },
-            {
-                name: '出口流量',
-                type: 'line',
-                yAxisIndex: 2,
-                data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
-            }
-        ]
-    };
-    myChart.setOption(option);
+            ],
+            series: [
+                {
+                    name: '总请求',
+                    type: 'bar',
+                    data: yTotalData,
+                },
+                {
+                    name: '成功请求',
+                    type: 'bar',
+                    yAxisIndex: 1,
+                    data: yC200Data,
+                },
+                {
+                    name: '出口流量',
+                    type: 'line',
+                    yAxisIndex: 2,
+                    data: yByteMData,
+                }
+            ]
+        };
+        myChart.setOption(option);
+    }
     function getBeforeDay(before) {
         let beforeTime = before * 24 * 60 * 60 * 1000;
         let time = (new Date).getTime() - beforeTime;
@@ -179,9 +176,46 @@
         if (day < 10) { day = '0' + day; }
         return year + '-' + month + '-' + day;
     }
+    function selectStatisticsDate() {
+        if ($('#startDate').val() && $('#endDate').val() && $('#startDate').val() <= $('#endDate').val()) {
+            utilAjax(
+                type = 'GET',
+                url = '/api/bases/statistics/',
+                data = { 'start_date': $('#startDate').val(), 'end_date': $('#endDate').val(), },
+                data_format = 'query',
+                check = {},
+                success = function (data, textStatus) {
+                    var xAxisData = [];
+                    var yTotalData = [];
+                    var yC200Data = [];
+                    var yByteMData = [];
+                    data['all_item'].forEach(function (value, index) {
+                        xAxisData.push(value.date);
+                        yTotalData.push(value.total);
+                        yC200Data.push(value.c_200);
+                        yByteMData.push(value.byte_m);
+                    });
+                    drawSummaryGraph(xAxisData, yTotalData, yC200Data, yByteMData);
+                },
+                success_reminder = false,
+                not_close = false,
+            );
+        }
+    }
     $(document).ready(function () {
-        $('#startDate').val(getBeforeDay(0));
+        $('#startDate').val(getBeforeDay(7));
+        $('#startDate').change(function (value) {
+            if ($('#startDate').val()) {
+                selectStatisticsDate();
+            }
+        });
         $('#endDate').val(getBeforeDay(0));
+        $('#endDate').change(function (value) {
+            if ($('#endDate').val()) {
+                selectStatisticsDate();
+            }
+        });
+        selectStatisticsDate();
     });
 </script>
 {% endblock %}

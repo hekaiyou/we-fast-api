@@ -40,7 +40,7 @@ async def read_statistics_all(start_date: date, end_date: date):
     if start_date > end_date or end_date > date.today():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='开始和结束日期无法匹配',
+            detail='开始与结束日期不在合理范围内',
         )
     date_list = []
     while start_date <= end_date:
@@ -55,10 +55,14 @@ async def read_statistics_all(start_date: date, end_date: date):
         else:
             # 历史天查询逻辑
             stored_path_day = path_day_col.find_one({'date': one_day})
-            del stored_path_day['_id']
             if not stored_path_day:
                 # 创建历史天数据
                 stored_path_day = summary_day_statistics(one_day)
                 doc_create(path_day_col, stored_path_day)
+        if '_id' in stored_path_day:
+            del stored_path_day['_id']
+        if 'create_time' in stored_path_day:
+            del stored_path_day['create_time']
+            del stored_path_day['update_time']
         all_item.append(stored_path_day)
     return NoPaginate(all_item=all_item, total=len(all_item))
