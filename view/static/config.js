@@ -1,7 +1,7 @@
 var navigationBar = [
     {
         'path': '/view/bases/statistics/',
-        'permission': ['read_statistics_page'],
+        'permission': ['read_statistics_all'],
         'text': '访问统计',
     },
     {

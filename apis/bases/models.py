@@ -5,6 +5,8 @@ from pydantic import BaseModel, EmailStr, Field
 
 COL_USER = 'user'
 COL_ROLE = 'role'
+COL_OPERATE_PATH = 'operate_path'
+COL_OPERATE_PATH_DAY = 'operate_path_day'
 
 
 class Paginate(BaseModel):
