@@ -96,30 +96,25 @@ async def shutdown_event():
 @app.middleware('http')
 async def add_response_middleware(request: Request, call_next):
     start = time()  # 请求开始前获取开始时间
-    try:
-        response = await call_next(request)
-    except Exception as e:
-        log = f'{request["method"]} {request["path"]} 内部异常 500 {str(e)}'
-        logger.error(log)
-    else:
-        end = time()  # 请求完成后获取结束时间
-        set_request_record(request, end-start, response)
-        if response.status_code not in [200, 307, 304, 422, 405, 404, 403, 401]:
-            # 提前解析响应
-            resp_body = [section async for section in response.__dict__['body_iterator']]
-            # 修复 FastAPI 响应
-            response.__setattr__('body_iterator', aiwrap(resp_body))
-            # 格式化响应正文以进行日志记录
-            try:
-                resp_body = json.loads(resp_body[0].decode())
-            except:
-                resp_body = str(resp_body)
-            log = f'{request["method"]} {request["path"]} 请求响应 {response.status_code} {resp_body}'
-            if response.status_code >= 500:
-                logger.error(log)
-            else:
-                logger.warning(log)
-        return response
+    response = await call_next(request)
+    end = time()  # 请求完成后获取结束时间
+    set_request_record(request, end-start, response)
+    if response.status_code not in [200, 307, 304, 422, 405, 404, 403, 401]:
+        # 提前解析响应
+        resp_body = [section async for section in response.__dict__['body_iterator']]
+        # 修复 FastAPI 响应
+        response.__setattr__('body_iterator', aiwrap(resp_body))
+        # 格式化响应正文以进行日志记录
+        try:
+            resp_body = json.loads(resp_body[0].decode())
+        except:
+            resp_body = str(resp_body)
+        log = f'{request["method"]} {request["path"]} 请求响应 {response.status_code} {resp_body}'
+        if response.status_code >= 500:
+            logger.error(log)
+        else:
+            logger.warning(log)
+    return response
 
 if __name__ == '__main__':
     uvicorn.run(
