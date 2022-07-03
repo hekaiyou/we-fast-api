@@ -23,7 +23,8 @@ def summary_day_statistics(one_day):
             t_c_200 += data.get('c_200', 0)
         new_path_day['paths'].append({
             'path': result['path'], 'total': t_total, 'c_200': t_c_200, 'byte_m': t_byte_m,
-            'avera_byte_m': t_byte_m/t_total, 'avera_spend_s': t_spend_s/t_total,
+            'avera_byte_m': t_byte_m/t_total if t_byte_m != 0.0 else t_byte_m,
+            'avera_spend_s': t_spend_s/t_total if t_spend_s != 0.0 else t_spend_s,
         })
         new_path_day['byte_m'] += t_byte_m
         new_path_day['total'] += t_total
