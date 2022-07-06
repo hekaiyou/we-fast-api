@@ -22,37 +22,26 @@
         <label for="sortValue">
             排序依据
             <select id="sortValue" required>
-                <option value="" selected>平均响应</option>
-                <option value="" selected>出口流量</option>
-                <option value="" selected>请求次数</option>
-                <option value="" selected>失败请求</option>
+                <option value="total" selected>接口请求次数</option>
+                <option value="avera_spend_s">接口请求平均处理时长(秒)</option>
+                <option value="c_200">接口成功请求次数</option>
+                <option value="byte_m">接口响应出口流量(MB)</option>
+                <option value="avera_byte_m">接口响应平均出口流量(MB)</option>
             </select>
         </label>
         <label for="sortOrder">
             排序方式
             <select id="sortOrder" required>
-                <option value="" selected>降序 (从大到小)</option>
-                <option value="" selected>升序 (从小到大)</option>
+                <option value="descending" selected>降序 (从大到小)</option>
+                <option value="ascending">升序 (从小到大)</option>
             </select>
         </label>
     </div>
 </form>
 <div id="details-content">
-    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
+    <!-- <details class="itemPath" onclick="event.preventDefault()" id="100000000000000000000001">
         <summary>GET /api/bases/permission/</summary>
-    </details>
-    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
-        <summary>GET /view/bases/setup/update/{modu...</summary>
-    </details>
-    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
-        <summary>GET /view/bases/password/update/</summary>
-    </details>
-    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
-        <summary>POST /api/bases/token/open/</summary>
-    </details>
-    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
-        <summary>GET /docs/</summary>
-    </details>
+    </details> -->
 </div>
 {% endblock %}
 
@@ -176,6 +165,38 @@
         if (day < 10) { day = '0' + day; }
         return year + '-' + month + '-' + day;
     }
+    var pathPoolList = [];
+    function drawSummaryList() {
+        let value = $('#sortValue').val();
+        let order = $('#sortOrder').val();
+        $('#details-content').empty();
+        let contentWidth = $('#details-content').width();
+        let summaryLen = 0;
+        if (contentWidth >= 600) {
+            summaryLen = 68;
+        } else if (contentWidth >= 500) {
+            summaryLen = 51;
+        } else if (contentWidth >= 400) {
+            summaryLen = 41;
+        } else {
+            summaryLen = 35;
+        }
+        $.each(pathPoolList.sort(
+            function (a, b) {
+                if (order == 'descending') {
+                    return (b[value] - a[value]);  // 降序
+                } else {
+                    return (a[value] - b[value]);  // 升序
+                }
+            }
+        ), function (index, items) {
+            let summaryValue = items['path'];
+            if (summaryValue.length + items[value].toString().length >= summaryLen + 1) {
+                summaryValue = summaryValue.substr(0, summaryLen - items[value].toString().length) + '...';
+            }
+            $('#details-content').append('<details class="itemPath" id="' + items['path'] + '"><summary>' + summaryValue + ' <sup>' + items[value] + '</sup></summary></details>');
+        });
+    }
     function selectStatisticsDate() {
         if ($('#startDate').val() && $('#endDate').val() && $('#startDate').val() <= $('#endDate').val()) {
             utilAjax(
@@ -189,13 +210,26 @@
                     var yTotalData = [];
                     var yC200Data = [];
                     var yByteMData = [];
+                    var pathPoolDict = {};
                     data['all_item'].forEach(function (value, index) {
                         xAxisData.push(value.date);
                         yTotalData.push(value.total);
                         yC200Data.push(value.c_200);
                         yByteMData.push(value.byte_m);
+                        value.paths.forEach(function (ps, pi) {
+                            if (pathPoolDict[ps.path] == undefined) {
+                                pathPoolDict[ps.path] = { 'path': ps.path, 'total': 0, 'c_200': 0, 'byte_m': 0.0, 'avera_byte_m': 0.0, 'avera_spend_s': 0.0 };
+                            }
+                            pathPoolDict[ps.path]['total'] += ps.total;
+                            pathPoolDict[ps.path]['c_200'] += ps.c_200;
+                            pathPoolDict[ps.path]['byte_m'] += ps.byte_m;
+                            pathPoolDict[ps.path]['avera_byte_m'] += ps.avera_byte_m;
+                            pathPoolDict[ps.path]['avera_spend_s'] += ps.avera_spend_s;
+                        });
                     });
                     drawSummaryGraph(xAxisData, yTotalData, yC200Data, yByteMData);
+                    pathPoolList = Object.values(pathPoolDict);
+                    drawSummaryList();
                 },
                 success_reminder = false,
                 not_close = false,
@@ -216,6 +250,16 @@
             }
         });
         selectStatisticsDate();
+        $('#sortValue').change(function (value) {
+            if ($('#sortValue').val()) {
+                drawSummaryList();
+            }
+        });
+        $('#sortOrder').change(function (value) {
+            if ($('#sortOrder').val()) {
+                drawSummaryList();
+            }
+        });
     });
 </script>
 {% endblock %}
