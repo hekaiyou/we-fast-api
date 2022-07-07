@@ -3,7 +3,7 @@ from core.dynamic import get_username_binding
 
 
 def update_bind_username(stored_name, update_name):
-    ''' 同步更新全部绑定用户名的集合及其字段内容 '''
+    """ 同步更新全部绑定用户名的集合及其字段内容 """
     for binding_k, binding_v in get_username_binding().items():
         for field in binding_v:
             if ':array' in field:

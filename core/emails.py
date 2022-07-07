@@ -6,7 +6,7 @@ from core.dynamic import get_apis_configs
 
 
 def send_mail(to_addrs: list, subject: str, msg: MIMEBase):
-    ''' 发送邮件 '''
+    """ 发送邮件 """
     configs = get_apis_configs('bases')
     try:
         if configs.mail_smtp_use_ssl:
@@ -39,12 +39,12 @@ def send_mail(to_addrs: list, subject: str, msg: MIMEBase):
 
 
 def send_base_mail(to_addrs, subject, text):
-    ''' 发送纯文本邮件 '''
+    """ 发送纯文本邮件 """
     send_mail(to_addrs, subject, MIMEText(text, 'plain', 'utf-8'))
 
 
 def send_simple_mail(to_addrs, subject, html_text_list: list):
-    ''' 发送简单 HTML 邮件 '''
+    """ 发送简单 HTML 邮件 """
     text = '<div>'
     for html_text in html_text_list:
         text += f'<p>{html_text}</p>'

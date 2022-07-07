@@ -19,7 +19,7 @@ def repeat_task(
     raise_exceptions: bool = False,
     max_repetitions: Optional[int] = None,
 ) -> NoArgsNoReturnDecorator:
-    '''
+    """
     返回一个修饰器, 该修饰器修改函数, 使其在首次调用后定期重复执行.
     其装饰的函数不能接受任何参数并且不返回任何内容.
     参数:
@@ -31,14 +31,14 @@ def repeat_task(
             如果为 True, 该函数抛出的错误将被再次抛出到事件循环的异常处理程序.
         max_repetitions: Optional[int] (默认 None)
             该函数重复执行的最大次数, 如果为 None, 则该函数将永远重复.
-    '''
+    """
 
     def decorator(
         func: Union[NoArgsNoReturnAsyncFuncT, NoArgsNoReturnFuncT]
     ) -> NoArgsNoReturnAsyncFuncT:
-        '''
+        """
         将修饰函数转换为自身重复且定期调用的版本.
-        '''
+        """
         is_coroutine = asyncio.iscoroutinefunction(func)
 
         @wraps(func)

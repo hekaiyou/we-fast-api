@@ -33,24 +33,24 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/bases/token/open/',
 
 
 def verify_password(plain_password, password):
-    ''' 校验接收的密码是否与存储的哈希值匹配 '''
+    """ 校验接收的密码是否与存储的哈希值匹配 """
     return pwd_context.verify(plain_password, password)
 
 
 def get_password_hash(password):
-    ''' 哈希来自用户的密码 '''
+    """ 哈希来自用户的密码 """
     return pwd_context.hash(password)
 
 
 def get_user(user_col, username: str):
-    ''' 查询数据库集合中的用户数据 '''
+    """ 查询数据库集合中的用户数据 """
     result = user_col.find_one({'username': username})
     if result:
         return UserGlobal(**result)
 
 
 def authenticate_user(user_col, username: str, password: str):
-    ''' 认证并返回用户 '''
+    """ 认证并返回用户 """
     user = get_user(user_col, username)
     if not user:
         # 通过用户名判断用户是否存在
@@ -62,7 +62,7 @@ def authenticate_user(user_col, username: str, password: str):
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    ''' 生成新的访问令牌 '''
+    """ 生成新的访问令牌 """
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -75,7 +75,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 async def get_token_data(request: Request,
                          token: str = Depends(oauth2_scheme)):
-    ''' 依赖项: 获取当前令牌数据 '''
+    """ 依赖项: 获取当前令牌数据 """
     if request.client.host[:request.client.host.
                            rfind('.')] in settings.token_exempt_ip:
         return TokenData(user_id='ExemptIP', role_id='ExemptIP')

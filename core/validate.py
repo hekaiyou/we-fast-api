@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 
 
 class ObjId(ObjectId):
-    ''' 验证 ObjectId 并转 str (常用于models) '''
+    """ 验证 ObjectId 并转 str (常用于models) """
 
     @classmethod
     def __get_validators__(cls):
@@ -25,7 +25,7 @@ class ObjId(ObjectId):
 
 
 class ObjIdParams(ObjectId):
-    ''' 验证 str 并转 ObjectId (常用于api_x) '''
+    """ 验证 str 并转 ObjectId (常用于api_x) """
 
     @classmethod
     def __get_validators__(cls):
@@ -43,7 +43,7 @@ class ObjIdParams(ObjectId):
 
 
 def str_to_oid(str_id):
-    ''' str 转 ObjectId '''
+    """ str 转 ObjectId """
     try:
         return ObjectId(str_id)
     except InvalidId as e:

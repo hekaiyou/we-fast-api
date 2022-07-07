@@ -21,7 +21,7 @@ def get_worker_id(wid_list: list = []):
 
 
 def get_apis_configs(module):
-    ''' 获取动态全局变量: 接口配置 '''
+    """ 获取动态全局变量: 接口配置 """
     global DYNAMIC_APIS_CONFIGS
     if module in DYNAMIC_APIS_CONFIGS:
         return DYNAMIC_APIS_CONFIGS[module]
@@ -46,7 +46,7 @@ def get_apis_configs(module):
 
 
 def set_apis_configs(module, key, vlaue):
-    ''' 设置动态全局变量: 接口配置 '''
+    """ 设置动态全局变量: 接口配置 """
     work_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     revise_settings(key, vlaue, env_path=f'{work_path}/apis/{module}/.env')
     global DYNAMIC_APIS_CONFIGS
@@ -58,7 +58,7 @@ def set_apis_configs(module, key, vlaue):
 
 
 def set_role_permissions(role_col):
-    ''' 设置动态全局变量: 角色权限 '''
+    """ 设置动态全局变量: 角色权限 """
     role_permissions = {
         '100000000000000000000001': Settings().user_default_permission
     }
@@ -69,7 +69,7 @@ def set_role_permissions(role_col):
 
 
 def get_role_permissions(role_id):
-    ''' 获取动态全局变量: 角色权限 '''
+    """ 获取动态全局变量: 角色权限 """
     try:
         if not role_id:
             return DYNAMIC_ROLE_PERMISSIONS['100000000000000000000001']
@@ -79,29 +79,29 @@ def get_role_permissions(role_id):
 
 
 def set_username_binding(col_name: str, field: list):
-    ''' 设置动态全局变量: 用户名绑定 '''
+    """ 设置动态全局变量: 用户名绑定 """
     global DYNAMIC_USERNAME_BINDING
     DYNAMIC_USERNAME_BINDING[col_name] = field
 
 
 def get_username_binding():
-    ''' 获取动态全局变量: 用户名绑定 '''
+    """ 获取动态全局变量: 用户名绑定 """
     return DYNAMIC_USERNAME_BINDING
 
 
 def set_startup_task(task_function):
-    ''' 设置动态全局变量: 启动任务函数 '''
+    """ 设置动态全局变量: 启动任务函数 """
     global DYNAMIC_STARTUP_TASK
     DYNAMIC_STARTUP_TASK.append(task_function)
 
 
 def get_startup_task():
-    ''' 获取动态全局变量: 启动任务函数 '''
+    """ 获取动态全局变量: 启动任务函数 """
     return DYNAMIC_STARTUP_TASK
 
 
 def revise_settings(key, value, env_path: str = '.env'):
-    ''' 修改环境变量文件 '''
+    """ 修改环境变量文件 """
     if not os.path.exists(env_path):
         os.mknod(env_path)
     with open(env_path, 'r', encoding='utf-8') as file_obj:
@@ -126,7 +126,7 @@ def revise_settings(key, value, env_path: str = '.env'):
 
 
 def get_request_record():
-    ''' 获取动态全局变量: 请求记录 '''
+    """ 获取动态全局变量: 请求记录 """
     global DYNAMIC_REQUEST_RECORD
     if DYNAMIC_REQUEST_RECORD:
         return DYNAMIC_REQUEST_RECORD.pop()
@@ -135,7 +135,7 @@ def get_request_record():
 
 
 def set_request_record(request, spend_sec, response):
-    ''' 设置动态全局变量: 请求记录 '''
+    """ 设置动态全局变量: 请求记录 """
     if response.status_code in [404, 405, 307]:
         return
     global DYNAMIC_REQUEST_RECORD

@@ -12,7 +12,7 @@ FILES_PATH = os.path.join(
 async def save_raw_file(file: NamedTemporaryFile,
                         directory: list,
                         filename: str = None):
-    ''' 保存原始文件 '''
+    """ 保存原始文件 """
     contents = await file.read()  # 读取文件二进制对象
     file_md5 = hashlib.md5(contents).hexdigest()  # 计算文件 MD5
     save_path = os.path.join(FILES_PATH, *directory)
@@ -35,7 +35,7 @@ async def save_raw_file(file: NamedTemporaryFile,
 
 
 async def save_file_by_date(file: NamedTemporaryFile, directory: list):
-    ''' 按日期划分子目录保存文件 '''
+    """ 按日期划分子目录保存文件 """
     save_datetime = datetime.now()
     directory.extend([
         str(save_datetime.year),
@@ -47,7 +47,7 @@ async def save_file_by_date(file: NamedTemporaryFile, directory: list):
 
 
 async def remove_file(path: list):
-    ''' 删除文件 '''
+    """ 删除文件 """
     remove_path = os.path.join(FILES_PATH, *path)
     # 判断文件是否存在, 再删除文件
     if os.path.exists(remove_path):
@@ -58,7 +58,7 @@ async def remove_file(path: list):
 
 
 async def remove_dirs(path: list):
-    ''' 删除目录 '''
+    """ 删除目录 """
     remove_path = os.path.join(FILES_PATH, *path)
     # 判断文件夹是否存在, 再删除文件夹
     if os.path.exists(remove_path):
@@ -66,7 +66,7 @@ async def remove_dirs(path: list):
 
 
 async def generate_thumbnail(path: list, size: tuple):
-    ''' 生成图像文件的缩略图文件 '''
+    """ 生成图像文件的缩略图文件 """
     original_path = os.path.join(FILES_PATH, *path)
     thumbnail_path = os.path.join(FILES_PATH, *path[:-1], f'{path[-1:][0]}_t')
     if os.path.exists(thumbnail_path):

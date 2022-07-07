@@ -12,11 +12,11 @@ from fastapi import Depends, HTTPException, Query, status, Request
 
 @lru_cache()
 def get_base_settings():
-    '''
+    """
     全局依赖项: 获取基础环境变量 (仅创建一次)
     依赖项示例: settings: Settings = Depends(get_base_settings)
     依赖项示例: settings = get_base_settings()
-    '''
+    """
     return Settings(
         _env_file=
         f'{os.path.dirname(os.path.dirname(os.path.realpath(__file__)))}/.env',
@@ -26,7 +26,7 @@ def get_base_settings():
 
 @lru_cache()
 def get_api_routes():
-    ''' 全局依赖项: 获取 API 路由 (仅创建一次) '''
+    """ 全局依赖项: 获取 API 路由 (仅创建一次) """
     routes = {}
     for r in apis_urls.router.routes:
         ritem = r.__dict__
@@ -62,7 +62,7 @@ async def get_paginate_parameters(
         regex='^[a-zA-Z]\w{2,31}$',
     ),
 ):
-    ''' 全局依赖项: 获取分页参数 '''
+    """ 全局依赖项: 获取分页参数 """
     sort_list = []
     if orderby:
         # 整理请求参数中的筛排序列表
@@ -106,7 +106,7 @@ async def verify_api_permission(
     request: Request,
     current_token: TokenData = Depends(get_token_data),
     routes: dict = Depends(get_api_routes)):
-    ''' 全局依赖项: 验证 API 访问权限 '''
+    """ 全局依赖项: 验证 API 访问权限 """
     if current_token.user_id == 'ExemptIP' and current_token.role_id == 'ExemptIP':
         return
     path_key = f'{request.scope["method"]} {request.scope["path"]}'
@@ -124,12 +124,12 @@ async def verify_api_permission(
 
 
 async def get_view_request(request: Request):
-    ''' 全局依赖项: 获取页面访问的请求内容 '''
+    """ 全局依赖项: 获取页面访问的请求内容 """
     return {'request': request, 'settings': get_apis_configs('bases')}
 
 
 class aiwrap:
-    ''' 全局依赖项: 提取解析后再还原 FastAPI 响应 '''
+    """ 全局依赖项: 提取解析后再还原 FastAPI 响应 """
 
     def __init__(self, obj):
         self._it = iter(obj)

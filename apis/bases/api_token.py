@@ -17,9 +17,9 @@ router = APIRouter(prefix='/token', )
 )
 async def create_api_access_token(
         form_data: OAuth2PasswordRequestForm = Depends()):
-    '''
+    """
     按照 **OAuth 2.0** 协议规定: 客户端/用户必须将 `username` 和 `password` 字段作为表单数据发送
-    '''
+    """
     user = authenticate_user(
         get_collection(COL_USER),
         form_data.username,

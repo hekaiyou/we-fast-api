@@ -15,7 +15,7 @@ DBClient = None
 
 @lru_cache()
 def get_collection(collection_name: str):
-    ''' 获取 DB 集合 (同一参数仅创建一次) '''
+    """ 获取 DB 集合 (同一参数仅创建一次) """
     settings = get_base_settings()
     db = DBClient[settings.mongo_db_name]
     # 获取 pymongo.collection.Collection 实例
@@ -24,7 +24,7 @@ def get_collection(collection_name: str):
 
 
 def whether_to_initialize(apis_urls):
-    ''' 判断数据库连接有效性 (首次连接时初始化) '''
+    """ 判断数据库连接有效性 (首次连接时初始化) """
     user_col = get_collection('user')
     role_col = get_collection('role')
     try:
@@ -80,7 +80,7 @@ def whether_to_initialize(apis_urls):
 
 
 def create_db_client(apis_urls):
-    ''' 创建 MongoDB 数据库客户端 '''
+    """ 创建 MongoDB 数据库客户端 """
     settings = get_base_settings()
     if settings.mongo_db_username and settings.mongo_db_password:
         # 环境变量中没有认证信息, 走认证连接
@@ -102,14 +102,14 @@ def create_db_client(apis_urls):
 
 
 def close_db_client():
-    ''' 关闭 MongoDB 数据库客户端 '''
+    """ 关闭 MongoDB 数据库客户端 """
     global DBClient
     DBClient.close()
 
 
 @lru_cache()
 def utc_offset():
-    ''' UTC 时间与本地时间的差 '''
+    """ UTC 时间与本地时间的差 """
     local_time = datetime.fromtimestamp(0)
     utc_time = datetime.utcfromtimestamp(0)
     return local_time - utc_time
@@ -120,7 +120,7 @@ async def paginate_find(collection: Collection,
                         query_content: dict,
                         item_model: BaseModel,
                         no_pagin: bool = False):
-    ''' 分页查询 DB 集合中的数据 '''
+    """ 分页查询 DB 集合中的数据 """
     if paginate_parameters['time_te']:
         time_te = paginate_parameters['time_te']
         for te_k, te_v in time_te.items():
@@ -164,7 +164,7 @@ async def paginate_get_cache(paginate_parameters: dict,
                              cache_name: str,
                              cache_key: str,
                              cache_interval_minutes: int = 7):
-    ''' 分页查询缓存中的数据 '''
+    """ 分页查询缓存中的数据 """
     cache_key = f'{paginate_parameters["sort_list"]}{paginate_parameters["time_field"]}{paginate_parameters["time_te"]}{cache_key}'
     cache_find = get_collection('paginate_cache').find_one({
         'name': cache_name,
@@ -189,7 +189,7 @@ async def paginate_get_cache(paginate_parameters: dict,
 
 async def paginate_set_cache(paginate_parameters: dict, cache_name: str,
                              cache_key: str, cache_value: list):
-    ''' 分页设置缓存中的数据 '''
+    """ 分页设置缓存中的数据 """
     cache_key = f'{paginate_parameters["sort_list"]}{paginate_parameters["time_field"]}{paginate_parameters["time_te"]}{cache_key}'
     doc_create(
         collection=get_collection('paginate_cache'),
@@ -211,7 +211,7 @@ set_startup_task(lambda: get_collection('paginate_cache').delete_many({}))
 
 
 def doc_create(collection: Collection, document: dict, **kw):
-    ''' 创建数据集合文档 '''
+    """ 创建数据集合文档 """
     document['create_time'] = datetime.utcnow()
     document['update_time'] = datetime.utcnow()
     # 此步骤会自动为 user_json 添加 _id 信息
@@ -223,7 +223,7 @@ def doc_update(collection: Collection,
                update: dict,
                many: bool = False,
                **kw):
-    ''' 更新数据集合文档 '''
+    """ 更新数据集合文档 """
     update['update_time'] = datetime.utcnow()
     if many:
         collection.update_many(filter=filter, update={'$set': update}, **kw)
