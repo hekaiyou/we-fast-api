@@ -5,9 +5,7 @@ from .models import SetupUpdate, SyncedWorkerRead
 from fastapi import APIRouter, HTTPException, status
 from core.dynamic import set_apis_configs, get_apis_configs
 
-router = APIRouter(
-    prefix='/setup',
-)
+router = APIRouter(prefix='/setup', )
 
 
 @router.get(
@@ -18,8 +16,8 @@ router = APIRouter(
 async def read_setup_module_all():
     all_item = []
     exclude_dir_path = ['apis_urls.py', '__init__.py', '__pycache__']
-    work_path = os.path.dirname(os.path.dirname(
-        os.path.dirname(os.path.realpath(__file__))))
+    work_path = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
     for dir_path in os.listdir(f'{work_path}/apis/'):
         if dir_path not in exclude_dir_path:
             if os.path.exists(f'{work_path}/apis/{dir_path}/config.py'):
@@ -43,7 +41,10 @@ async def read_setup(module_name: str):
     configs_describe = get_apis_configs(f'{module_name[9:]}_describe')
     for config in configs:
         all_item.append({
-            'key': config[0], 'value': config[1], 'type': str(type(config[1]))[8:-2], 'describe': configs_describe.get(config[0], ''),
+            'key': config[0],
+            'value': config[1],
+            'type': str(type(config[1]))[8:-2],
+            'describe': configs_describe.get(config[0], ''),
         })
     return NoPaginate(all_item=all_item, total=len(all_item))
 

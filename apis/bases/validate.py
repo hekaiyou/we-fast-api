@@ -8,6 +8,7 @@ from core.validate import ObjIdParams, ObjectId, str_to_oid
 
 
 class RoleObjIdParams(ObjIdParams):
+
     @classmethod
     def validate(cls, v):
         ObjIdParams.validate(v)
@@ -56,6 +57,7 @@ def check_role_id(v):
 
 
 class UserObjIdParams(ObjIdParams):
+
     @classmethod
     def validate(cls, v):
         ObjIdParams.validate(v)
@@ -110,7 +112,9 @@ def get_verify_code(value, user_id, verify_key):
         s = chr(randint(97, 122))
         code += str(choice([n, b, s]))
     doc_update(
-        get_collection(COL_USER), {'_id': user_id}, {
+        get_collection(COL_USER),
+        {'_id': user_id},
+        {
             f'verify.{verify_key}.code': code,
             f'verify.{verify_key}.value': value,
             f'verify.{verify_key}.create': datetime.utcnow(),
@@ -129,7 +133,8 @@ def check_verify_code(code, user_id, verify_key):
     user = user_col.find_one({'_id': user_id})
     if not user['verify'][verify_key]['code']:
         return False
-    if (datetime.utcnow() - user['verify'][verify_key]['create']).seconds > 3600:
+    if (datetime.utcnow() -
+            user['verify'][verify_key]['create']).seconds > 3600:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='过期的验证码',
@@ -140,7 +145,9 @@ def check_verify_code(code, user_id, verify_key):
             detail='错误的验证码',
         )
     update_dict = {
-        f'verify.{verify_key}.code': '', f'verify.{verify_key}.create': None, f'verify.{verify_key}.value': '',
+        f'verify.{verify_key}.code': '',
+        f'verify.{verify_key}.create': None,
+        f'verify.{verify_key}.value': '',
     }
     if verify_key == 'email':
         update_dict[f'bind.{verify_key}'] = user['verify'][verify_key]['value']

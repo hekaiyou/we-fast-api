@@ -18,7 +18,8 @@ from core.dynamic import get_startup_task, get_apis_configs, set_request_record,
 
 def swagger_monkey_patch(*args, **kwargs):
     return get_swagger_ui_html(
-        *args, **kwargs,
+        *args,
+        **kwargs,
         swagger_js_url='/static/swagger-ui/4/swagger-ui-bundle.js',
         swagger_css_url='/static/swagger-ui/4/swagger-ui.css',
         swagger_favicon_url='/static/image/favicon.png',
@@ -27,7 +28,8 @@ def swagger_monkey_patch(*args, **kwargs):
 
 def redoc_monkey_patch(*args, **kwargs):
     return get_redoc_html(
-        *args, **kwargs,
+        *args,
+        **kwargs,
         redoc_js_url='/static/redoc/next/redoc.standalone.js',
         redoc_favicon_url='/static/image/favicon.png',
     )
@@ -44,8 +46,12 @@ app = FastAPI(
 )
 app.include_router(apis_urls.router)
 app.include_router(view_urls.router)
-app.mount('/static', StaticFiles(
-    directory=f'{os.path.dirname(os.path.realpath(__file__))}/view/static'), name='static')
+app.mount(
+    '/static',
+    StaticFiles(
+        directory=f'{os.path.dirname(os.path.realpath(__file__))}/view/static'
+    ),
+    name='static')
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_base_settings().allow_origins,
@@ -80,12 +86,16 @@ def repeat_task_aggregate_request_records() -> None:
             if not operate_path_col.count_documents(current_data):
                 doc_create(operate_path_col, {'hours': {}, **current_data})
             current_temp.append(f'{record["date"]}{record["path"]}')
-        operate_path_col.update_one(current_data, {
-            '$inc': {
-                f'hours.{record["hour"]}.total': 1, f'hours.{record["hour"]}.spend_s':  record['spend_sec'],
-                f'hours.{record["hour"]}.byte_m': record['byte']/1024/1024, f'hours.{record["hour"]}.c_{record["status"]}': 1,
-            },
-        })
+        operate_path_col.update_one(
+            current_data, {
+                '$inc': {
+                    f'hours.{record["hour"]}.total': 1,
+                    f'hours.{record["hour"]}.spend_s': record['spend_sec'],
+                    f'hours.{record["hour"]}.byte_m':
+                    record['byte'] / 1024 / 1024,
+                    f'hours.{record["hour"]}.c_{record["status"]}': 1,
+                },
+            })
 
 
 @app.on_event('shutdown')
@@ -98,10 +108,12 @@ async def add_response_middleware(request: Request, call_next):
     start = time()  # 请求开始前获取开始时间
     response = await call_next(request)
     end = time()  # 请求完成后获取结束时间
-    set_request_record(request, end-start, response)
+    set_request_record(request, end - start, response)
     if response.status_code not in [200, 307, 304, 422, 405, 404, 403, 401]:
         # 提前解析响应
-        resp_body = [section async for section in response.__dict__['body_iterator']]
+        resp_body = [
+            section async for section in response.__dict__['body_iterator']
+        ]
         # 修复 FastAPI 响应
         response.__setattr__('body_iterator', aiwrap(resp_body))
         # 格式化响应正文以进行日志记录
@@ -116,9 +128,12 @@ async def add_response_middleware(request: Request, call_next):
             logger.warning(log)
     return response
 
+
 if __name__ == '__main__':
     uvicorn.run(
         'main:app',
-        host=settings.uvicorn_host, port=settings.uvicorn_port,
-        workers=settings.uvicorn_workers, reload=settings.uvicorn_reload,
+        host=settings.uvicorn_host,
+        port=settings.uvicorn_port,
+        workers=settings.uvicorn_workers,
+        reload=settings.uvicorn_reload,
     )

@@ -32,10 +32,19 @@ def whether_to_initialize(apis_urls):
             role_result = role_col.find_one({'title': 'SuperAdministrator'})
             if not role_result:
                 role_result = role_col.insert_one({
-                    'title': 'SuperAdministrator',
-                    'permissions': ['read_permission_all', 'read_role_all', 'read_role', 'create_role', 'delete_role', 'update_role', 'create_user', 'read_user_page', 'delete_user', 'update_user', 'read_setup_module_all', 'read_setup', 'update_setup', 'read_logs_all', 'read_logs_file'],
-                    'create_time': datetime.utcnow(),
-                    'update_time': datetime.utcnow(),
+                    'title':
+                    'SuperAdministrator',
+                    'permissions': [
+                        'read_permission_all', 'read_role_all', 'read_role',
+                        'create_role', 'delete_role', 'update_role',
+                        'create_user', 'read_user_page', 'delete_user',
+                        'update_user', 'read_setup_module_all', 'read_setup',
+                        'update_setup', 'read_logs_all', 'read_logs_file'
+                    ],
+                    'create_time':
+                    datetime.utcnow(),
+                    'update_time':
+                    datetime.utcnow(),
                 })
                 role_id = str(role_result.inserted_id)
             else:
@@ -49,8 +58,17 @@ def whether_to_initialize(apis_urls):
                 'role_id': role_id,
                 'source': 'Initialization',
                 'avata': '',
-                'bind': {'wechat': '', 'email': ''},
-                'verify': {'email': {'code': '', 'create': None, 'value': ''}},
+                'bind': {
+                    'wechat': '',
+                    'email': ''
+                },
+                'verify': {
+                    'email': {
+                        'code': '',
+                        'create': None,
+                        'value': ''
+                    }
+                },
                 'create_time': datetime.utcnow(),
                 'update_time': datetime.utcnow(),
             })
@@ -97,7 +115,11 @@ def utc_offset():
     return local_time - utc_time
 
 
-async def paginate_find(collection: Collection, paginate_parameters: dict, query_content: dict, item_model: BaseModel, no_pagin: bool = False):
+async def paginate_find(collection: Collection,
+                        paginate_parameters: dict,
+                        query_content: dict,
+                        item_model: BaseModel,
+                        no_pagin: bool = False):
     ''' 分页查询 DB 集合中的数据 '''
     if paginate_parameters['time_te']:
         time_te = paginate_parameters['time_te']
@@ -110,27 +132,21 @@ async def paginate_find(collection: Collection, paginate_parameters: dict, query
     if no_pagin:
         if paginate_parameters['sort_list']:
             find_results = collection.find(query_content).sort(
-                key_or_list=paginate_parameters['sort_list'],
-            )
+                key_or_list=paginate_parameters['sort_list'], )
         else:
             find_results = collection.find(query_content)
     else:
         if paginate_parameters['sort_list']:
             # 包括排序参数的查询
             find_results = collection.find(query_content).sort(
-                key_or_list=paginate_parameters['sort_list'],
-            ).skip(
-                skip=paginate_parameters['skip'],
-            ).limit(
-                limit=paginate_parameters['limit'],
-            )
+                key_or_list=paginate_parameters['sort_list'], ).skip(
+                    skip=paginate_parameters['skip'], ).limit(
+                        limit=paginate_parameters['limit'], )
         else:
             # 没有排序参数的查询
             find_results = collection.find(query_content).skip(
-                skip=paginate_parameters['skip'],
-            ).limit(
-                limit=paginate_parameters['limit'],
-            )
+                skip=paginate_parameters['skip'], ).limit(
+                    limit=paginate_parameters['limit'], )
     items = []
     for result in find_results:
         # 将 UTC 时间转为本地时间
@@ -144,39 +160,51 @@ async def paginate_find(collection: Collection, paginate_parameters: dict, query
     return Paginate(items=items, total=find_count)
 
 
-async def paginate_get_cache(paginate_parameters: dict, cache_name: str, cache_key: str, cache_interval_minutes: int = 7):
+async def paginate_get_cache(paginate_parameters: dict,
+                             cache_name: str,
+                             cache_key: str,
+                             cache_interval_minutes: int = 7):
     ''' 分页查询缓存中的数据 '''
     cache_key = f'{paginate_parameters["sort_list"]}{paginate_parameters["time_field"]}{paginate_parameters["time_te"]}{cache_key}'
     cache_find = get_collection('paginate_cache').find_one({
-        'name': cache_name, 'key': cache_key,
+        'name': cache_name,
+        'key': cache_key,
     })
     if cache_find:
         cache_find['update_time'] += utc_offset()
-        if datetime.now() - cache_find['update_time'] > timedelta(minutes=cache_interval_minutes):
+        if datetime.now() - cache_find['update_time'] > timedelta(
+                minutes=cache_interval_minutes):
             # 超过指定间隔分钟数则删除缓存
             get_collection('paginate_cache').delete_many({
-                'name': cache_name, 'key': cache_key,
+                'name': cache_name,
+                'key': cache_key,
             })
         else:
             return Paginate(
-                items=cache_find['value'][paginate_parameters['skip']
-                    :paginate_parameters['limit']],
+                items=cache_find['value']
+                [paginate_parameters['skip']:paginate_parameters['limit']],
                 total=len(cache_find['value']),
             )
 
 
-async def paginate_set_cache(paginate_parameters: dict, cache_name: str, cache_key: str, cache_value: list):
+async def paginate_set_cache(paginate_parameters: dict, cache_name: str,
+                             cache_key: str, cache_value: list):
     ''' 分页设置缓存中的数据 '''
     cache_key = f'{paginate_parameters["sort_list"]}{paginate_parameters["time_field"]}{paginate_parameters["time_te"]}{cache_key}'
     doc_create(
         collection=get_collection('paginate_cache'),
-        document={'name': cache_name, 'key': cache_key, 'value': cache_value},
+        document={
+            'name': cache_name,
+            'key': cache_key,
+            'value': cache_value
+        },
     )
     return Paginate(
-        items=cache_value[paginate_parameters['skip']
-            :paginate_parameters['limit']],
+        items=cache_value[
+            paginate_parameters['skip']:paginate_parameters['limit']],
         total=len(cache_value),
     )
+
 
 # 服务启动时清理分页缓存数据
 set_startup_task(lambda: get_collection('paginate_cache').delete_many({}))
@@ -190,7 +218,11 @@ def doc_create(collection: Collection, document: dict, **kw):
     collection.insert_one(document=document, **kw)
 
 
-def doc_update(collection: Collection, filter: dict, update: dict, many: bool = False, **kw):
+def doc_update(collection: Collection,
+               filter: dict,
+               update: dict,
+               many: bool = False,
+               **kw):
     ''' 更新数据集合文档 '''
     update['update_time'] = datetime.utcnow()
     if many:

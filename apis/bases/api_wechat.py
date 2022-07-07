@@ -9,9 +9,7 @@ from fastapi import APIRouter, HTTPException, status
 from core.dynamic import get_apis_configs, get_role_permissions
 from core.security import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
 
-router = APIRouter(
-    prefix='/wechat',
-)
+router = APIRouter(prefix='/wechat', )
 
 
 @router.get(
@@ -27,7 +25,8 @@ async def read_wechat_access_token(code: str):
             detail='未配置微信小程序相关变量',
         )
     wechat_response = requests.get(
-        f'https://api.weixin.qq.com/sns/jscode2session?appid={configs.wechat_app_id}&secret={configs.wechat_app_secret}&js_code={code}&grant_type=authorization_code')
+        f'https://api.weixin.qq.com/sns/jscode2session?appid={configs.wechat_app_id}&secret={configs.wechat_app_secret}&js_code={code}&grant_type=authorization_code'
+    )
     if wechat_response.status_code != 200:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -47,18 +46,37 @@ async def read_wechat_access_token(code: str):
     user_filter = {'bind.wechat': wechat_json['openid']}
     user = user_col.find_one(user_filter)
     if not user:
-        doc_create(user_col, {
-            'username': wechat_json['openid'],
-            'email': None,
-            'full_name': None,
-            'disabled': False,
-            'password': get_password_hash(''.join(random.sample(string.ascii_letters + string.digits, 16))),
-            'role_id': '',
-            'source': 'WeChat',
-            'avata': '',
-            'bind': {'wechat': wechat_json['openid'], 'email': ''},
-            'verify': {'email': {'code': '', 'create': None, 'value': ''}},
-        })
+        doc_create(
+            user_col, {
+                'username':
+                wechat_json['openid'],
+                'email':
+                None,
+                'full_name':
+                None,
+                'disabled':
+                False,
+                'password':
+                get_password_hash(''.join(
+                    random.sample(string.ascii_letters + string.digits, 16))),
+                'role_id':
+                '',
+                'source':
+                'WeChat',
+                'avata':
+                '',
+                'bind': {
+                    'wechat': wechat_json['openid'],
+                    'email': ''
+                },
+                'verify': {
+                    'email': {
+                        'code': '',
+                        'create': None,
+                        'value': ''
+                    }
+                },
+            })
         user = user_col.find_one(user_filter)
     if user.get('disabled', False):
         raise HTTPException(
@@ -69,7 +87,8 @@ async def read_wechat_access_token(code: str):
     role = {'title': 'Default', 'permissions': get_role_permissions(None)}
     if user['role_id']:
         role = get_collection(COL_ROLE).find_one({
-            '_id': str_to_oid(user['role_id']),
+            '_id':
+            str_to_oid(user['role_id']),
         })
     # 生成访问令牌
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -78,8 +97,13 @@ async def read_wechat_access_token(code: str):
         expires_delta=access_token_expires,
     )
     return Token(
-        access_token=access_token, token_type='Bearer', username=user['username'], role_title=role['title'], role_permissions=role['permissions'],
-        expires_minutes=ACCESS_TOKEN_EXPIRE_MINUTES, full_name=user['full_name'],
+        access_token=access_token,
+        token_type='Bearer',
+        username=user['username'],
+        role_title=role['title'],
+        role_permissions=role['permissions'],
+        expires_minutes=ACCESS_TOKEN_EXPIRE_MINUTES,
+        full_name=user['full_name'],
         incomplete=(user['username'] == user['bind']['wechat']
                     or not user['email']),
     )

@@ -8,9 +8,8 @@ from typing import Any, Callable, Coroutine, Optional, Union
 NoArgsNoReturnFuncT = Callable[[], None]
 NoArgsNoReturnAsyncFuncT = Callable[[], Coroutine[Any, Any, None]]
 NoArgsNoReturnDecorator = Callable[
-    [Union[NoArgsNoReturnFuncT, NoArgsNoReturnAsyncFuncT]],
-    NoArgsNoReturnAsyncFuncT
-]
+    [Union[NoArgsNoReturnFuncT,
+           NoArgsNoReturnAsyncFuncT]], NoArgsNoReturnAsyncFuncT]
 
 
 def repeat_task(
@@ -33,7 +32,10 @@ def repeat_task(
         max_repetitions: Optional[int] (默认 None)
             该函数重复执行的最大次数, 如果为 None, 则该函数将永远重复.
     '''
-    def decorator(func: Union[NoArgsNoReturnAsyncFuncT, NoArgsNoReturnFuncT]) -> NoArgsNoReturnAsyncFuncT:
+
+    def decorator(
+        func: Union[NoArgsNoReturnAsyncFuncT, NoArgsNoReturnFuncT]
+    ) -> NoArgsNoReturnAsyncFuncT:
         '''
         将修饰函数转换为自身重复且定期调用的版本.
         '''
@@ -61,6 +63,9 @@ def repeat_task(
                         if raise_exceptions:
                             raise exc
                     await asyncio.sleep(seconds)
+
             ensure_future(loop())
+
         return wrapped
+
     return decorator

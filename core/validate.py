@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 
 class ObjId(ObjectId):
     ''' 验证 ObjectId 并转 str (常用于models) '''
+
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -25,6 +26,7 @@ class ObjId(ObjectId):
 
 class ObjIdParams(ObjectId):
     ''' 验证 str 并转 ObjectId (常用于api_x) '''
+
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -46,5 +48,6 @@ def str_to_oid(str_id):
         return ObjectId(str_id)
     except InvalidId as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail='无效的字符串 ID',
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='无效的字符串 ID',
         )

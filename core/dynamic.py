@@ -26,8 +26,8 @@ def get_apis_configs(module):
     if module in DYNAMIC_APIS_CONFIGS:
         return DYNAMIC_APIS_CONFIGS[module]
     else:
-        work_path = os.path.dirname(
-            os.path.dirname(os.path.realpath(__file__)))
+        work_path = os.path.dirname(os.path.dirname(
+            os.path.realpath(__file__)))
         if os.path.exists(f'{work_path}/apis/{module}/config.py'):
             meta_class = importlib.import_module(f'apis.{module}.config')
             if os.path.exists(f'{work_path}/apis/{module}/.env'):
@@ -38,7 +38,8 @@ def get_apis_configs(module):
             else:
                 DYNAMIC_APIS_CONFIGS[module] = meta_class.Settings()
             try:
-                DYNAMIC_APIS_CONFIGS[f'{module}_describe'] = meta_class.settings_describe
+                DYNAMIC_APIS_CONFIGS[
+                    f'{module}_describe'] = meta_class.settings_describe
             except AttributeError:
                 DYNAMIC_APIS_CONFIGS[f'{module}_describe'] = {}
             return DYNAMIC_APIS_CONFIGS[module]
@@ -157,5 +158,10 @@ def set_request_record(request, spend_sec, response):
     now_dt = datetime.now()
     # 'ip': request.client.host,
     DYNAMIC_REQUEST_RECORD.append({
-        'path': path_key, 'spend_sec': spend_sec, 'byte': byte, 'date': str(now_dt.date()), 'hour': now_dt.time().hour, 'status': response.status_code,
+        'path': path_key,
+        'spend_sec': spend_sec,
+        'byte': byte,
+        'date': str(now_dt.date()),
+        'hour': now_dt.time().hour,
+        'status': response.status_code,
     })

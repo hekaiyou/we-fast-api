@@ -6,9 +6,7 @@ from .validate import RoleObjIdParams, check_role_title, check_role_permissions
 from .models import COL_ROLE, RoleRead, RoleUpdate, COL_USER, RoleBase, SyncedWorkerRead
 from core.dynamic import set_role_permissions, revise_settings, get_worker_id, get_role_permissions
 
-router = APIRouter(
-    prefix='/role',
-)
+router = APIRouter(prefix='/role', )
 
 
 @router.get(

@@ -10,7 +10,8 @@ from fastapi import HTTPException, Depends, status, Request
 from core.dynamic import get_apis_configs
 
 base_settings = Settings(
-    _env_file=f'{os.path.dirname(os.path.dirname(os.path.realpath(__file__)))}/.env',
+    _env_file=
+    f'{os.path.dirname(os.path.dirname(os.path.realpath(__file__)))}/.env',
     _env_file_encoding='utf-8',
 )
 settings = get_apis_configs('bases')
@@ -27,8 +28,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = settings.token_expire_minute
 # 1. 检查请求 `header` 中是否加上 `Authorization Bearer token` 值
 # 2. 如果 `header` 中找不到, 而且请求参数中没有 `token` 值, 直接响应 401 异常
 # 3. 设置 `auto_error=False` 可以关闭自动异常响应, 实现自定义异常响应
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl='/api/bases/token/open/', auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/api/bases/token/open/',
+                                     auto_error=False)
 
 
 def verify_password(plain_password, password):
@@ -72,9 +73,11 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def get_token_data(request: Request, token: str = Depends(oauth2_scheme)):
+async def get_token_data(request: Request,
+                         token: str = Depends(oauth2_scheme)):
     ''' 依赖项: 获取当前令牌数据 '''
-    if request.client.host[:request.client.host.rfind('.')] in settings.token_exempt_ip:
+    if request.client.host[:request.client.host.
+                           rfind('.')] in settings.token_exempt_ip:
         return TokenData(user_id='ExemptIP', role_id='ExemptIP')
     else:
         if not token:

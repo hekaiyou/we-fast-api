@@ -11,9 +11,7 @@ from .models import COL_USER, UserRead, UserCreate, UserUpdate
 from core.database import get_collection, paginate_find, doc_create, doc_update
 from .validate import UserObjIdParams, check_user_username, check_role_id, check_user_email
 
-router = APIRouter(
-    prefix='/user',
-)
+router = APIRouter(prefix='/user', )
 
 
 @router.post(
@@ -89,7 +87,8 @@ async def update_user(user_id: UserObjIdParams, user_update: UserUpdate):
     doc_update(user_col, stored_user_data, jsonable_encoder(updated_user))
     if stored_user_data['username'] != updated_user.username:
         update_bind_username(
-            stored_name=stored_user_data['username'], update_name=updated_user.username,
+            stored_name=stored_user_data['username'],
+            update_name=updated_user.username,
         )
     return updated_user
 
@@ -106,7 +105,8 @@ async def delete_user(user_id: UserObjIdParams):
     update_name = f'[deleted{int(time())}]{stored_user_data["username"]}'
     if stored_user_data['username'] != update_name:
         update_bind_username(
-            stored_name=stored_user_data['username'], update_name=update_name,
+            stored_name=stored_user_data['username'],
+            update_name=update_name,
         )
     if stored_user_data['avata']:
         # 删除头像文件

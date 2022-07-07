@@ -3,15 +3,17 @@ from core.database import get_collection, doc_create
 from fastapi import APIRouter, HTTPException, status
 from .models import COL_OPERATE_PATH, COL_OPERATE_PATH_DAY, NoPaginate
 
-router = APIRouter(
-    prefix='/statistics',
-)
+router = APIRouter(prefix='/statistics', )
 
 
 def summary_day_statistics(one_day):
     """ 汇总日统计数据 """
     new_path_day = {
-        'date': one_day, 'byte_m': 0.0, 'total': 0, 'c_200': 0, 'paths': [],
+        'date': one_day,
+        'byte_m': 0.0,
+        'total': 0,
+        'c_200': 0,
+        'paths': [],
     }
     for result in get_collection(COL_OPERATE_PATH).find({'date': one_day}):
         t_byte_m, t_spend_s = 0.0, 0.0
@@ -22,9 +24,18 @@ def summary_day_statistics(one_day):
             t_total += data['total']
             t_c_200 += data.get('c_200', 0)
         new_path_day['paths'].append({
-            'path': result['path'], 'total': t_total, 'c_200': t_c_200, 'byte_m': t_byte_m,
-            'avera_byte_m': t_byte_m/t_total if t_byte_m != 0.0 else t_byte_m,
-            'avera_spend_s': t_spend_s/t_total if t_spend_s != 0.0 else t_spend_s,
+            'path':
+            result['path'],
+            'total':
+            t_total,
+            'c_200':
+            t_c_200,
+            'byte_m':
+            t_byte_m,
+            'avera_byte_m':
+            t_byte_m / t_total if t_byte_m != 0.0 else t_byte_m,
+            'avera_spend_s':
+            t_spend_s / t_total if t_spend_s != 0.0 else t_spend_s,
         })
         new_path_day['byte_m'] += t_byte_m
         new_path_day['total'] += t_total

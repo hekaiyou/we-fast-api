@@ -6,10 +6,7 @@ from apis.bases.models import NoPaginate
 from fastapi.responses import FileResponse
 from fastapi import APIRouter, HTTPException, status
 
-router = APIRouter(
-    prefix='/logs',
-)
-
+router = APIRouter(prefix='/logs', )
 """
 # 调用参考代码, 先导入模块
 from loguru import logger
@@ -22,9 +19,8 @@ logger.error('异常日志')
 
 # 定位到项目根目录, 再定位到 logs 日志目录
 log_path = os.path.join(
-    os.path.dirname(os.path.dirname(
-        os.path.dirname(os.path.realpath(__file__))
-    )),
+    os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__)))),
     'logs',
 )
 # 创建 logs 日志目录
@@ -40,7 +36,8 @@ logger.add(
     retention='30 days',
     enqueue=True,
     level='DEBUG',
-    format='{time:%Y-%m-%d %H:%M:%S.%f} - {name}:{function}:{line}\n<{level}>{message}</{level}>',
+    format=
+    '{time:%Y-%m-%d %H:%M:%S.%f} - {name}:{function}:{line}\n<{level}>{message}</{level}>',
 )
 
 

@@ -13,9 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from .models import TokenData, COL_USER, UserGlobal, UserBase, UserUpdatePassword
 from .validate import get_me_user, check_user_username, check_user_email, check_verify_code, get_verify_code, UserObjIdParams
 
-router = APIRouter(
-    prefix='/me',
-)
+router = APIRouter(prefix='/me', )
 
 
 @router.get(
@@ -33,7 +31,8 @@ async def read_me_info(current_token: TokenData = Depends(get_token_data)):
     response_model=UserBase,
     summary='更新我的信息 (无权限)',
 )
-async def update_me_info(user_update: UserBase, current_token: TokenData = Depends(get_token_data)):
+async def update_me_info(user_update: UserBase,
+                         current_token: TokenData = Depends(get_token_data)):
     user_col = get_collection(COL_USER)
     stored_user_data = get_me_user(current_token.user_id)
     stored_user_model = UserBase(**stored_user_data)
@@ -46,7 +45,8 @@ async def update_me_info(user_update: UserBase, current_token: TokenData = Depen
     doc_update(user_col, stored_user_data, jsonable_encoder(updated_user))
     if stored_user_data['username'] != updated_user.username:
         update_bind_username(
-            stored_name=stored_user_data['username'], update_name=updated_user.username,
+            stored_name=stored_user_data['username'],
+            update_name=updated_user.username,
         )
     return updated_user
 
@@ -55,7 +55,9 @@ async def update_me_info(user_update: UserBase, current_token: TokenData = Depen
     '/password/free/',
     summary='更新我的密码 (无权限)',
 )
-async def update_me_password(update_password: UserUpdatePassword, current_token: TokenData = Depends(get_token_data)):
+async def update_me_password(
+    update_password: UserUpdatePassword,
+    current_token: TokenData = Depends(get_token_data)):
     if update_password.new_password != update_password.repeat_new_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -68,7 +70,8 @@ async def update_me_password(update_password: UserUpdatePassword, current_token:
             detail='当前密码错误',
         )
     doc_update(
-        get_collection(COL_USER), user,
+        get_collection(COL_USER),
+        user,
         {'password': get_password_hash(update_password.new_password)},
     )
     return {}
@@ -78,10 +81,12 @@ async def update_me_password(update_password: UserUpdatePassword, current_token:
     '/email/verify/free/',
     summary='更新我的电子邮箱验证 (无权限)',
 )
-async def verify_me_email_verify(current_token: TokenData = Depends(get_token_data)):
+async def verify_me_email_verify(
+        current_token: TokenData = Depends(get_token_data)):
     user = get_me_user(current_token.user_id)
     if user['verify']['email']['code']:
-        if (datetime.utcnow() - user['verify']['email']['create']).seconds < 3600:
+        if (datetime.utcnow() -
+                user['verify']['email']['create']).seconds < 3600:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail='验证邮件已经发送',
@@ -99,14 +104,11 @@ async def verify_me_email_verify(current_token: TokenData = Depends(get_token_da
             )
     code = get_verify_code(user['email'], user['_id'], 'email')
     configs = get_apis_configs('bases')
-    send_simple_mail(
-        [f'{user["username"]}<{user["email"]}>'],
-        '验证电子邮箱',
-        [
-            f'尊敬的 <b>{user["username"]}({user["full_name"]})</b> :',
-            f'请点击 <a href="{configs.app_host}api/bases/me/email/verify/open/?code={code}&user_id={current_token.user_id}"><span>验证链接</span></a> 以完成操作!',
-            '<i>请保管好您的邮箱, 避免账号被他人盗用</i>',
-        ])
+    send_simple_mail([f'{user["username"]}<{user["email"]}>'], '验证电子邮箱', [
+        f'尊敬的 <b>{user["username"]}({user["full_name"]})</b> :',
+        f'请点击 <a href="{configs.app_host}api/bases/me/email/verify/open/?code={code}&user_id={current_token.user_id}"><span>验证链接</span></a> 以完成操作!',
+        '<i>请保管好您的邮箱, 避免账号被他人盗用</i>',
+    ])
     logger.info(f'向 {user["username"]}<{user["email"]}> 发送验证电子邮箱的 {code} 验证码')
     return {}
 
@@ -124,7 +126,9 @@ async def read_me_email_verify(code: str, user_id: UserObjIdParams):
     '/avata/free/',
     summary='创建我的头像文件 (无权限)',
 )
-async def create_me_avata_file(file: UploadFile = File(...), current_token: TokenData = Depends(get_token_data)):
+async def create_me_avata_file(
+        file: UploadFile = File(...),
+        current_token: TokenData = Depends(get_token_data)):
     user_col = get_collection(COL_USER)
     user = get_me_user(current_token.user_id)
     if file.content_type.split('/')[0] != 'image':
@@ -141,7 +145,8 @@ async def create_me_avata_file(file: UploadFile = File(...), current_token: Toke
     '/avata/free/',
     summary='读取我的头像文件 (无权限)',
 )
-async def read_me_avata_file(current_token: TokenData = Depends(get_token_data)):
+async def read_me_avata_file(
+        current_token: TokenData = Depends(get_token_data)):
     user = get_me_user(current_token.user_id)
     if user['avata']:
         path = os.path.join(FILES_PATH, 'avata', current_token.user_id)
@@ -153,4 +158,6 @@ async def read_me_avata_file(current_token: TokenData = Depends(get_token_data))
     def iter_file():
         with open(path, mode='rb') as file_like:
             yield from file_like
-    return StreamingResponse(iter_file(), media_type=f'image/{filename.split(".")[-1]}')
+
+    return StreamingResponse(iter_file(),
+                             media_type=f'image/{filename.split(".")[-1]}')

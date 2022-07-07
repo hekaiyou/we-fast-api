@@ -8,11 +8,15 @@ def update_bind_username(stored_name, update_name):
         for field in binding_v:
             if ':array' in field:
                 field = field.split(':')[0]
-                change_item = get_collection(binding_k).find({
-                    field: {'$elemMatch': {
-                        '$in': [stored_name]
-                    }}
-                }, {field: 1, '_id': 1})
+                change_item = get_collection(binding_k).find(
+                    {field: {
+                        '$elemMatch': {
+                            '$in': [stored_name]
+                        }
+                    }}, {
+                        field: 1,
+                        '_id': 1
+                    })
                 for change in change_item:
                     revise = change[field]
                     for i, v in enumerate(revise):
@@ -25,9 +29,7 @@ def update_bind_username(stored_name, update_name):
                         update={field: revise},
                     )
             else:
-                doc_update(
-                    collection=get_collection(binding_k),
-                    filter={field: stored_name},
-                    update={field: update_name},
-                    many=True
-                )
+                doc_update(collection=get_collection(binding_k),
+                           filter={field: stored_name},
+                           update={field: update_name},
+                           many=True)
