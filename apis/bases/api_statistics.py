@@ -63,7 +63,7 @@ def summary_hour_statistics(one_day):
         for path, data in value.items():
             byte_m = data['byte_m']
             spend_s = data['spend_s']
-            c_200 += data.get('c_200', 0)
+            c_200 = data.get('c_200', 0)
             new_path_hour['paths'].append({
                 'path':
                 path,
