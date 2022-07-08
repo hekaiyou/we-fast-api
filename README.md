@@ -86,6 +86,9 @@ WantedBy=multi-user.target
 - 重新启动服务: sudo systemctl restart wefast
 - 查看服务启动状态: sudo service wefast status
 - 查看服务日志: sudo journalctl -u wefast
+- 清理10秒之前的日志: sudo journalctl --vacuum-time=10s
+- 清理2小时之前的日志: sudo journactl --vacuum-time=2h
+- 清理7天之前的日志: sudo journalctl --vacuum-time=7d
 
 如果需要配置域名访问, 到 Nginx 配置目录下创建一个新配置.
 

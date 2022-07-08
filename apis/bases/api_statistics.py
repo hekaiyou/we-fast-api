@@ -63,13 +63,14 @@ def summary_hour_statistics(one_day):
         for path, data in value.items():
             byte_m = data['byte_m']
             spend_s = data['spend_s']
+            c_200 += data.get('c_200', 0)
             new_path_hour['paths'].append({
                 'path':
                 path,
                 'total':
                 data['total'],
                 'c_200':
-                data['c_200'],
+                c_200,
                 'byte_m':
                 byte_m,
                 'avera_byte_m':
@@ -79,7 +80,7 @@ def summary_hour_statistics(one_day):
             })
             new_path_hour['byte_m'] += byte_m
             new_path_hour['total'] += data['total']
-            new_path_hour['c_200'] += data['c_200']
+            new_path_hour['c_200'] += c_200
         hour_item.append(new_path_hour)
     return hour_item
 
