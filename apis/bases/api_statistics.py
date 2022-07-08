@@ -50,7 +50,7 @@ def summary_hour_statistics(one_day):
         hour_dict[str(i).zfill(2)] = {}
     for result in get_collection(COL_OPERATE_PATH).find({'date': one_day}):
         for _hour, value in result['hours'].items():
-            hour_dict[_hour][result['path']] = value
+            hour_dict[str(_hour).zfill(2)][result['path']] = value
     hour_item = []
     for hour, value in hour_dict.items():
         new_path_hour = {
