@@ -24,7 +24,7 @@ async def read_me_info(current_token: TokenData = Depends(get_token_data)):
     user = get_me_user(current_token.user_id)
     user_data = UserGlobal(**user).dict()
     user_data[
-        'avata_url'] = f'/api/bases/user/{current_token.user_id}/avata/open/'
+        'avata_url'] = f'api/bases/user/{current_token.user_id}/avata/open/'
     return user_data
 
 
