@@ -18,16 +18,14 @@ router = APIRouter(prefix='/me', )
 
 @router.get(
     '/free/',
+    response_model=UserGlobal,
     summary='读取我的信息 (无权限)',
 )
 async def read_me_info(current_token: TokenData = Depends(get_token_data)):
     user = get_me_user(current_token.user_id)
-    user_data = UserGlobal(**user).dict()
-    if not user['avata']:
-        user_data['avata_url'] = ''
-    else:
-        user_data[
-            'avata_url'] = f'api/bases/user/{current_token.user_id}/avata/open/'
+    user_data = UserGlobal(**user)
+    if user['avata']:
+        user_data.avata_url = f'api/bases/user/{current_token.user_id}/avata/open/'
     return user_data
 
 

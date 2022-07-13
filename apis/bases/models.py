@@ -70,6 +70,10 @@ class UserGlobal(UserCreate):
         title='用户ID',
     )
     bind: dict = Field(title='用户绑定信息', )
+    avata_url: Optional[str] = Field(
+        default='',
+        title='头像地址',
+    )
 
 
 class UserUpdate(UserBase):
