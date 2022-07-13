@@ -5,8 +5,9 @@ from core.security import get_password_hash
 from fastapi.encoders import jsonable_encoder
 from core.storage import remove_file, FILES_PATH
 from core.dependencies import get_paginate_parameters
-from apis.bases.models import Paginate
 from fastapi import APIRouter, Depends
+from apis.bases.api_me import read_me_avata_file
+from apis.bases.models import Paginate, TokenData
 from .models import COL_USER, UserRead, UserCreate, UserUpdate
 from core.database import get_collection, paginate_find, doc_create, doc_update
 from .validate import UserObjIdParams, check_user_username, check_role_id, check_user_email
@@ -112,3 +113,13 @@ async def delete_user(user_id: UserObjIdParams):
         # 删除头像文件
         await remove_file([FILES_PATH, 'avata', str(user_id)])
     return {}
+
+
+@router.get(
+    '/{user_id}/avata/open/',
+    summary='读取用户头像文件 (开放)',
+)
+async def read_user_avata_file(user_id: UserObjIdParams):
+    results = await read_me_avata_file(
+        TokenData(user_id=str(user_id), role_id=''))
+    return results
