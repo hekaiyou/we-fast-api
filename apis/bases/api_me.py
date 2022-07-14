@@ -132,11 +132,10 @@ async def read_me_email_verify(code: str, user_id: UserObjIdParams):
 async def create_me_avata_file(
         file: UploadFile = File(...),
         current_token: TokenData = Depends(get_token_data)):
-    user_col = get_collection(COL_USER)
-    user = get_me_user(current_token.user_id)
     save_result = await save_raw_file(file, ['avata'], current_token.user_id,
                                       ['image'])
-    doc_update(user_col, user, {'avata': save_result['filename']})
+    doc_update(get_collection(COL_USER), {'_id': current_token.user_id},
+               {'avata': save_result['filename']})
     return {}
 
 

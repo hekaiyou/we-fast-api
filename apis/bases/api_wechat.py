@@ -117,9 +117,8 @@ async def read_wechat_access_token(code: str):
 )
 async def create_wechat_avata_file(
     file_url: FileURL, current_token: TokenData = Depends(get_token_data)):
-    user_col = get_collection(COL_USER)
-    user = get_me_user(current_token.user_id)
     save_result = await save_url_file(file_url.url, ['avata'],
                                       current_token.user_id, ['image'])
-    doc_update(user_col, user, {'avata': save_result['filename']})
+    doc_update(get_collection(COL_USER), {'_id': current_token.user_id},
+               {'avata': save_result['filename']})
     return {}
