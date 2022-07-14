@@ -134,12 +134,8 @@ async def create_me_avata_file(
         current_token: TokenData = Depends(get_token_data)):
     user_col = get_collection(COL_USER)
     user = get_me_user(current_token.user_id)
-    if file.content_type.split('/')[0] != 'image':
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='文件不是图像类型',
-        )
-    save_result = await save_raw_file(file, ['avata'], current_token.user_id)
+    save_result = await save_raw_file(file, ['avata'], current_token.user_id,
+                                      ['image'])
     doc_update(user_col, user, {'avata': save_result['filename']})
     return {}
 
