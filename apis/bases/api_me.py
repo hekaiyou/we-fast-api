@@ -1,6 +1,7 @@
 import os
 from loguru import logger
 from datetime import datetime
+from core.validate import ObjectId
 from .utils import update_bind_username
 from core.emails import send_simple_mail
 from core.dynamic import get_apis_configs
@@ -134,7 +135,8 @@ async def create_me_avata_file(
         current_token: TokenData = Depends(get_token_data)):
     save_result = await save_raw_file(file, ['avata'], current_token.user_id,
                                       ['image'])
-    doc_update(get_collection(COL_USER), {'_id': current_token.user_id},
+    doc_update(get_collection(COL_USER),
+               {'_id': ObjectId(current_token.user_id)},
                {'avata': save_result['filename']})
     return {}
 

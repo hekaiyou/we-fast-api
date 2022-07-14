@@ -3,8 +3,8 @@ import string
 import requests
 from datetime import timedelta
 from .validate import get_me_user
-from core.validate import str_to_oid
 from core.storage import save_url_file
+from core.validate import str_to_oid, ObjectId
 from core.database import get_collection, doc_create, doc_update
 from fastapi import APIRouter, HTTPException, status, Depends
 from core.dynamic import get_apis_configs, get_role_permissions
@@ -119,6 +119,7 @@ async def create_wechat_avata_file(
     file_url: FileURL, current_token: TokenData = Depends(get_token_data)):
     save_result = await save_url_file(file_url.url, ['avata'],
                                       current_token.user_id, ['image'])
-    doc_update(get_collection(COL_USER), {'_id': current_token.user_id},
+    doc_update(get_collection(COL_USER),
+               {'_id': ObjectId(current_token.user_id)},
                {'avata': save_result['filename']})
     return {}
