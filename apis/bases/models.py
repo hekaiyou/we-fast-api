@@ -1,7 +1,7 @@
 from datetime import datetime
 from core.validate import ObjId
 from typing import Optional, List, Dict
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, HttpUrl
 
 COL_USER = 'user'
 COL_ROLE = 'role'
@@ -19,6 +19,10 @@ class NoPaginate(BaseModel):
     """ 不分页数据响应的模型 """
     all_item: List[Dict]
     total: int
+
+
+class FileURL(BaseModel):
+    url: HttpUrl = Field(title='资源地址', )
 
 
 class Token(BaseModel):

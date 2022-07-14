@@ -2,12 +2,14 @@ import random
 import string
 import requests
 from datetime import timedelta
+from .validate import get_me_user
 from core.validate import str_to_oid
-from .models import Token, COL_USER, COL_ROLE
-from core.database import get_collection, doc_create
-from fastapi import APIRouter, HTTPException, status
+from core.storage import save_url_file
+from core.database import get_collection, doc_create, doc_update
+from fastapi import APIRouter, HTTPException, status, Depends
 from core.dynamic import get_apis_configs, get_role_permissions
-from core.security import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
+from .models import Token, COL_USER, COL_ROLE, FileURL, TokenData
+from core.security import get_password_hash, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_token_data
 
 router = APIRouter(prefix='/wechat', )
 
@@ -107,3 +109,17 @@ async def read_wechat_access_token(code: str):
         incomplete=(user['username'] == user['bind']['wechat']
                     or not user['email']),
     )
+
+
+@router.post(
+    '/avata/free/',
+    summary='创建微信头像文件 (无权限)',
+)
+async def create_wechat_avata_file(
+    file_url: FileURL, current_token: TokenData = Depends(get_token_data)):
+    user_col = get_collection(COL_USER)
+    user = get_me_user(current_token.user_id)
+    save_result = await save_url_file(file_url.url, ['avata'],
+                                      current_token.user_id, ['image'])
+    doc_update(user_col, user, {'avata': save_result['filename']})
+    return {}
