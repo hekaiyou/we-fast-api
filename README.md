@@ -7,8 +7,8 @@
 创建 Python3 版本的虚拟环境:
 
 ```shell
-$ python3 -m venv env
-$ source env/bin/activate
+$ python3 -m venv venv
+$ source venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
