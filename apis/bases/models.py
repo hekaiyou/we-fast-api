@@ -34,10 +34,7 @@ class Token(BaseModel):
     role_title: str = Field(title='角色名称', )
     role_permissions: list = Field(title='权限列表', )
     expires_minutes: int = Field(title='令牌超时分钟数', )
-    incomplete: Optional[bool] = Field(
-        default=False,
-        title='需要补全资料',
-    )
+    incomplete: Optional[bool] = Field(default=False, title='需要补全资料')
 
 
 class TokenData(BaseModel):
@@ -51,33 +48,21 @@ class UserBase(BaseModel):
     username: Optional[str] = Field(title='用户名称', )
     full_name: Optional[str] = Field(title='用户完整姓名', )
     email: Optional[EmailStr] = Field(title='电子邮箱', )
-    disabled: Optional[bool] = Field(
-        default=False,
-        title='是否禁用',
-    )
+    disabled: Optional[bool] = Field(default=False, title='是否禁用')
 
 
 class UserCreate(UserBase):
     """ 用户的创建模型 """
     username: str = Field(title='用户名称', )
     password: str = Field(title='认证密码', )
-    role_id: Optional[str] = Field(
-        default='',
-        title='角色ID',
-    )
+    role_id: Optional[str] = Field(default='', title='角色ID')
 
 
 class UserGlobal(UserCreate):
     """ 用户的全局模型 """
-    id: ObjId = Field(
-        alias='_id',
-        title='用户ID',
-    )
+    id: ObjId = Field(alias='_id', title='用户ID')
     bind: dict = Field(title='用户绑定信息', )
-    avata_url: Optional[str] = Field(
-        default='',
-        title='头像地址',
-    )
+    avata_url: Optional[str] = Field(default='', title='头像地址')
 
 
 class UserUpdate(UserBase):
@@ -87,10 +72,7 @@ class UserUpdate(UserBase):
 
 class UserRead(UserBase):
     """ 用户的读取模型 """
-    id: ObjId = Field(
-        alias='_id',
-        title='用户ID',
-    )
+    id: ObjId = Field(alias='_id', title='用户ID')
     role_id: Optional[str] = Field(title='角色ID', )
     source: str = Field(title='用户来源', )
     create_time: datetime
@@ -107,28 +89,19 @@ class PermissionRead(BaseModel):
 
 class RoleBase(BaseModel):
     """ 角色数据的基础模型 """
-    title: str = Field(
-        title='角色名称',
-        regex='^\S{2,}$',
-    )
+    title: str = Field(title='角色名称', regex='^\S{2,}$')
     permissions: list = Field(title='权限列表', )
 
 
 class RoleUpdate(RoleBase):
     """ 角色的更新模型 """
-    title: Optional[str] = Field(
-        title='角色名称',
-        regex='^\S{2,}$',
-    )
+    title: Optional[str] = Field(title='角色名称', regex='^\S{2,}$')
     permissions: Optional[list] = Field(title='权限列表', )
 
 
 class RoleRead(RoleBase):
     """ 角色的读取模型 """
-    id: ObjId = Field(
-        alias='_id',
-        title='角色ID',
-    )
+    id: ObjId = Field(alias='_id', title='角色ID')
     create_time: Optional[datetime] = datetime.utcnow()
     update_time: Optional[datetime] = datetime.utcnow()
 
