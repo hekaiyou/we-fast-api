@@ -2,7 +2,6 @@ import random
 import string
 import requests
 from datetime import timedelta
-from .validate import get_me_user
 from core.storage import save_url_file
 from core.validate import str_to_oid
 from core.database import get_collection, doc_create, doc_update

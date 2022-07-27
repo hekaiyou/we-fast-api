@@ -14,7 +14,8 @@ FILES_PATH = os.path.join(
 async def save_url_file(url: str,
                         directory: list,
                         filename: str = None,
-                        type_check: list = []):
+                        type_check: list = [],
+                        auto_resp: bool = True):
     """ 保存URL文件 """
     url_md5 = hashlib.md5(url.encode('utf8')).hexdigest()
     save_path = os.path.join(FILES_PATH, *directory)
@@ -27,22 +28,31 @@ async def save_url_file(url: str,
     try:
         res = requests.get(url, stream=True)
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f'文件资源地址无法连接: {e}',
-        )
+        if auto_resp:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f'文件资源地址无法连接: {e}',
+            )
+        else:
+            raise Exception(f'文件资源地址无法连接: {e}')
     if res.status_code != 200:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='文件资源地址不可用',
-        )
+        if auto_resp:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='文件资源地址不可用',
+            )
+        else:
+            raise Exception('文件资源地址不可用')
     file_type = res.headers.get('Content-Type', '')
     if type_check:
         if file_type.split('/')[0] not in type_check:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f'文件不是 {"|".join(type_check)} 类型',
-            )
+            if auto_resp:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f'文件 {file_type} 不是 {"|".join(type_check)} 类型',
+                )
+            else:
+                raise Exception(f'文件 {file_type} 不是 {"|".join(type_check)} 类型')
     with open(file_path, 'wb') as f_obj:
         for chunk in res.iter_content(chunk_size=1024):
             if chunk:
@@ -131,3 +141,9 @@ async def generate_thumbnail(path: list, size: tuple):
     im.thumbnail(size)
     im.save(thumbnail_path, im.format)
     return thumbnail_path
+
+
+def file_exists(directory: list, filename: str):
+    file_path = os.path.join(FILES_PATH, *directory, filename)
+    if os.path.isfile(file_path):
+        return file_path
