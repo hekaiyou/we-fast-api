@@ -1,3 +1,4 @@
+from enum import Enum
 from datetime import datetime
 from core.validate import ObjId
 from typing import Optional, List, Dict
@@ -115,6 +116,19 @@ class SetupUpdate(BaseModel):
 class SyncedWorkerRead(BaseModel):
     """ 同步工作进程的读取模型 """
     wid: str = Field(title='进程ID', )
+
+
+class LogLevelEnum(str, Enum):
+    debug = 'debug'
+    info = 'info'
+    warning = 'warning'
+    error = 'error'
+
+
+class ExternalLogBase(BaseModel):
+    """ 外部日志的基础模型 """
+    level: LogLevelEnum = Field(title='日志级别', )
+    message: str = Field(title='日志信息', )
 
 
 class UserUpdatePassword(BaseModel):

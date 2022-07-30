@@ -39,7 +39,9 @@ def whether_to_initialize(apis_urls):
                         'create_role', 'delete_role', 'update_role',
                         'create_user', 'read_user_page', 'delete_user',
                         'update_user', 'read_setup_module_all', 'read_setup',
-                        'update_setup', 'read_logs_all', 'read_logs_file'
+                        'update_setup', 'read_logs_all', 'read_logs_file',
+                        'create_logs', 'summary_day_statistics',
+                        'summary_hour_statistics', 'read_statistics_all'
                     ],
                     'create_time':
                     datetime.utcnow(),

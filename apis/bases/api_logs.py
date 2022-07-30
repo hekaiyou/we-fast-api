@@ -4,6 +4,7 @@ from loguru import logger
 from datetime import date
 from apis.bases.models import NoPaginate
 from fastapi.responses import FileResponse
+from .models import ExternalLogBase, LogLevelEnum
 from fastapi import APIRouter, HTTPException, status
 
 router = APIRouter(prefix='/logs', )
@@ -74,3 +75,19 @@ async def read_logs_file(snippet: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='找不到日志',
         )
+
+
+@router.post(
+    '/',
+    summary='创建日志',
+)
+async def create_logs(external_log: ExternalLogBase):
+    if external_log.level == LogLevelEnum.debug:
+        logger.debug(external_log.message)
+    elif external_log.level == LogLevelEnum.info:
+        logger.info(external_log.message)
+    elif external_log.level == LogLevelEnum.warning:
+        logger.warning(external_log.message)
+    elif external_log.level == LogLevelEnum.error:
+        logger.error(external_log.message)
+    return {}
