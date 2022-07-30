@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     uvicorn_workers: int = 1
     uvicorn_reload: bool = False
     token_expire_minute: int = 720
-    token_exempt_ip: list = []
+    token_exempt_ip: list = ['127.0.0']
     mail_smtp_host: str = 'smtp.163.com'
     mail_smtp_use_ssl: bool = True
     mail_smtp_port: int = 465
