@@ -133,3 +133,66 @@ server {
 
 - 验证配置是否正确: sudo nginx -t
 - 更新配置并重启服务: sudo nginx -s reload
+
+## 异步需求
+
+### 独立进程
+
+如果一个异步任务需要调用其他语言编译的 SDK 时, 可以将这个任务写成一个脚本独立运行, 必要时可以多节点部署任务进程. 例如下面创建一个 `exec_tasks.py` 文件, 用于执行某个异步任务:
+
+```python
+import time
+import requests
+import argparse
+from pymongo import MongoClient
+
+# 获取命令行参数
+parser = argparse.ArgumentParser(description='ExecTasks')
+parser.add_argument(
+    '--numbering',
+    dest='numbering',
+    type=int,
+    default=0,
+    help='Numbering',
+)
+args = parser.parse_args()
+# 全局变量
+exec_id = f'ET-{args.numbering}'
+service_host = 'http://127.0.0.1:8083/'
+task_interval_seconds = 10
+# 数据库客户端及连接
+db_client = MongoClient(host='127.0.0.1', port=27017)
+db = db_client['test_database']
+
+def post_log(level: str, message: str):
+    """ 提交日志 level=debug|info|warning|error """
+    print(f'[{level}] {message}')
+    headers = {'content-type': 'application/json'}
+    payload = {'level': level, 'message': message}
+    while True:
+        try:
+            res = requests.post(
+                f'{service_host}api/bases/logs/',
+                json=payload,
+                headers=headers,
+            )
+            if res.status_code == 200:
+                return
+            else:
+                print(f'提交日志异常: {res.text}')
+        except Exception as e:
+            print(f'提交日志异常: {e}')
+        time.sleep(60)
+
+seconds = int(time.time())  # 获取基准时间戳
+post_log('debug', f'任务执行程序 {exec_id} 已启动')
+while True:
+    new_seconds = int(time.time())
+    if new_seconds - seconds > task_interval_seconds:
+        try:
+            col_rc = db['test_case']
+            time.sleep(360)  # 模拟任务执行内容
+        except Exception as e:
+            post_log('error', f'任务执行程序 {exec_name} 异常: {e}')
+        seconds = int(time.time())
+```
