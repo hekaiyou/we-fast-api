@@ -36,6 +36,8 @@ def send_mail(to_addrs: list, subject: str, msg: MIMEBase):
     except smtplib.SMTPServerDisconnected as e:
         logger.error(f'发送邮件异常, {e}')
         logger.debug('建议: 可能需要开启 SSL 加密')
+    except Exception as e:
+        logger.error(f'发送邮件异常, {e}')
 
 
 def send_base_mail(to_addrs, subject, text):
@@ -47,6 +49,8 @@ def send_simple_mail(to_addrs, subject, html_text_list: list):
     """ 发送简单 HTML 邮件 """
     text = '<div>'
     for html_text in html_text_list:
+        if '</' not in html_text and '>' not in html_text:
+            html_text = html_text.replace(" ", "&nbsp;")
         text += f'<p>{html_text}</p>'
     text += '</div>'
     content_css = 'span {color:#d81b60;}'
