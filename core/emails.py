@@ -45,13 +45,27 @@ def send_base_mail(to_addrs, subject, text):
     send_mail(to_addrs, subject, MIMEText(text, 'plain', 'utf-8'))
 
 
-def send_simple_mail(to_addrs, subject, html_text_list: list):
+def send_simple_mail(to_addrs, subject, html_content_list: list):
     """ 发送简单 HTML 邮件 """
     text = '<div>'
-    for html_text in html_text_list:
-        if '</' not in html_text and '>' not in html_text:
-            html_text = html_text.replace(" ", "&nbsp;")
-        text += f'<p>{html_text}</p>'
+    for html_content in html_content_list:
+        if type(html_content) is list:
+            text += '<table border="1">'
+            for tr_i in range(len(html_content)):
+                tr_c = html_content[tr_i]
+                text += '<tr>'
+                if tr_i == 0:
+                    for th in tr_c:
+                        text += f'<th>{th}</th>'
+                else:
+                    for td in tr_c:
+                        text += f'<td>{td}</td>'
+                text += '</tr>'
+            text += '</table>'
+        else:
+            if '</' not in html_content and '>' not in html_content:
+                html_content = html_content.replace(" ", "&nbsp;")
+            text += f'<p>{html_content}</p>'
     text += '</div>'
     content_css = 'span {color:#d81b60;}'
     content = f'<html><head><style>{content_css}</style></head><body><div style="background:#eee; padding-top:30px; padding-bottom:30px;"><div style="width:80%;background:#fff; margin:0 auto; border-radius: 5px; overflow:hidden;"><div style="background:#d81b60;padding: 15px 35px 10px; color:#fff; font-size:16px;">{subject}</div><div id="content" style="padding: 35px 35px 60px; overflow:hidden; max-width:100%; min-height:300px;word-wrap:break-word; word-break:break-all;">{text}</div></div></div></body></html>'
