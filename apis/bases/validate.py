@@ -93,6 +93,11 @@ def check_user_email(v):
 
 
 def get_me_user(v):
+    if v == 'ExemptIP':
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='当前为免鉴权 IP 访问',
+        )
     user = get_collection(COL_USER).find_one({
         '_id': str_to_oid(v),
     })
