@@ -136,12 +136,33 @@ server {
 
 ## 异步需求
 
+### 轻量协程
+
+如果一个异步任务需要进行数据读写、文件读写、数据状态短期追踪、发起第三方接口请求等耗时操作, 协程是一个很好的解决方案. 例如下面创建一个 `exec_tasks.py` 文件, 用于执行某个异步任务:
+
+```python
+import asyncio
+
+async def coroutine_test_task(name):
+    """ 协程任务的具体执行函数 """
+    for i in range(5):
+        await asyncio.sleep(60)  # 模拟任务执行内容
+        return  # 一分钟后直接结束协程任务
+
+@router.get('/')
+async def read_test():
+    # 创建一个协程任务
+    asyncio.create_task(coroutine_exec_task('参数name的值'))
+    return {}
+```
+
 ### 独立进程
 
 如果一个异步任务需要调用其他语言编译的 SDK 时, 可以将这个任务写成一个脚本独立运行, 必要时可以多节点部署任务进程. 例如下面创建一个 `exec_tasks.py` 文件, 用于执行某个异步任务:
 
 ```python
 import time
+import random
 import requests
 import argparse
 from pymongo import MongoClient
@@ -185,14 +206,16 @@ def post_log(level: str, message: str):
         time.sleep(60)
 
 seconds = int(time.time())  # 获取基准时间戳
+interval_random = random.randint(0, 10)
 post_log('debug', f'任务执行程序 {exec_id} 已启动')
 while True:
     new_seconds = int(time.time())
-    if new_seconds - seconds > task_interval_seconds:
+    if new_seconds - seconds > task_interval_seconds + interval_random:
         try:
             col_rc = db['test_case']
             time.sleep(360)  # 模拟任务执行内容
         except Exception as e:
             post_log('error', f'任务执行程序 {exec_name} 异常: {e}')
         seconds = int(time.time())
+        interval_random = random.randint(0, 10)
 ```
