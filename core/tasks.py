@@ -52,10 +52,10 @@ def repeat_task(
                 while max_repetitions is None or repetitions < max_repetitions:
                     try:
                         if is_coroutine:
-                            # 以协程方式执行
+                            # 以协程方式执行 async def
                             await func()  # type: ignore
                         else:
-                            # 以线程方式执行
+                            # 以线程方式执行 def
                             await run_in_threadpool(func)
                         repetitions += 1
                     except Exception as exc:
