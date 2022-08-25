@@ -142,7 +142,7 @@ def set_request_record(request, spend_sec, response):
     path_key = f'{request.scope["method"]} {request.scope["path"]}'
     if request['root_path'] == '/static':
         path_key = 'GET /static/'
-    elif 'GET /docs' in path_key:
+    elif 'GET /docs' in path_key or path_key == 'GET /openapi.json':
         path_key = 'GET /docs/'
     elif 'GET /redoc' in path_key:
         path_key = 'GET /redoc/'
