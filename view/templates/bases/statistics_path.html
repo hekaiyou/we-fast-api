@@ -1,6 +1,10 @@
 {% extends 'navigation.html' %}
 {% block title %}访问统计{% endblock %}
 
+{% block operate_left %}
+<a href="javascript:history.back(-1)">返回</a>
+{% endblock %}
+
 {% block main %}
 <form>
     <div class="grid">
@@ -17,28 +21,6 @@
 <article style="padding-left:15px;padding-right:15px;padding-top:35px;padding-bottom:0px;margin-top:0px;">
     <div id="summaryGraph" style="height:400px;"></div>
 </article>
-<form>
-    <div class="grid">
-        <label for="sortValue">
-            排序依据
-            <select id="sortValue" required>
-                <option value="total" selected>接口请求次数</option>
-                <option value="avera_spend_s">接口请求平均处理时长(秒)</option>
-                <option value="c_200">接口成功请求次数</option>
-                <option value="byte_m">接口响应出口流量(MB)</option>
-                <option value="avera_byte_m">接口响应平均出口流量(MB)</option>
-            </select>
-        </label>
-        <label for="sortOrder">
-            排序方式
-            <select id="sortOrder" required>
-                <option value="descending" selected>降序 (从大到小)</option>
-                <option value="ascending">升序 (从小到大)</option>
-            </select>
-        </label>
-    </div>
-</form>
-<div id="details-content"></div>
 {% endblock %}
 
 {% block javascript %}
@@ -150,61 +132,12 @@
         };
         myChart.setOption(option);
     }
-    function getBeforeDay(before) {
-        let beforeTime = before * 24 * 60 * 60 * 1000;
-        let time = (new Date).getTime() - beforeTime;
-        let date = new Date(time);
-        let year = date.getFullYear();
-        let month = date.getMonth() + 1;
-        let day = date.getDate();
-        if (month < 10) { month = '0' + month; }
-        if (day < 10) { day = '0' + day; }
-        return year + '-' + month + '-' + day;
-    }
-    var pathPoolList = [];
-    function drawSummaryList() {
-        let value = $('#sortValue').val();
-        let order = $('#sortOrder').val();
-        $('#details-content').empty();
-        let contentWidth = $('#details-content').width();
-        let summaryLen = 0;
-        if (contentWidth >= 600) {
-            summaryLen = 68;
-        } else if (contentWidth >= 500) {
-            summaryLen = 51;
-        } else if (contentWidth >= 400) {
-            summaryLen = 41;
-        } else {
-            summaryLen = 35;
-        }
-        $.each(pathPoolList.sort(
-            function (a, b) {
-                if (order == 'descending') {
-                    return (b[value] - a[value]);  // 降序
-                } else {
-                    return (a[value] - b[value]);  // 升序
-                }
-            }
-        ), function (index, items) {
-            let summaryValue = items['path'];
-            if (summaryValue.length + items[value].toString().length >= summaryLen + 1) {
-                summaryValue = summaryValue.substr(0, summaryLen - items[value].toString().length) + '...';
-            }
-            $('#details-content').append('<details class="itemPath" onclick="event.preventDefault()" id="' + items['path'] + '"><summary>' + summaryValue + ' <sup>' + items[value] + '</sup></summary></details>');
-        });
-        $('.itemPath').click(function () {
-            let pk = $(this).attr('id').replace(/\//g, '%2f');
-            pk = pk.replace(/{/g, '%7b');
-            pk = pk.replace(/}/g, '%7d');
-            window.location.href = '/view/bases/statistics/path/?pk=' + pk + '&start_date=' + $('#startDate').val() + '&end_date=' + $('#endDate').val();
-        });
-    }
     function selectStatisticsDate() {
         if ($('#startDate').val() && $('#endDate').val() && $('#startDate').val() <= $('#endDate').val()) {
             utilAjax(
                 type = 'GET',
-                url = '/api/bases/statistics/',
-                data = { 'start_date': $('#startDate').val(), 'end_date': $('#endDate').val(), },
+                url = '/api/bases/statistics/path/',
+                data = { 'pk': '{{ pk }}', 'start_date': $('#startDate').val(), 'end_date': $('#endDate').val(), },
                 data_format = 'query',
                 check = {},
                 success = function (data, textStatus) {
@@ -212,26 +145,13 @@
                     var yTotalData = [];
                     var yC200Data = [];
                     var yByteMData = [];
-                    var pathPoolDict = {};
                     data['all_item'].forEach(function (value, index) {
                         xAxisData.push(value.date);
                         yTotalData.push(value.total);
                         yC200Data.push(value.c_200);
                         yByteMData.push(value.byte_m);
-                        value.paths.forEach(function (ps, pi) {
-                            if (pathPoolDict[ps.path] == undefined) {
-                                pathPoolDict[ps.path] = { 'path': ps.path, 'total': 0, 'c_200': 0, 'byte_m': 0.0, 'avera_byte_m': 0.0, 'avera_spend_s': 0.0 };
-                            }
-                            pathPoolDict[ps.path]['total'] += ps.total;
-                            pathPoolDict[ps.path]['c_200'] += ps.c_200;
-                            pathPoolDict[ps.path]['byte_m'] += ps.byte_m;
-                            pathPoolDict[ps.path]['avera_byte_m'] += ps.avera_byte_m;
-                            pathPoolDict[ps.path]['avera_spend_s'] += ps.avera_spend_s;
-                        });
                     });
                     drawSummaryGraph(xAxisData, yTotalData, yC200Data, yByteMData);
-                    pathPoolList = Object.values(pathPoolDict);
-                    drawSummaryList();
                 },
                 success_reminder = false,
                 not_close = false,
@@ -239,29 +159,19 @@
         }
     }
     $(document).ready(function () {
-        $('#startDate').val(getBeforeDay(6));
+        $('#startDate').val('{{ start_date }}');
         $('#startDate').change(function (value) {
             if ($('#startDate').val()) {
                 selectStatisticsDate();
             }
         });
-        $('#endDate').val(getBeforeDay(0));
+        $('#endDate').val('{{ end_date }}');
         $('#endDate').change(function (value) {
             if ($('#endDate').val()) {
                 selectStatisticsDate();
             }
         });
         selectStatisticsDate();
-        $('#sortValue').change(function (value) {
-            if ($('#sortValue').val()) {
-                drawSummaryList();
-            }
-        });
-        $('#sortOrder').change(function (value) {
-            if ($('#sortOrder').val()) {
-                drawSummaryList();
-            }
-        });
     });
 </script>
 {% endblock %}

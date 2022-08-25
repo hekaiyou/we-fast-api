@@ -123,3 +123,56 @@ async def read_statistics_all(start_date: date, end_date: date):
             del stored_path_day['update_time']
         all_item.append(stored_path_day)
     return NoPaginate(all_item=all_item, total=len(all_item))
+
+
+@router.get(
+    '/path/',
+    response_model=NoPaginate,
+    summary='读取访问统计',
+)
+async def read_statistics(pk: str, start_date: date, end_date: date):
+    if start_date > end_date or end_date > date.today():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='开始与结束日期不在合理范围内',
+        )
+    path_col = get_collection(COL_OPERATE_PATH)
+    all_item = []
+    if start_date == end_date:
+        hour_dict = {}
+        for i in range(24):
+            hour_dict[str(i).zfill(2)] = {
+                'byte_m': 0.0,
+                'c_200': 0,
+                'spend_s': 0.0,
+                'total': 0
+            }
+        day_path = path_col.find_one({'path': pk, 'date': str(start_date)})
+        if day_path:
+            for _hour, _value in day_path['hours'].items():
+                hour_dict[str(_hour).zfill(2)] = _value
+        for hour, value in hour_dict.items():
+            all_item.append({'date': hour, **value})
+    else:
+        date_list = []
+        while start_date <= end_date:
+            date_list.append(str(start_date))
+            start_date += timedelta(days=1)
+        day_paths = path_col.find({'path': pk, 'date': {'$in': date_list}})
+        day_dict = {}
+        for _date in date_list:
+            day_dict[_date] = {
+                'byte_m': 0.0,
+                'c_200': 0,
+                'spend_s': 0.0,
+                'total': 0
+            }
+        for day_path in day_paths:
+            for _hour, _value in day_path['hours'].items():
+                for vk, vv in _value.items():
+                    if vk not in day_dict[day_path['date']]:
+                        day_dict[day_path['date']][vk] = 0
+                    day_dict[day_path['date']][vk] += vv
+        for day, value in day_dict.items():
+            all_item.append({'date': day, **value})
+    return NoPaginate(all_item=all_item, total=len(all_item))

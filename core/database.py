@@ -40,7 +40,7 @@ def whether_to_initialize(apis_urls):
                         'create_user', 'read_user_page', 'delete_user',
                         'update_user', 'read_setup_module_all', 'read_setup',
                         'update_setup', 'read_logs_all', 'read_logs_file',
-                        'create_logs', 'read_statistics_all'
+                        'create_logs', 'read_statistics', 'read_statistics_all'
                     ],
                     'create_time':
                     datetime.utcnow(),
