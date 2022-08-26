@@ -132,17 +132,32 @@
                 {
                     name: '总请求',
                     type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' 次';
+                        }
+                    },
                     data: yTotalData,
                 },
                 {
                     name: '成功请求',
                     type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' 次';
+                        }
+                    },
                     yAxisIndex: 1,
                     data: yC200Data,
                 },
                 {
                     name: '出口流量',
                     type: 'line',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' MB';
+                        }
+                    },
                     yAxisIndex: 2,
                     data: yByteMData,
                 }

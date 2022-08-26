@@ -121,17 +121,32 @@
                 {
                     name: '总请求',
                     type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' 次';
+                        }
+                    },
                     data: yTotalData,
                 },
                 {
                     name: '成功请求',
                     type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' 次';
+                        }
+                    },
                     yAxisIndex: 1,
                     data: yC200Data,
                 },
                 {
                     name: '出口流量',
                     type: 'line',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' MB';
+                        }
+                    },
                     yAxisIndex: 2,
                     data: yByteMData,
                 }
@@ -150,6 +165,7 @@
             toolbox: {
                 feature: {
                     dataView: { show: true, readOnly: false },
+                    magicType: { type: ['line', 'bar'] },
                     restore: { show: true },
                     saveAsImage: { show: true }
                 }
@@ -172,6 +188,11 @@
                 {
                     name: '平均响应时间',
                     type: 'line',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' 秒';
+                        }
+                    },
                     data: ySpendSData,
                     markPoint: {
                         data: [
@@ -206,7 +227,11 @@
                         yTotalData.push(value.total);
                         yC200Data.push(value.c_200);
                         yByteMData.push(value.byte_m);
-                        ySpendSData.push(value.spend_s / value.total);
+                        if (value.spend_s != 0) {
+                            ySpendSData.push(value.spend_s / value.total);
+                        } else {
+                            ySpendSData.push(value.spend_s);
+                        }
                     });
                     drawSummaryGraph(xAxisData, yTotalData, yC200Data, yByteMData);
                     drawResponseGraph(xAxisData, ySpendSData)
