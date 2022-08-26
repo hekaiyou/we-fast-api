@@ -25,17 +25,20 @@
 <article style="padding-left:15px;padding-right:15px;padding-top:35px;padding-bottom:0px;margin-top:0px;">
     <div id="summaryGraph" style="height:400px;"></div>
 </article>
+<article style="padding-left:15px;padding-right:15px;padding-top:35px;padding-bottom:0px;margin-top:0px;">
+    <div id="responseGraph" style="height:400px;"></div>
+</article>
 {% endblock %}
 
 {% block javascript %}
 <script src='/static/echarts/echarts.min.js'></script>
 <script>
-    var chartDom = document.getElementById('summaryGraph');
-    var myChart = echarts.init(chartDom);
-    var option;
+    var summaryChartDom = document.getElementById('summaryGraph');
+    var summaryChart = echarts.init(summaryChartDom);
+    var summaryChartOption;
     function drawSummaryGraph(xAxisData, yTotalData, yC200Data, yByteMData) {
         const colors = ['#5470C6', '#91CC75', '#EE6666'];
-        option = {
+        summaryChartOption = {
             color: colors,
             tooltip: {
                 trigger: 'axis',
@@ -134,7 +137,55 @@
                 }
             ]
         };
-        myChart.setOption(option);
+        summaryChart.setOption(summaryChartOption);
+    }
+    var responseChartDom = document.getElementById('responseGraph');
+    var responseChart = echarts.init(responseChartDom);
+    var responseChartOption;
+    function drawResponseGraph(xAxisData, ySpendSData) {
+        responseChartOption = {
+            tooltip: {
+                trigger: 'axis',
+            },
+            toolbox: {
+                feature: {
+                    dataView: { show: true, readOnly: false },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
+                }
+            },
+            legend: {},
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: xAxisData,
+                }
+            ],
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value} 秒'
+                }
+            },
+            series: [
+                {
+                    name: '平均响应时间',
+                    type: 'line',
+                    data: ySpendSData,
+                    markPoint: {
+                        data: [
+                            { type: 'max', name: 'Max' },
+                            { type: 'min', name: 'Min' }
+                        ]
+                    },
+                    markLine: {
+                        data: [{ type: 'average', name: 'Avg' }]
+                    }
+                }
+            ]
+        };
+        responseChart.setOption(responseChartOption);
     }
     function selectStatisticsDate() {
         if ($('#startDate').val() && $('#endDate').val() && $('#startDate').val() <= $('#endDate').val()) {
@@ -149,13 +200,16 @@
                     var yTotalData = [];
                     var yC200Data = [];
                     var yByteMData = [];
+                    var ySpendSData = [];
                     data['all_item'].forEach(function (value, index) {
                         xAxisData.push(value.date);
                         yTotalData.push(value.total);
                         yC200Data.push(value.c_200);
                         yByteMData.push(value.byte_m);
+                        ySpendSData.push(value.spend_s / value.total);
                     });
                     drawSummaryGraph(xAxisData, yTotalData, yC200Data, yByteMData);
+                    drawResponseGraph(xAxisData, ySpendSData)
                 },
                 success_reminder = false,
                 not_close = false,
