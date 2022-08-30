@@ -41,7 +41,7 @@ def get_api_routes():
 
 async def get_paginate_parameters(
     skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=10, ge=1, le=100),
+    limit: int = Query(default=10, ge=1, le=9999),
     orderby: Optional[str] = Query(
         default=None,
         description='示例: field1 asc,field2 desc',
