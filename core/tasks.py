@@ -40,9 +40,14 @@ def repeat_task(
         将修饰函数转换为自身重复且定期调用的版本.
         """
         is_coroutine = asyncio.iscoroutinefunction(func)
+        had_run = False
 
         @wraps(func)
         async def wrapped() -> None:
+            nonlocal had_run
+            if had_run:
+                return
+            had_run = True
             repetitions = 0
 
             async def loop() -> None:

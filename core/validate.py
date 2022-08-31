@@ -16,7 +16,7 @@ class ObjId(ObjectId):
         try:
             ObjectId.is_valid(v)
         except InvalidId as e:
-            raise ValueError('无效的对象 ID')
+            raise ValueError('无效的对象ID')
         return str(v)
 
     @classmethod
@@ -34,8 +34,15 @@ class ObjIdParams(ObjectId):
     @classmethod
     def validate(cls, v):
         if not ObjectId.is_valid(v):
-            raise ValueError('无效的字符串 ID')
-        return ObjectId(v)
+            raise ValueError('无效的字符串ID')
+        oid = ObjectId(v)
+        if not cls.validate_doc(oid):
+            raise ValueError('找不到匹配文档')
+        return oid
+
+    @classmethod
+    def validate_doc(cls, oid) -> bool:
+        return True
 
     @classmethod
     def __modify_schema__(cls, field_schema):
@@ -49,5 +56,5 @@ def str_to_oid(str_id):
     except InvalidId as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='无效的字符串 ID',
+            detail='无效的字符串ID',
         )

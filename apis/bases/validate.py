@@ -10,16 +10,20 @@ from core.validate import ObjIdParams, ObjectId, str_to_oid
 class RoleObjIdParams(ObjIdParams):
 
     @classmethod
-    def validate(cls, v):
-        ObjIdParams.validate(v)
-        role_id = ObjectId(v)
-        if not get_collection(COL_ROLE).count_documents({'_id': role_id}):
-            if v != '100000000000000000000001':
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail='找不到角色',
-                )
-        return role_id
+    def validate_doc(cls, oid):
+        if not get_collection(COL_ROLE).count_documents({'_id': oid}):
+            if str(oid) != '100000000000000000000001':
+                return False
+        return True
+
+
+class UserObjIdParams(ObjIdParams):
+
+    @classmethod
+    def validate_doc(cls, oid):
+        return get_collection(COL_USER).count_documents({
+            '_id': oid,
+        })
 
 
 def check_role_title(v):
@@ -56,20 +60,6 @@ def check_role_id(v):
         )
 
 
-class UserObjIdParams(ObjIdParams):
-
-    @classmethod
-    def validate(cls, v):
-        ObjIdParams.validate(v)
-        user_id = ObjectId(v)
-        if not get_collection(COL_USER).count_documents({'_id': user_id}):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='找不到用户',
-            )
-        return user_id
-
-
 def check_user_username(v):
     user_col = get_collection(COL_USER)
     if user_col.count_documents({'username': v}):
@@ -90,6 +80,38 @@ def check_user_email(v):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='电子邮箱地址已存在',
         )
+
+
+def check_verify_code(code, user_id, verify_key):
+    if not code or len(code) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='无效的验证码',
+        )
+    user_col = get_collection(COL_USER)
+    user = user_col.find_one({'_id': user_id})
+    if not user['verify'][verify_key]['code']:
+        return False
+    if (datetime.utcnow() -
+            user['verify'][verify_key]['create']).seconds > 3600:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='过期的验证码',
+        )
+    if user['verify'][verify_key]['code'] != code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='错误的验证码',
+        )
+    update_dict = {
+        f'verify.{verify_key}.code': '',
+        f'verify.{verify_key}.create': None,
+        f'verify.{verify_key}.value': '',
+    }
+    if verify_key == 'email':
+        update_dict[f'bind.{verify_key}'] = user['verify'][verify_key]['value']
+    doc_update(user_col, {'_id': user['_id']}, update_dict)
+    return True
 
 
 def get_me_user(v):
@@ -126,35 +148,3 @@ def get_verify_code(value, user_id, verify_key):
         },
     )
     return code
-
-
-def check_verify_code(code, user_id, verify_key):
-    if not code or len(code) < 6:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='无效的验证码',
-        )
-    user_col = get_collection(COL_USER)
-    user = user_col.find_one({'_id': user_id})
-    if not user['verify'][verify_key]['code']:
-        return False
-    if (datetime.utcnow() -
-            user['verify'][verify_key]['create']).seconds > 3600:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='过期的验证码',
-        )
-    if user['verify'][verify_key]['code'] != code:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='错误的验证码',
-        )
-    update_dict = {
-        f'verify.{verify_key}.code': '',
-        f'verify.{verify_key}.create': None,
-        f'verify.{verify_key}.value': '',
-    }
-    if verify_key == 'email':
-        update_dict[f'bind.{verify_key}'] = user['verify'][verify_key]['value']
-    doc_update(user_col, {'_id': user['_id']}, update_dict)
-    return True
