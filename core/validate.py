@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 from fastapi import HTTPException, status
@@ -47,6 +48,20 @@ class ObjIdParams(ObjectId):
     @classmethod
     def __modify_schema__(cls, field_schema):
         field_schema.update(type='string')
+
+
+def get_date_list(start_date: date, end_date: date):
+    """ 验证开始与结束日期并返回日期区间字符串列表 """
+    if start_date > end_date or end_date > date.today():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='开始与结束日期不在合理范围内',
+        )
+    date_list = []
+    while start_date <= end_date:
+        date_list.append(str(start_date))
+        start_date += timedelta(days=1)
+    return date_list
 
 
 def str_to_oid(str_id):

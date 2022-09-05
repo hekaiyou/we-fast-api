@@ -52,6 +52,14 @@ def check_role_permissions(v):
         )
 
 
+def check_role_and_user(v):
+    if get_collection(COL_USER).count_documents({'role_id': v}):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='角色存在用户绑定关系',
+        )
+
+
 def check_role_id(v):
     if not get_collection(COL_ROLE).count_documents({'_id': str_to_oid(v)}):
         raise HTTPException(

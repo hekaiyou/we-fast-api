@@ -1,6 +1,7 @@
-from datetime import date, timedelta
+from datetime import date
+from fastapi import APIRouter
+from core.validate import get_date_list
 from core.database import get_collection, doc_create
-from fastapi import APIRouter, HTTPException, status
 from .models import COL_OPERATE_PATH, COL_OPERATE_PATH_DAY, NoPaginate
 
 router = APIRouter(prefix='/statistics', )
@@ -91,18 +92,10 @@ def summary_hour_statistics(one_day):
     summary='读取访问统计 (全量)',
 )
 async def read_statistics_all(start_date: date, end_date: date):
-    if start_date > end_date or end_date > date.today():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='开始与结束日期不在合理范围内',
-        )
-    if start_date == end_date:
+    date_list = get_date_list(start_date, end_date)
+    if len(date_list) == 1:
         all_item = summary_hour_statistics(str(start_date))
         return NoPaginate(all_item=all_item, total=len(all_item))
-    date_list = []
-    while start_date <= end_date:
-        date_list.append(str(start_date))
-        start_date += timedelta(days=1)
     path_day_col = get_collection(COL_OPERATE_PATH_DAY)
     all_item = []
     for one_day in date_list:
@@ -131,14 +124,10 @@ async def read_statistics_all(start_date: date, end_date: date):
     summary='读取访问统计',
 )
 async def read_statistics(pk: str, start_date: date, end_date: date):
-    if start_date > end_date or end_date > date.today():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='开始与结束日期不在合理范围内',
-        )
+    date_list = get_date_list(start_date, end_date)
     path_col = get_collection(COL_OPERATE_PATH)
     all_item = []
-    if start_date == end_date:
+    if len(date_list) == 1:
         hour_dict = {}
         for i in range(24):
             hour_dict[str(i).zfill(2)] = {
@@ -154,10 +143,6 @@ async def read_statistics(pk: str, start_date: date, end_date: date):
         for hour, value in hour_dict.items():
             all_item.append({'date': hour, **value})
     else:
-        date_list = []
-        while start_date <= end_date:
-            date_list.append(str(start_date))
-            start_date += timedelta(days=1)
         day_paths = path_col.find({'path': pk, 'date': {'$in': date_list}})
         day_dict = {}
         for _date in date_list:

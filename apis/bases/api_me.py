@@ -35,24 +35,24 @@ async def read_me_info(current_token: TokenData = Depends(get_token_data)):
     response_model=UserBase,
     summary='更新我的信息 (无权限)',
 )
-async def update_me_info(user_update: UserBase,
+async def update_me_info(update_data: UserBase,
                          current_token: TokenData = Depends(get_token_data)):
-    user_col = get_collection(COL_USER)
-    stored_user_data = get_me_user(current_token.user_id)
-    stored_user_model = UserBase(**stored_user_data)
-    update_data = user_update.dict(exclude_unset=True)
-    updated_user = stored_user_model.copy(update=update_data)
-    if stored_user_model.username != updated_user.username:
-        check_user_username(updated_user.username)
-    if stored_user_model.email != updated_user.email:
-        check_user_email(updated_user.email)
-    doc_update(user_col, stored_user_data, jsonable_encoder(updated_user))
-    if stored_user_data['username'] != updated_user.username:
+    update_col = get_collection(COL_USER)
+    doc_before_update = get_me_user(current_token.user_id)
+    model_before_update = UserBase(**doc_before_update)
+    update_json = update_data.dict(exclude_unset=True)
+    updated_model = model_before_update.copy(update=update_json)
+    if model_before_update.username != updated_model.username:
+        check_user_username(updated_model.username)
+    if model_before_update.email != updated_model.email:
+        check_user_email(updated_model.email)
+    doc_update(update_col, doc_before_update, jsonable_encoder(updated_model))
+    if doc_before_update['username'] != updated_model.username:
         update_bind_username(
-            stored_name=stored_user_data['username'],
-            update_name=updated_user.username,
+            stored_name=doc_before_update['username'],
+            update_name=updated_model.username,
         )
-    return updated_user
+    return updated_model
 
 
 @router.put(
@@ -60,15 +60,15 @@ async def update_me_info(user_update: UserBase,
     summary='更新我的密码 (无权限)',
 )
 async def update_me_password(
-    update_password: UserUpdatePassword,
+    update_data: UserUpdatePassword,
     current_token: TokenData = Depends(get_token_data)):
-    if update_password.new_password != update_password.repeat_new_password:
+    if update_data.new_password != update_data.repeat_new_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='重复新密码不一致',
         )
     user = get_me_user(current_token.user_id)
-    if not verify_password(update_password.current_password, user['password']):
+    if not verify_password(update_data.current_password, user['password']):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='当前密码错误',
@@ -76,7 +76,7 @@ async def update_me_password(
     doc_update(
         get_collection(COL_USER),
         user,
-        {'password': get_password_hash(update_password.new_password)},
+        {'password': get_password_hash(update_data.new_password)},
     )
     return {}
 
