@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     mail_smtp_host: str = 'smtp.163.com'
     mail_smtp_use_ssl: bool = True
     mail_smtp_port: int = 465
+    mail_smtp_sender_name: str = 'fromXX'
     mail_smtp_sender: str = 'from@163.com'
     mail_smtp_password: str = 'xxxxxxx'
     wechat_app_id: str = ''
@@ -41,6 +42,7 @@ settings_describe = {
     'mail_smtp_host': '邮件 SMTP 服务器主机地址',
     'mail_smtp_use_ssl': '邮件 SMTP 服务器 SSL 加密',
     'mail_smtp_port': '邮件 SMTP 服务器主机端口',
+    'mail_smtp_sender_name': '邮件 SMTP 服务器发件人名称',
     'mail_smtp_sender': '邮件 SMTP 服务器发件人邮箱',
     'mail_smtp_password': '邮件 SMTP 服务器授权码',
     'wechat_app_id': '[可选] 微信小程序唯一标识',

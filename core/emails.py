@@ -20,7 +20,7 @@ def send_mail(to_addrs: list, subject: str, msg: MIMEBase):
                 port=configs.mail_smtp_port,
             )
         mail_server.login(configs.mail_smtp_sender, configs.mail_smtp_password)
-        msg['From'] = f'{configs.app_name}<{configs.mail_smtp_sender}>'
+        msg['From'] = f'{configs.mail_smtp_sender_name}<{configs.mail_smtp_sender}>'
         msg['To'] = ';'.join(to_addrs)
         msg['Subject'] = subject
         mail_server.sendmail(
