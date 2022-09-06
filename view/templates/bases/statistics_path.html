@@ -28,6 +28,9 @@
 <article style="padding-left:15px;padding-right:15px;padding-top:35px;padding-bottom:0px;margin-top:0px;">
     <div id="responseGraph" style="height:400px;"></div>
 </article>
+<article style="padding-left:15px;padding-right:15px;padding-top:35px;padding-bottom:0px;margin-top:0px;">
+    <div id="outflowGraph" style="height:400px;"></div>
+</article>
 {% endblock %}
 
 {% block javascript %}
@@ -174,7 +177,6 @@
             xAxis: [
                 {
                     type: 'category',
-                    boundaryGap: false,
                     data: xAxisData,
                 }
             ],
@@ -208,6 +210,59 @@
         };
         responseChart.setOption(responseChartOption);
     }
+    var outflowChartDom = document.getElementById('outflowGraph');
+    var outflowChart = echarts.init(outflowChartDom);
+    var outflowChartOption;
+    function drawOutflowGraph(xAxisData, yByteMAvgData) {
+        outflowChartOption = {
+            tooltip: {
+                trigger: 'axis',
+            },
+            toolbox: {
+                feature: {
+                    dataView: { show: true, readOnly: false },
+                    magicType: { type: ['line', 'bar'] },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
+                }
+            },
+            legend: {},
+            xAxis: [
+                {
+                    type: 'category',
+                    data: xAxisData,
+                }
+            ],
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value} MB'
+                }
+            },
+            series: [
+                {
+                    name: '平均出口流量',
+                    type: 'bar',
+                    tooltip: {
+                        valueFormatter: function (value) {
+                            return value + ' MB';
+                        }
+                    },
+                    data: yByteMAvgData,
+                    markPoint: {
+                        data: [
+                            { type: 'max', name: 'Max' },
+                            { type: 'min', name: 'Min' }
+                        ]
+                    },
+                    markLine: {
+                        data: [{ type: 'average', name: 'Avg' }]
+                    }
+                }
+            ]
+        };
+        outflowChart.setOption(outflowChartOption);
+    }
     function selectStatisticsDate() {
         if ($('#startDate').val() && $('#endDate').val() && $('#startDate').val() <= $('#endDate').val()) {
             utilAjax(
@@ -222,6 +277,7 @@
                     var yC200Data = [];
                     var yByteMData = [];
                     var ySpendSData = [];
+                    var yByteMAvgData = [];
                     data['all_item'].forEach(function (value, index) {
                         xAxisData.push(value.date);
                         yTotalData.push(value.total);
@@ -232,9 +288,15 @@
                         } else {
                             ySpendSData.push(value.spend_s);
                         }
+                        if (value.byte_m != 0) {
+                            yByteMAvgData.push(value.byte_m / value.total);
+                        } else {
+                            yByteMAvgData.push(value.byte_m);
+                        }
                     });
                     drawSummaryGraph(xAxisData, yTotalData, yC200Data, yByteMData);
-                    drawResponseGraph(xAxisData, ySpendSData)
+                    drawResponseGraph(xAxisData, ySpendSData);
+                    drawOutflowGraph(xAxisData, yByteMAvgData);
                 },
                 success_reminder = false,
                 not_close = false,
