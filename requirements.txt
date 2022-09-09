@@ -10,3 +10,4 @@ pydantic[email]
 requests
 jinja2
 Pillow
+openpyxl

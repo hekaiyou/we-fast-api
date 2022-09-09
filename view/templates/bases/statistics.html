@@ -240,8 +240,18 @@
                             pathPoolDict[ps.path]['total'] += ps.total;
                             pathPoolDict[ps.path]['c_200'] += ps.c_200;
                             pathPoolDict[ps.path]['byte_m'] += ps.byte_m;
-                            pathPoolDict[ps.path]['avera_byte_m'] += ps.avera_byte_m;
-                            pathPoolDict[ps.path]['avera_spend_s'] += ps.avera_spend_s;
+                            if (pathPoolDict[ps.path]['avera_byte_m'] != 0.0 && ps.avera_byte_m != 0) {
+                                pathPoolDict[ps.path]['avera_byte_m'] += ps.avera_byte_m;
+                                pathPoolDict[ps.path]['avera_byte_m'] /= 2;
+                            } else {
+                                pathPoolDict[ps.path]['avera_byte_m'] += ps.avera_byte_m;
+                            }
+                            if (pathPoolDict[ps.path]['avera_spend_s'] != 0.0 && ps.avera_spend_s != 0) {
+                                pathPoolDict[ps.path]['avera_spend_s'] += ps.avera_spend_s;
+                                pathPoolDict[ps.path]['avera_spend_s'] /= 2;
+                            } else {
+                                pathPoolDict[ps.path]['avera_spend_s'] += ps.avera_spend_s;
+                            }
                         });
                     });
                     drawSummaryGraph(xAxisData, yTotalData, yC200Data, yByteMData);

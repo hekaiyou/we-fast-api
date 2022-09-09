@@ -20,6 +20,7 @@
     var setups = {};
     var app_workers_num = parseInt('{{ settings.app_workers_num }}');
     var synchronizations = 20;
+    var enable_relations = {};
     function putSetup() {
         utilAjax(
             type = 'PUT',
@@ -49,6 +50,21 @@
             not_close = true,
         );
     }
+    function onClickEnable(obj) {
+        let key = obj.id.slice(7);
+        let relations = enable_relations[key];
+        if (obj.checked) {
+            for (var i = 0, len = relations['ids'].length; i < len; i++) {
+                $('#' + relations['ids'][i]).removeAttr('disabled');
+            }
+            enable_relations[key]['value'] = true
+        } else {
+            for (var i = 0, len = relations['ids'].length; i < len; i++) {
+                $('#' + relations['ids'][i]).attr('disabled', 'disabled');
+            }
+            enable_relations[key]['value'] = false
+        }
+    }
     var setupInputArray = [];
     $(document).ready(function () {
         utilAjax(
@@ -59,7 +75,28 @@
             check = {},
             success = function (data, textStatus) {
                 let reg = new RegExp('_', 'g');
+                let enable_temp_key = null;
+                let enable_temp_value = true;
+                let enable_temp_key_first = null;
+                let next_disable = '';
                 data['all_item'].forEach(function (value, index) {
+                    if (value.key.indexOf('enable_') != -1) {
+                        enable_temp_key = value.key.slice(7);
+                        enable_temp_value = value.value;
+                        enable_temp_key_first = value.key.slice(7);
+                        enable_relations[enable_temp_key] = { 'value': value.value, 'ids': [] };
+                        next_disable = '';
+                    } else if (enable_temp_key != null) {
+                        if (value.key.slice(0, enable_temp_key.length) == enable_temp_key) {
+                            enable_relations[enable_temp_key]['ids'].push(value.key);
+                            if (enable_temp_value == false) {
+                                next_disable = 'disabled="disabled"';
+                            }
+                        } else {
+                            enable_temp_key = null;
+                            next_disable = '';
+                        }
+                    }
                     let keyTitle = '';
                     if (value.describe) {
                         keyTitle = value.describe;
@@ -69,23 +106,27 @@
                     }
                     let formHtml = '<label for="' + value.key + '">';
                     if (value.type == 'str') {
-                        formHtml += keyTitle + '<input ';
+                        formHtml += keyTitle + '<input ' + next_disable;
                         formHtml += 'type="text"';
                         formHtml += ' id="' + value.key + '" value="' + value.value + '" required>';
                     } else if (value.type == 'int') {
-                        formHtml += keyTitle + '<input ';
+                        formHtml += keyTitle + '<input ' + next_disable;
                         formHtml += 'type="number"';
                         formHtml += ' id="' + value.key + '" value="' + value.value + '" required>';
                     } else if (value.type == 'bool') {
-                        formHtml += '<input ';
+                        formHtml += '<input ' + next_disable;
                         formHtml += 'type="checkbox" role="switch"';
                         if (value.value) {
                             formHtml += 'checked="checked"';
                         }
+                        if (enable_temp_key_first != null) {
+                            formHtml += 'onclick="onClickEnable(this)"';
+                            enable_temp_key_first = null;
+                        }
                         formHtml += ' id="' + value.key + '" required>';
                         formHtml += keyTitle + '<br /><br />';
                     } else if (value.type == 'list') {
-                        formHtml += keyTitle + '<input ';
+                        formHtml += keyTitle + '<input ' + next_disable;
                         formHtml += 'type="text"';
                         formHtml += ' id="' + value.key + '" value="' + value.value.join(',') + '" required>';
                         formHtml += '<small>列表值之间使用逗号 <strong>,</strong> 分隔</small>';
