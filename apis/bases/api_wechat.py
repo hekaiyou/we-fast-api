@@ -20,6 +20,11 @@ router = APIRouter(prefix='/wechat', )
 )
 async def read_wechat_access_token(code: str):
     configs = get_apis_configs('bases')
+    if not configs.enable_wechat_app:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='未启用微信小程序支持',
+        )
     if not configs.wechat_app_id or not configs.wechat_app_secret:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
