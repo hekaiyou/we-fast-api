@@ -138,13 +138,13 @@ server {
 
 ### 轻量协程
 
-如果一个异步任务需要进行数据读写、文件读写、数据状态短期追踪、发起第三方接口请求等耗时操作, 协程是一个很好的解决方案. 例如下面的 `coroutine_test_task` 函数, 通过协程执行某个异步任务:
+如果一个异步任务需要进行数据读写、文件读写、数据状态短期追踪、发起第三方接口请求等耗时操作, 协程是一个很好的解决方案. 例如下面的 `coroutine_task_test` 函数, 通过协程执行某个异步任务:
 
 ```python
 import asyncio
 
-async def coroutine_test_task(name):
-    """ 协程任务的具体执行函数 """
+async def coroutine_task_test(name):
+    """ 协程任务: 测试 """
     for i in range(5):
         await asyncio.sleep(60)  # 模拟任务执行内容
         return  # 一分钟后直接结束协程任务
@@ -152,7 +152,7 @@ async def coroutine_test_task(name):
 @router.get('/')
 async def read_test():
     # 创建一个协程任务
-    asyncio.create_task(coroutine_exec_task('参数name的值'))
+    asyncio.create_task(coroutine_task_test('参数name的值'))
     return {}
 ```
 

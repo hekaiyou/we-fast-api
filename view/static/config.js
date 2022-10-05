@@ -10,6 +10,11 @@ var navigationBar = [
         'text': '服务日志',
     },
     {
+        'path': '/view/bases/user/',
+        'permission': ['read_user_page'],
+        'text': '用户管理',
+    },
+    {
         'path': '/view/bases/role/',
         'permission': ['read_permission_all', 'create_role', 'delete_role', 'update_role', 'read_role', 'read_role_all'],
         'text': '角色与权限',

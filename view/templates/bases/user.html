@@ -1,0 +1,41 @@
+{% extends 'navigation.html' %}
+{% block title %}用户管理{% endblock %}
+
+{% block main %}
+<div id="details-content">
+    <details class="itemUser" onclick="event.preventDefault()" id="100000000000000000000001">
+        <summary>Default</summary>
+    </details>
+</div>
+{% endblock %}
+
+{% block operate_right_bottom %}
+<button id="submit">创建</button>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $(document).ready(function () {
+        utilAjax(
+            type = 'GET',
+            url = '/api/bases/user/',
+            data = {},
+            data_format = 'query',
+            check = {},
+            success = function (data, textStatus) {
+                data['items'].forEach(function (value, index) {
+                    $('#details-content').append('<details class="itemUser" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['username'] + ' <sup>' + value['full_name'] + '</sup></summary></details>');
+                });
+                $('.itemUser').click(function () {
+                    window.location.href = '/view/bases/role/update/' + $(this).attr('id') + '/';
+                });
+            },
+            success_reminder = false,
+            not_close = false,
+        );
+        $('#submit').click(function () {
+            window.location.href = '/view/bases/role/create/';
+        });
+    });
+</script>
+{% endblock %}

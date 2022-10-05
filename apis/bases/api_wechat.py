@@ -117,7 +117,7 @@ async def read_wechat_access_token(code: str):
 
 @router.post(
     '/avata/free/',
-    summary='创建微信头像文件 (无权限)',
+    summary='创建微信头像 (文件|无权限)',
 )
 async def create_wechat_avata_file(
     file_url: FileURL, current_token: TokenData = Depends(get_token_data)):

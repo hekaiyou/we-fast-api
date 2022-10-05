@@ -77,7 +77,8 @@ async def save_raw_file(file: NamedTemporaryFile,
         if file.content_type.split('/')[0] not in type_check:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f'文件不是 {"|".join(type_check)} 类型',
+                detail=
+                f'文件 {file.filename}[{file.content_type.split("/")[0]}] 不是 {"|".join(type_check)} 类型',
             )
     contents = await file.read()  # 读取文件二进制对象
     file_md5 = hashlib.md5(contents).hexdigest()  # 计算文件 MD5

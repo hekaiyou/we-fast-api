@@ -128,7 +128,7 @@ async def read_me_email_verify(code: str, user_id: UserObjIdParams):
 
 @router.post(
     '/avata/free/',
-    summary='创建我的头像文件 (无权限)',
+    summary='创建我的头像 (文件|无权限)',
 )
 async def create_me_avata_file(
         file: UploadFile = File(...),

@@ -1,7 +1,8 @@
+from typing import List
 from datetime import date, timedelta
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, UploadFile
 
 
 class ObjId(ObjectId):
@@ -73,3 +74,14 @@ def str_to_oid(str_id):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='无效的字符串ID',
         )
+
+
+def check_upload_files_type(files: List[UploadFile], type_check: list = []):
+    """ 验证上传文件列表中每个文件的类型 """
+    for file in files:
+        if file.content_type.split('/')[0] not in type_check:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=
+                f'文件 {file.filename}[{file.content_type.split("/")[0]}] 不是 {"|".join(type_check)} 类型',
+            )

@@ -116,3 +116,8 @@ async def page_bases_password_update(
         request: dict = Depends(get_view_request)):
     return templates.TemplateResponse('bases/password-update.html',
                                       {**request})
+
+
+@router.get('/user/', response_class=HTMLResponse, include_in_schema=False)
+async def page_bases_user(request: dict = Depends(get_view_request)):
+    return templates.TemplateResponse('bases/user.html', {**request})
