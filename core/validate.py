@@ -65,6 +65,22 @@ def get_date_list(start_date: date, end_date: date):
     return date_list
 
 
+def get_month_list(start_date: date, end_date: date):
+    """ 验证开始与结束日期并返回月份区间字符串列表 """
+    if start_date > end_date:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='开始与结束日期不在合理范围内',
+        )
+    month_set = set()
+    while start_date <= end_date:
+        month_set.add(start_date.strftime('%Y-%m'))
+        start_date += timedelta(days=1)
+    month_list = list(month_set)
+    month_list.sort()
+    return month_list
+
+
 def str_to_oid(str_id):
     """ str 转 ObjectId """
     try:
