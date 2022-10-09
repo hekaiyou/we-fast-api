@@ -72,12 +72,11 @@ def get_month_list(start_date: date, end_date: date):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='开始与结束日期不在合理范围内',
         )
-    month_set = set()
+    month_list = []
     while start_date <= end_date:
-        month_set.add(start_date.strftime('%Y-%m'))
+        if start_date.strftime('%Y-%m') not in month_list:
+            month_list.append(start_date.strftime('%Y-%m'))
         start_date += timedelta(days=1)
-    month_list = list(month_set)
-    month_list.sort()
     return month_list
 
 
@@ -92,8 +91,10 @@ def str_to_oid(str_id):
         )
 
 
-def check_upload_files_type(files: List[UploadFile], type_check: list = []):
+def check_upload_files_type(files: List[UploadFile], type_check: list = None):
     """ 验证上传文件列表中每个文件的类型 """
+    if type_check is None:
+        type_check = []
     for file in files:
         if file.content_type.split('/')[0] not in type_check:
             raise HTTPException(
