@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from loguru import logger
+from calendar import monthrange
+from pydantic import BaseModel
 from pymongo import MongoClient
 from functools import lru_cache
 from apis.bases.models import Paginate
@@ -209,6 +210,61 @@ async def paginate_set_cache(paginate_parameters: dict, cache_name: str,
 
 # 服务启动时清理分页缓存数据
 set_startup_task(lambda: get_collection('paginate_cache').delete_many({}))
+
+
+def doc_read(
+    collection,
+    query_content: dict,
+    sort: list = None,
+):
+    if sort is None:
+        sort = []
+    if isinstance(collection, str):
+        collection = get_collection(collection)
+    return collection.find(query_content)
+
+
+def doc_read_by_month(collection,
+                      start_time,
+                      end_time,
+                      time_field: str = 'create_time',
+                      query_content: dict = None,
+                      **kw):
+    """读取数据集合文档 (按月份查询)
+
+    Args:
+        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        start_time (str|datetime.date): 开始年月或日期时间对象. 例 '2022-10'|datetime.date.today().
+        end_time (str|datetime.date): 结束年月或日期时间对象. 例 '2022-10'|datetime.date.today().
+        time_field (str, optional): 用于查询月份的日期时间字段. 默认为 'create_time'.
+        query_content (dict, optional): 其他查询条件. 默认为 None.
+
+    Returns:
+        pymongo.cursor.Cursor: 可迭代的游标对象
+    """
+    if query_content is None:
+        query_content = {}
+    if isinstance(start_time, str):
+        _start_time_sl = start_time.split('-')
+        start_time = datetime(int(_start_time_sl[0]), int(_start_time_sl[1]),
+                              1, 0, 0, 0, 0)
+    else:
+        start_time = datetime(start_time.year, start_time.month, 1, 0, 0, 0, 0)
+    if isinstance(end_time, str):
+        _end_time_sl = end_time.split('-')
+        end_time = datetime(
+            int(_end_time_sl[0]), int(_end_time_sl[1]),
+            monthrange(int(_end_time_sl[0]), int(_end_time_sl[1]))[1], 23, 59,
+            59, 999999)
+    else:
+        end_time = datetime(end_time.year, end_time.month,
+                            monthrange(end_time.year, end_time.month)[1], 23,
+                            59, 59, 999999)
+    query_content[time_field] = {
+        '$gte': start_time - utc_offset(),
+        '$lte': end_time - utc_offset(),
+    }
+    return doc_read(collection, query_content, **kw)
 
 
 def doc_create(collection: Collection, document: dict, **kw):
