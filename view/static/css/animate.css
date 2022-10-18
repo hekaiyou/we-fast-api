@@ -1,0 +1,33 @@
+@-webkit-keyframes changePosition {
+    0% {
+        -webkit-transform: translate(-150px);
+    }
+
+    50% {
+        -webkit-transform: translate(0);
+    }
+
+    100% {
+        -webkit-transform: translate(150px);
+    }
+}
+
+.loader-pagination {
+    width: 150px;
+    height: 8px;
+    border-radius: 4px;
+    margin: 0 auto;
+    margin-top: 36px;
+    position: relative;
+    background: rgba(216, 27, 96, 0.125);
+    overflow: hidden;
+}
+
+.loader-pagination span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 3px;
+    background: var(--primary);
+    -webkit-animation: changePosition 4s linear infinite;
+}

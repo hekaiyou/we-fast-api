@@ -7,6 +7,7 @@
         <summary>Default</summary>
     </details>
 </div>
+<div class="loader-pagination"><span></span></div>
 {% endblock %}
 
 {% block operate_right_bottom %}
@@ -19,7 +20,7 @@
         utilAjax(
             type = 'GET',
             url = '/api/bases/user/',
-            data = {},
+            data = { 'limit': 20, },
             data_format = 'query',
             check = {},
             success = function (data, textStatus) {
@@ -36,6 +37,18 @@
         $('#submit').click(function () {
             window.location.href = '/view/bases/role/create/';
         });
+    });
+
+    $(window).scroll(function () {
+        // 窗口高度
+        var w_h = parseFloat($(window).height());
+        // 页面高度
+        var doc_h = $(document).height();
+        //当前滚动条位置时，页面可见区域及以上区域高度
+        totalheight = w_h + parseFloat($(window).scrollTop()) + 2;
+        if (totalheight >= doc_h) {
+            console.log('页面滚动到达底部');
+        }
     });
 </script>
 {% endblock %}

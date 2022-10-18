@@ -20,6 +20,12 @@ MONGO_DB_PORT=27017
 MONGO_DB_NAME='test_database'
 ```
 
+变量读取的优先级排序:
+
+1. 系统环境变量
+2. `.env` 文件
+3. 变量默认值
+
 *根据数据库是否开启权限管理, 选择性使用 `MONGO_DB_USERNAME` 和 `MONGO_DB_PASSWORD` 环境变量配置数据库认证信息.*
 
 使用指定的地址和端口启动项目:

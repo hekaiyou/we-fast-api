@@ -267,22 +267,46 @@ def doc_read_by_month(collection,
     return doc_read(collection, query_content, **kw)
 
 
-def doc_create(collection: Collection, document: dict, **kw):
-    """ 创建数据集合文档 """
+def doc_create(collection, document: dict, **kw):
+    """创建数据集合文档
+
+    Args:
+        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        document (dict): 用于创建文档的字典.
+    """
+    if isinstance(collection, str):
+        collection = get_collection(collection)
     document['create_time'] = datetime.utcnow()
     document['update_time'] = datetime.utcnow()
-    # 此步骤会自动为 user_json 添加 _id 信息
+    # 此步骤会自动为 user_json 添加 _id 信息 (因为此处为浅拷贝)
     collection.insert_one(document=document, **kw)
 
 
-def doc_update(collection: Collection,
+def doc_update(collection,
                filter: dict,
                update: dict,
                many: bool = False,
                **kw):
     """ 更新数据集合文档 """
+    if isinstance(collection, str):
+        collection = get_collection(collection)
     update['update_time'] = datetime.utcnow()
     if many:
         collection.update_many(filter=filter, update={'$set': update}, **kw)
     else:
         collection.update_one(filter=filter, update={'$set': update}, **kw)
+
+
+def doc_count(collection, filter: dict, **kw):
+    """统计数据集合文档
+
+    Args:
+        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        filter (dict): 用于统计文档的查询条件.
+
+    Returns:
+        int: 满足查询条件的文档数
+    """
+    if isinstance(collection, str):
+        collection = get_collection(collection)
+    return collection.count_documents(filter, **kw)
