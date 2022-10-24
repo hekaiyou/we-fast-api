@@ -176,52 +176,73 @@ from pymongo import MongoClient
 # 获取命令行参数
 parser = argparse.ArgumentParser(description='ExecTasks')
 parser.add_argument(
-    '--numbering',
-    dest='numbering',
+    '--service-host',
+    dest='service_host',
+    type=str,
+    default='http://127.0.0.1:8083/',
+    help='ServiceHost',
+)
+parser.add_argument(
+    '--id',
+    dest='id',
     type=int,
     default=0,
-    help='Numbering',
+    help='ID',
 )
-args = parser.parse_args()
-# 全局变量
-exec_id = f'ET-{args.numbering}'
-service_host = 'http://127.0.0.1:8083/'
-task_interval_seconds = 10
+args = parser.parse_args(
+# 执行端编号
+exec_id = f'ET-{args.id}'
 # 数据库客户端及连接
 db_client = MongoClient(host='127.0.0.1', port=27017)
 db = db_client['test_database']
 
-def post_log(level: str, message: str):
-    """ 提交日志 level=debug|info|warning|error """
-    print(f'[{level}] {message}')
-    headers = {'content-type': 'application/json'}
-    payload = {'level': level, 'message': message}
+def service_request(method: str, host: str = args.service_host, path: str = 'api/', is_repeat: bool = True, headers=None, data=None, **kw):
+    if headers is None:
+        headers = {'content-type': 'application/json'}
+    if data is None:
+        data = {}
+    url = f'{host}{path}'
     while True:
+        err_str = ''
+        res = None
         try:
-            res = requests.post(
-                f'{service_host}api/bases/logs/',
-                json=payload,
-                headers=headers,
-            )
-            if res.status_code == 200:
-                return
+            if method == 'POST':
+                res = requests.post(url=url, json=data, headers=headers, **kw)
+            elif method == 'DELETE':
+                res = requests.delete(url=url, json=data, headers=headers, **kw)
+            elif method == 'PUT':
+                res = requests.put(url=url, json=data, headers=headers, **kw)
             else:
-                print(f'提交日志异常: {res.text}')
-        except Exception as e:
-            print(f'提交日志异常: {e}')
+                res = requests.get(url=url, params=data, **kw)
+            if res.status_code == 200:
+                return res, err_str
+            else:
+                err_str = f'服务响应异常: {res.status_code} {res.reason} {res.text}'
+        except requests.exceptions.ConnectTimeout:
+            err_str = '服务请求异常: 连接超时或读取超时'
+        except requests.exceptions.ConnectionError:
+            err_str = '服务请求异常: 未知服务或网络异常'
+        except Exception as err:
+            err_str = f'服务请求异常: {err}'
+        if is_repeat:
+            print(err_str)
+        else:
+            return res, err_str
         time.sleep(60)
 
+def log(level: str, message: str):
+    """ 提交日志 level=debug|info|warning|error """
+    print(f'[{level}] {message}')
+    service_request('POST', 'api/bases/logs/', {'level': level, 'message': message})
+
 seconds = int(time.time())  # 获取基准时间戳
-interval_random = random.randint(0, 10)
-post_log('debug', f'任务执行程序 {exec_id} 已启动')
+log('debug', f'任务执行程序 {exec_id} 已启动')
 while True:
-    new_seconds = int(time.time())
-    if new_seconds - seconds > task_interval_seconds + interval_random:
+    if int(time.time()) - seconds > random.randint(13, 23):
         try:
             col_rc = db['test_case']
             time.sleep(360)  # 模拟任务执行内容
         except Exception as e:
-            post_log('error', f'任务执行程序 {exec_name} 异常: {e}')
+            log('error', f'任务执行程序 {exec_name} 异常: {e}')
         seconds = int(time.time())
-        interval_random = random.randint(0, 10)
 ```

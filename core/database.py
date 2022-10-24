@@ -5,7 +5,6 @@ from pymongo import MongoClient
 from functools import lru_cache
 from apis.bases.models import Paginate
 from datetime import datetime, timedelta
-from pymongo.collection import Collection
 from core.dependencies import get_base_settings
 from core.security import get_password_hash
 from core.dynamic import set_role_permissions, set_startup_task
@@ -117,12 +116,14 @@ def utc_offset():
     return local_time - utc_time
 
 
-async def paginate_find(collection: Collection,
+async def paginate_find(collection,
                         paginate_parameters: dict,
                         query_content: dict,
                         item_model: BaseModel,
                         no_pagin: bool = False):
     """ 分页查询 DB 集合中的数据 """
+    if isinstance(collection, str):
+        collection = get_collection(collection)
     if paginate_parameters['time_te']:
         time_te = paginate_parameters['time_te']
         for te_k, te_v in time_te.items():
@@ -215,18 +216,35 @@ set_startup_task(lambda: get_collection('paginate_cache').delete_many({}))
 def doc_read(
     collection,
     query_content: dict,
+    many: bool = False,
     sort: list = None,
 ):
+    """读取数据集合文档
+
+    Args:
+        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        query_content (dict): 查询条件.
+        many (bool, optional): 是否批量操作. 默认为 False.
+        sort (list, optional): _description_. 默认为 None.
+
+    Returns:
+        [many=True] pymongo.cursor.Cursor: 可迭代的游标对象.
+        [many=False] Document: 文档字典.
+    """
     if sort is None:
         sort = []
     if isinstance(collection, str):
         collection = get_collection(collection)
-    return collection.find(query_content)
+    if many:
+        return collection.find(query_content)
+    else:
+        return collection.find_one(query_content)
 
 
 def doc_read_by_month(collection,
                       start_time,
                       end_time,
+                      many: bool = True,
                       time_field: str = 'create_time',
                       query_content: dict = None,
                       **kw):
@@ -236,11 +254,13 @@ def doc_read_by_month(collection,
         collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
         start_time (str|datetime.date): 开始年月或日期时间对象. 例 '2022-10'|datetime.date.today().
         end_time (str|datetime.date): 结束年月或日期时间对象. 例 '2022-10'|datetime.date.today().
+        many (bool, optional): 是否批量操作. 默认为 True.
         time_field (str, optional): 用于查询月份的日期时间字段. 默认为 'create_time'.
         query_content (dict, optional): 其他查询条件. 默认为 None.
 
     Returns:
-        pymongo.cursor.Cursor: 可迭代的游标对象
+        [many=True] pymongo.cursor.Cursor: 可迭代的游标对象.
+        [many=False] Document: 文档字典.
     """
     if query_content is None:
         query_content = {}
@@ -264,7 +284,7 @@ def doc_read_by_month(collection,
         '$gte': start_time - utc_offset(),
         '$lte': end_time - utc_offset(),
     }
-    return doc_read(collection, query_content, **kw)
+    return doc_read(collection, query_content, many=many, **kw)
 
 
 def doc_create(collection, document: dict, **kw):
@@ -305,8 +325,24 @@ def doc_count(collection, filter: dict, **kw):
         filter (dict): 用于统计文档的查询条件.
 
     Returns:
-        int: 满足查询条件的文档数
+        int: 满足查询条件的文档数.
     """
     if isinstance(collection, str):
         collection = get_collection(collection)
     return collection.count_documents(filter, **kw)
+
+
+def doc_delete(collection, filter: dict, many: bool = False, **kw):
+    """删除数据集合文档
+
+    Args:
+        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        filter (dict): 用于删除文档的查询条件.
+        many (bool, optional): 是否批量操作. 默认为 False.
+    """
+    if isinstance(collection, str):
+        collection = get_collection(collection)
+    if many:
+        collection.delete_many(filter=filter, **kw)
+    else:
+        collection.delete_one(filter=filter, **kw)
