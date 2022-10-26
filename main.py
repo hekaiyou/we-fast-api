@@ -2,7 +2,6 @@ import os
 import json
 import uvicorn
 import apis.apis_urls as apis_urls
-import view.view_urls as view_urls
 from time import time
 from loguru import logger
 from core.tasks import repeat_task
@@ -20,9 +19,9 @@ def swagger_monkey_patch(*args, **kwargs):
     return get_swagger_ui_html(
         *args,
         **kwargs,
-        swagger_js_url='/static/swagger-ui-4/swagger-ui-bundle.js',
-        swagger_css_url='/static/swagger-ui-4/swagger-ui.css',
-        swagger_favicon_url='/static/image/favicon.png',
+        swagger_js_url='/static/bases/swagger-ui-4/swagger-ui-bundle.js',
+        swagger_css_url='/static/bases/swagger-ui-4/swagger-ui.css',
+        swagger_favicon_url='/static/bases/image/favicon.png',
     )
 
 
@@ -30,8 +29,8 @@ def redoc_monkey_patch(*args, **kwargs):
     return get_redoc_html(
         *args,
         **kwargs,
-        redoc_js_url='/static/redoc-2.0.0/redoc.standalone.js',
-        redoc_favicon_url='/static/image/favicon.png',
+        redoc_js_url='/static/bases/redoc-2.0.0/redoc.standalone.js',
+        redoc_favicon_url='/static/bases/image/favicon.png',
     )
 
 
@@ -45,13 +44,21 @@ app = FastAPI(
     redoc_url='/redoc' if settings.app_redoc else None,
 )
 app.include_router(apis_urls.router)
-app.include_router(view_urls.router)
-app.mount(
-    '/static',
-    StaticFiles(
-        directory=f'{os.path.dirname(os.path.realpath(__file__))}/view/static'
-    ),
-    name='static')
+app.include_router(apis_urls.router_view)
+# 自动查找可用的 Static 目录并添加路由
+exclude_dir_path = ['apis_urls.py', '__init__.py', '__pycache__']
+work_path_static = os.path.dirname(os.path.realpath(__file__))
+for dir_path in os.listdir(f'{work_path_static}/apis/'):
+    if dir_path not in exclude_dir_path:
+        if os.path.exists(f'{work_path_static}/apis/{dir_path}/views/static'):
+            app.mount(
+                f'/static/{dir_path}',
+                StaticFiles(
+                    directory=
+                    f'{os.path.dirname(os.path.realpath(__file__))}/apis/{dir_path}/views/static',
+                ),
+                name=f'static_{dir_path}',
+            )
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_base_settings().allow_origins,

@@ -11,9 +11,7 @@ from fastapi import APIRouter, Cookie, Depends
 
 router = APIRouter(prefix='/bases', )
 templates = Jinja2Templates(
-    directory=
-    f'{os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))}/view/templates'
-)
+    directory=f'{os.path.dirname(os.path.realpath(__file__))}/templates', )
 
 
 @router.get('/token/', response_class=HTMLResponse, include_in_schema=False)
