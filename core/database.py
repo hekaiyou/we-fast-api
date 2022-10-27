@@ -1,10 +1,13 @@
+from typing import Union
 from loguru import logger
 from calendar import monthrange
 from pydantic import BaseModel
 from pymongo import MongoClient
 from functools import lru_cache
+from pymongo.cursor import Cursor
 from apis.bases.models import Paginate
 from datetime import datetime, timedelta
+from pymongo.collection import Collection
 from core.dependencies import get_base_settings
 from core.security import get_password_hash
 from core.dynamic import set_role_permissions, set_startup_task
@@ -116,7 +119,7 @@ def utc_offset():
     return local_time - utc_time
 
 
-async def paginate_find(collection,
+async def paginate_find(collection: Union[Collection, str],
                         paginate_parameters: dict,
                         query_content: dict,
                         item_model: BaseModel,
@@ -214,22 +217,21 @@ set_startup_task(lambda: get_collection('paginate_cache').delete_many({}))
 
 
 def doc_read(
-    collection,
+    collection: Union[Collection, str],
     query_content: dict,
     many: bool = False,
     sort: list = None,
-):
+) -> Union[Cursor, dict]:
     """读取数据集合文档
 
     Args:
-        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        collection (Union[Collection, str]): 集合名称或集合对象. 例 'demo'|get_collection('demo').
         query_content (dict): 查询条件.
         many (bool, optional): 是否批量操作. 默认为 False.
         sort (list, optional): _description_. 默认为 None.
 
     Returns:
-        [many=True] pymongo.cursor.Cursor: 可迭代的游标对象.
-        [many=False] Document: 文档字典.
+        Union[Cursor, dict]: 可迭代的游标对象(many=True)或文档字典(many=False).
     """
     if sort is None:
         sort = []
@@ -241,26 +243,27 @@ def doc_read(
         return collection.find_one(query_content)
 
 
-def doc_read_by_month(collection,
-                      start_time,
-                      end_time,
-                      many: bool = True,
-                      time_field: str = 'create_time',
-                      query_content: dict = None,
-                      **kw):
+def doc_read_by_month(
+    collection: Union[Collection, str],
+    start_time: Union[datetime, str],
+    end_time: Union[datetime, str],
+    many: bool = True,
+    time_field: str = 'create_time',
+    query_content: dict = None,
+    **kw,
+) -> Union[Cursor, dict]:
     """读取数据集合文档 (按月份查询)
 
     Args:
-        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
-        start_time (str|datetime.date): 开始年月或日期时间对象. 例 '2022-10'|datetime.date.today().
-        end_time (str|datetime.date): 结束年月或日期时间对象. 例 '2022-10'|datetime.date.today().
+        collection (Union[Collection, str]): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        start_time (Union[datetime, str]): 开始年月或日期时间对象. 例 '2022-10'|datetime.date.today().
+        end_time (Union[datetime, str]): 结束年月或日期时间对象. 例 '2022-10'|datetime.date.today().
         many (bool, optional): 是否批量操作. 默认为 True.
         time_field (str, optional): 用于查询月份的日期时间字段. 默认为 'create_time'.
         query_content (dict, optional): 其他查询条件. 默认为 None.
 
     Returns:
-        [many=True] pymongo.cursor.Cursor: 可迭代的游标对象.
-        [many=False] Document: 文档字典.
+        Union[Cursor, dict]: 可迭代的游标对象(many=True)或文档字典(many=False).
     """
     if query_content is None:
         query_content = {}
@@ -287,11 +290,11 @@ def doc_read_by_month(collection,
     return doc_read(collection, query_content, many=many, **kw)
 
 
-def doc_create(collection, document: dict, **kw):
+def doc_create(collection: Union[Collection, str], document: dict, **kw):
     """创建数据集合文档
 
     Args:
-        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        collection (Union[Collection, str]): 集合名称或集合对象. 例 'demo'|get_collection('demo').
         document (dict): 用于创建文档的字典.
     """
     if isinstance(collection, str):
@@ -302,26 +305,41 @@ def doc_create(collection, document: dict, **kw):
     collection.insert_one(document=document, **kw)
 
 
-def doc_update(collection,
-               filter: dict,
-               update: dict,
-               many: bool = False,
-               **kw):
-    """ 更新数据集合文档 """
+def doc_update(
+    collection: Union[Collection, str],
+    filter: dict,
+    update: dict,
+    update_inc: dict = None,
+    many: bool = False,
+    **kw,
+):
+    """更新数据集合文档
+
+    Args:
+        collection (Union[Collection, str]): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        filter (dict): 用于更新文档的查询条件.
+        update (dict): 用于更新文档的字典.
+        update_inc (dict, optional): 用于更新(加减数值)文档的字典. 默认为 None.
+        many (bool, optional): 是否批量操作. 默认为 False.
+    """
+    raw_update = {}
+    if update_inc:
+        raw_update['$inc'] = update_inc
     if isinstance(collection, str):
         collection = get_collection(collection)
     update['update_time'] = datetime.utcnow()
+    raw_update['$set'] = update
     if many:
-        collection.update_many(filter=filter, update={'$set': update}, **kw)
+        collection.update_many(filter=filter, update=raw_update, **kw)
     else:
-        collection.update_one(filter=filter, update={'$set': update}, **kw)
+        collection.update_one(filter=filter, update=raw_update, **kw)
 
 
-def doc_count(collection, filter: dict, **kw):
+def doc_count(collection: Union[Collection, str], filter: dict, **kw) -> int:
     """统计数据集合文档
 
     Args:
-        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        collection (Union[Collection, str]): 集合名称或集合对象. 例 'demo'|get_collection('demo').
         filter (dict): 用于统计文档的查询条件.
 
     Returns:
@@ -332,11 +350,16 @@ def doc_count(collection, filter: dict, **kw):
     return collection.count_documents(filter, **kw)
 
 
-def doc_delete(collection, filter: dict, many: bool = False, **kw):
+def doc_delete(
+    collection: Union[Collection, str],
+    filter: dict,
+    many: bool = False,
+    **kw,
+):
     """删除数据集合文档
 
     Args:
-        collection (str|pymongo.collection.Collection): 集合名称或集合对象. 例 'demo'|get_collection('demo').
+        collection (Union[Collection, str]): 集合名称或集合对象. 例 'demo'|get_collection('demo').
         filter (dict): 用于删除文档的查询条件.
         many (bool, optional): 是否批量操作. 默认为 False.
     """

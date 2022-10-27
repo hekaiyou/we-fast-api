@@ -1,4 +1,4 @@
-{% extends 'navigation.html' %}
+{% extends 'core/navigation.html' %}
 {% block title %}访问统计{% endblock %}
 
 {% block main %}
@@ -42,7 +42,7 @@
 {% endblock %}
 
 {% block javascript %}
-<script src='/static/echarts-5.4.0/echarts.min.js'></script>
+<script src='/static/bases/echarts-5.4.0/echarts.min.js'></script>
 <script>
     var chartDom = document.getElementById('summaryGraph');
     var myChart = echarts.init(chartDom);
