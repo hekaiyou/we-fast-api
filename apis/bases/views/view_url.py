@@ -4,14 +4,12 @@ from typing import Optional
 from core.validate import ObjIdParams
 from core.dynamic import get_apis_configs
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from core.dependencies import get_view_request
 from fastapi import APIRouter, Cookie, Depends
+from apis.templating import templates
 
 router = APIRouter(prefix='/bases', )
-templates = Jinja2Templates(
-    directory=f'{os.path.dirname(os.path.realpath(__file__))}/templates', )
 
 
 @router.get('/token/', response_class=HTMLResponse, include_in_schema=False)

@@ -46,7 +46,9 @@ app = FastAPI(
 app.include_router(apis_urls.router)
 app.include_router(apis_urls.router_view)
 # 自动查找可用的 Static 目录并添加路由
-exclude_dir_path = ['apis_urls.py', '__init__.py', '__pycache__']
+exclude_dir_path = [
+    'apis_urls.py', '__init__.py', '__pycache__', 'templating.py'
+]
 work_path_static = os.path.dirname(os.path.realpath(__file__))
 for dir_path in os.listdir(f'{work_path_static}/apis/'):
     if dir_path not in exclude_dir_path:

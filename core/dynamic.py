@@ -140,7 +140,7 @@ def set_request_record(request, spend_sec, response):
         return
     global DYNAMIC_REQUEST_RECORD
     path_key = f'{request.scope["method"]} {request.scope["path"]}'
-    if request['root_path'] == '/static':
+    if '/static/' in request['root_path']:
         path_key = 'GET /static/'
     elif 'GET /docs' in path_key or path_key == 'GET /openapi.json':
         path_key = 'GET /docs/'

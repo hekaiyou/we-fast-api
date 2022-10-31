@@ -12,7 +12,9 @@ router_view = APIRouter(
     dependencies=[],
 )
 
-exclude_dir_path = ['apis_urls.py', '__init__.py', '__pycache__']
+exclude_dir_path = [
+    'apis_urls.py', '__init__.py', '__pycache__', 'templating.py'
+]
 # 自动查找可用的 API|VIEW 模块并添加路由
 work_path_apis = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 for dir_path in os.listdir(f'{work_path_apis}/apis/'):
