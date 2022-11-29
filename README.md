@@ -196,12 +196,18 @@ exec_id = f'ET-{args.id}'
 db_client = MongoClient(host='127.0.0.1', port=27017)
 db = db_client['test_database']
 
-def service_request(method: str, host: str = args.service_host, path: str = 'api/', is_repeat: bool = True, headers=None, data=None, **kw):
+def service_request(method: str, path: str = 'api/', data=None, host: str = args.service_host, headers=None, is_repeat: bool = True, **kw):
     if headers is None:
-        headers = {'content-type': 'application/json'}
+        if method == 'GET':
+            headers = {}
+        else:
+            headers = {'content-type': 'application/json'}
     if data is None:
         data = {}
-    url = f'{host}{path}'
+    if '//' not in path:
+        url = f'{host}{path}'
+    else:
+        url = path
     while True:
         err_str = ''
         res = None
@@ -213,7 +219,7 @@ def service_request(method: str, host: str = args.service_host, path: str = 'api
             elif method == 'PUT':
                 res = requests.put(url=url, json=data, headers=headers, **kw)
             else:
-                res = requests.get(url=url, params=data, **kw)
+                res = requests.get(url=url, params=data, headers=headers, **kw)
             if res.status_code == 200:
                 return res, err_str
             else:
@@ -232,17 +238,16 @@ def service_request(method: str, host: str = args.service_host, path: str = 'api
 
 def log(level: str, message: str):
     """ 提交日志 level=debug|info|warning|error """
-    print(f'[{level}] {message}')
-    service_request('POST', 'api/bases/logs/', {'level': level, 'message': message})
+    print(f'[{level}] 执行端{exec_id}: {message}')
+    service_request(method='POST', path='api/bases/logs/', data={'level': level, 'message': f'执行端{exec_id}: {message}'})
 
 seconds = int(time.time())  # 获取基准时间戳
-log('debug', f'任务执行程序 {exec_id} 已启动')
+log('debug', '已启动')
 while True:
     if int(time.time()) - seconds > random.randint(13, 23):
         try:
-            col_rc = db['test_case']
             time.sleep(360)  # 模拟任务执行内容
         except Exception as e:
-            log('error', f'任务执行程序 {exec_name} 异常: {e}')
+            log('error', str(e))
         seconds = int(time.time())
 ```

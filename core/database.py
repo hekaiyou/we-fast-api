@@ -26,7 +26,7 @@ def get_collection(collection_name: str):
     return collection
 
 
-def whether_to_initialize(apis_urls):
+def whether_to_initialize():
     """ 判断数据库连接有效性 (首次连接时初始化) """
     user_col = get_collection('user')
     role_col = get_collection('role')
@@ -83,11 +83,11 @@ def whether_to_initialize(apis_urls):
         logger.error(f'初始化 MongoDB 连接异常, {e}')
 
 
-def create_db_client(apis_urls):
+def create_db_client():
     """ 创建 MongoDB 数据库客户端 """
     settings = get_base_settings()
     if settings.mongo_db_username and settings.mongo_db_password:
-        # 环境变量中没有认证信息, 走认证连接
+        # 环境变量中有认证信息, 走认证连接
         db_client = MongoClient(
             host=settings.mongo_db_host,
             port=settings.mongo_db_port,
@@ -102,7 +102,7 @@ def create_db_client(apis_urls):
         )
     global DBClient
     DBClient = db_client
-    whether_to_initialize(apis_urls)
+    whether_to_initialize()
 
 
 def close_db_client():

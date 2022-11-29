@@ -76,7 +76,7 @@ async def redirect_view():
 
 @app.on_event('startup')
 async def startup_event():
-    create_db_client(apis_urls)
+    create_db_client()
     for task in get_startup_task():
         task()
 
