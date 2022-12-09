@@ -37,6 +37,7 @@ logger.add(
     retention='30 days',
     enqueue=True,
     level='DEBUG',
+    encoding='UTF-8',
     format=
     '{time:%Y-%m-%d %H:%M:%S.%f} - {name}:{function}:{line}\n<{level}>{message}</{level}>',
 )

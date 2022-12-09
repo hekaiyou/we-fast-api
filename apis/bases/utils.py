@@ -1,4 +1,4 @@
-from core.database import get_collection, doc_update
+from core.database import doc_update, doc_read
 from core.dynamic import get_username_binding
 
 
@@ -8,15 +8,21 @@ def update_bind_username(stored_name, update_name):
         for field in binding_v:
             if ':array' in field:
                 field = field.split(':')[0]
-                change_item = get_collection(binding_k).find(
-                    {field: {
-                        '$elemMatch': {
-                            '$in': [stored_name]
-                        }
-                    }}, {
+                change_item = doc_read(
+                    binding_k,
+                    {
+                        field: {
+                            '$elemMatch': {
+                                '$in': [stored_name],
+                            }
+                        },
+                    },
+                    many=True,
+                    projection={
                         field: 1,
                         '_id': 1
-                    })
+                    },
+                )
                 for change in change_item:
                     revise = change[field]
                     for i, v in enumerate(revise):
@@ -24,12 +30,12 @@ def update_bind_username(stored_name, update_name):
                             revise[i] = update_name
                             break
                     doc_update(
-                        collection=get_collection(binding_k),
+                        collection=binding_k,
                         filter={'_id': change['_id']},
                         update={field: revise},
                     )
             else:
-                doc_update(collection=get_collection(binding_k),
+                doc_update(collection=binding_k,
                            filter={field: stored_name},
                            update={field: update_name},
                            many=True)

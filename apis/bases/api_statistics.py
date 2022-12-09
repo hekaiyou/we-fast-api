@@ -1,7 +1,7 @@
 from datetime import date
 from fastapi import APIRouter
 from core.validate import get_date_list
-from core.database import get_collection, doc_create
+from core.database import doc_create, doc_read
 from .models import COL_OPERATE_PATH, COL_OPERATE_PATH_DAY, NoPaginate
 
 router = APIRouter(prefix='/statistics', )
@@ -16,7 +16,7 @@ def summary_day_statistics(one_day):
         'c_200': 0,
         'paths': [],
     }
-    for result in get_collection(COL_OPERATE_PATH).find({'date': one_day}):
+    for result in doc_read(COL_OPERATE_PATH, {'date': one_day}, many=True):
         t_byte_m, t_spend_s = 0.0, 0.0
         t_total, t_c_200 = 0, 0
         for hour, data in result['hours'].items():
@@ -49,7 +49,7 @@ def summary_hour_statistics(one_day):
     hour_dict = {}
     for i in range(24):
         hour_dict[str(i).zfill(2)] = {}
-    for result in get_collection(COL_OPERATE_PATH).find({'date': one_day}):
+    for result in doc_read(COL_OPERATE_PATH, {'date': one_day}, many=True):
         for _hour, value in result['hours'].items():
             hour_dict[str(_hour).zfill(2)][result['path']] = value
     hour_item = []
@@ -96,7 +96,6 @@ async def read_statistics_all(start_date: date, end_date: date):
     if len(date_list) == 1:
         all_item = summary_hour_statistics(str(start_date))
         return NoPaginate(all_item=all_item, total=len(all_item))
-    path_day_col = get_collection(COL_OPERATE_PATH_DAY)
     all_item = []
     for one_day in date_list:
         if one_day == str(date.today()):
@@ -104,11 +103,11 @@ async def read_statistics_all(start_date: date, end_date: date):
             stored_path_day = summary_day_statistics(one_day)
         else:
             # 历史天查询逻辑
-            stored_path_day = path_day_col.find_one({'date': one_day})
+            stored_path_day = doc_read(COL_OPERATE_PATH_DAY, {'date': one_day})
             if not stored_path_day:
                 # 创建历史天数据
                 stored_path_day = summary_day_statistics(one_day)
-                doc_create(path_day_col, stored_path_day)
+                doc_create(COL_OPERATE_PATH_DAY, stored_path_day)
         if '_id' in stored_path_day:
             del stored_path_day['_id']
         if 'create_time' in stored_path_day:
@@ -125,7 +124,6 @@ async def read_statistics_all(start_date: date, end_date: date):
 )
 async def read_statistics(pk: str, start_date: date, end_date: date):
     date_list = get_date_list(start_date, end_date)
-    path_col = get_collection(COL_OPERATE_PATH)
     all_item = []
     if len(date_list) == 1:
         hour_dict = {}
@@ -136,14 +134,26 @@ async def read_statistics(pk: str, start_date: date, end_date: date):
                 'spend_s': 0.0,
                 'total': 0
             }
-        day_path = path_col.find_one({'path': pk, 'date': str(start_date)})
+        day_path = doc_read(COL_OPERATE_PATH, {
+            'path': pk,
+            'date': str(start_date)
+        })
         if day_path:
             for _hour, _value in day_path['hours'].items():
                 hour_dict[str(_hour).zfill(2)] = _value
         for hour, value in hour_dict.items():
             all_item.append({'date': hour, **value})
     else:
-        day_paths = path_col.find({'path': pk, 'date': {'$in': date_list}})
+        day_paths = doc_read(
+            COL_OPERATE_PATH,
+            {
+                'path': pk,
+                'date': {
+                    '$in': date_list
+                }
+            },
+            many=True,
+        )
         day_dict = {}
         for _date in date_list:
             day_dict[_date] = {

@@ -4,7 +4,7 @@ import requests
 from datetime import timedelta
 from core.storage import save_url_file
 from core.validate import str_to_oid
-from core.database import get_collection, doc_create, doc_update
+from core.database import doc_read, doc_create, doc_update
 from fastapi import APIRouter, HTTPException, status, Depends
 from core.dynamic import get_apis_configs, get_role_permissions
 from .models import Token, COL_USER, COL_ROLE, FileURL, TokenData
@@ -47,13 +47,12 @@ async def read_wechat_access_token(code: str):
             detail=f'微信授权登录失败 ({wechat_json["errmsg"]})',
             headers={'WWW-Authenticate': 'Bearer'},
         )
-    user_col = get_collection(COL_USER)
     # 判断微信端用户是否已存在
     user_filter = {'bind.wechat': wechat_json['openid']}
-    user = user_col.find_one(user_filter)
+    user = doc_read(COL_USER, user_filter)
     if not user:
         doc_create(
-            user_col, {
+            COL_USER, {
                 'username':
                 wechat_json['openid'],
                 'email':
@@ -83,7 +82,7 @@ async def read_wechat_access_token(code: str):
                     }
                 },
             })
-        user = user_col.find_one(user_filter)
+        user = doc_read(COL_USER, user_filter)
     if user.get('disabled', False):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -92,9 +91,8 @@ async def read_wechat_access_token(code: str):
         )
     role = {'title': 'Default', 'permissions': get_role_permissions(None)}
     if user['role_id']:
-        role = get_collection(COL_ROLE).find_one({
-            '_id':
-            str_to_oid(user['role_id']),
+        role = doc_read(COL_ROLE, {
+            '_id': str_to_oid(user['role_id']),
         })
     # 生成访问令牌
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -123,7 +121,6 @@ async def create_wechat_avata_file(
     file_url: FileURL, current_token: TokenData = Depends(get_token_data)):
     save_result = await save_url_file(file_url.url, ['avata'],
                                       current_token.user_id, ['image'])
-    doc_update(get_collection(COL_USER),
-               {'_id': str_to_oid(current_token.user_id)},
+    doc_update(COL_USER, {'_id': str_to_oid(current_token.user_id)},
                {'avata': save_result['filename']})
     return {}

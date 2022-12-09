@@ -3,11 +3,8 @@
 
 {% block main %}
 <div id="details-content">
-    <details class="itemUser" onclick="event.preventDefault()" id="100000000000000000000001">
-        <summary>Default</summary>
-    </details>
 </div>
-<div class="loader-pagination"><span></span></div>
+<div class="loader-pagination" style="display:none"><span></span></div>
 {% endblock %}
 
 {% block operate_right_bottom %}
@@ -16,16 +13,28 @@
 
 {% block javascript %}
 <script>
-    $(document).ready(function () {
+    var loadUserSwitch = false;
+    var loadUserSkip = 0;
+    function loadUserData() {
         utilAjax(
             type = 'GET',
             url = '/api/bases/user/',
-            data = { 'limit': 20, },
+            data = { 'limit': 20, 'skip': loadUserSkip },
             data_format = 'query',
             check = {},
             success = function (data, textStatus) {
+                if (data['items'].length == 20) {
+                    loadUserSwitch = true;
+                } else {
+                    loadUserSwitch = false;
+                }
+                loadUserSkip += data['items'].length;
                 data['items'].forEach(function (value, index) {
-                    $('#details-content').append('<details class="itemUser" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['username'] + ' <sup>' + value['full_name'] + '</sup></summary></details>');
+                    let auxiliary = value['full_name'];
+                    if (!auxiliary) {
+                        let auxiliary = value['email'];
+                    }
+                    $('#details-content').append('<details class="itemUser" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['username'] + ' <sup>' + auxiliary + '</sup></summary></details>');
                 });
                 $('.itemUser').click(function () {
                     window.location.href = '/view/bases/role/update/' + $(this).attr('id') + '/';
@@ -34,20 +43,26 @@
             success_reminder = false,
             not_close = false,
         );
+    }
+    $(document).ready(function () {
+        loadUserData();
         $('#submit').click(function () {
             window.location.href = '/view/bases/role/create/';
         });
     });
-
     $(window).scroll(function () {
-        // 窗口高度
-        var w_h = parseFloat($(window).height());
-        // 页面高度
-        var doc_h = $(document).height();
-        //当前滚动条位置时，页面可见区域及以上区域高度
-        totalheight = w_h + parseFloat($(window).scrollTop()) + 2;
-        if (totalheight >= doc_h) {
-            console.log('页面滚动到达底部');
+        if (loadUserSwitch) {
+            $('#loader-pagination').hide();
+            // 窗口高度
+            var w_h = parseFloat($(window).height());
+            // 页面高度
+            var doc_h = $(document).height();
+            //当前滚动条位置时，页面可见区域及以上区域高度
+            totalheight = w_h + parseFloat($(window).scrollTop()) + 2;
+            if (totalheight >= doc_h) {
+                console.log('页面滚动到达底部');
+                loadUserData();
+            }
         }
     });
 </script>

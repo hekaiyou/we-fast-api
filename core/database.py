@@ -220,7 +220,7 @@ def doc_read(
     collection: Union[Collection, str],
     query_content: dict,
     many: bool = False,
-    sort: list = None,
+    **kw,
 ) -> Union[Cursor, dict]:
     """读取数据集合文档
 
@@ -228,19 +228,17 @@ def doc_read(
         collection (Union[Collection, str]): 集合名称或集合对象. 例 'demo'|get_collection('demo').
         query_content (dict): 查询条件.
         many (bool, optional): 是否批量操作. 默认为 False.
-        sort (list, optional): _description_. 默认为 None.
+        projection (dict, optional): 控制显示这个字段(0=不显示|1=显示). 例 {'name': 1}.
 
     Returns:
         Union[Cursor, dict]: 可迭代的游标对象(many=True)或文档字典(many=False).
     """
-    if sort is None:
-        sort = []
     if isinstance(collection, str):
         collection = get_collection(collection)
     if many:
-        return collection.find(query_content)
+        return collection.find(query_content, **kw)
     else:
-        return collection.find_one(query_content)
+        return collection.find_one(query_content, **kw)
 
 
 def doc_read_by_month(

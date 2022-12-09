@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends
 from apis.bases.api_me import read_me_avata_file
 from apis.bases.models import Paginate, TokenData
 from .models import COL_USER, UserRead, UserCreate, UserUpdate
-from core.database import get_collection, paginate_find, doc_create, doc_update
+from core.database import paginate_find, doc_create, doc_update, doc_read, doc_delete
 from .validate import UserObjIdParams, check_user_username, check_role_id, check_user_email
 
 router = APIRouter(prefix='/user', )
@@ -21,7 +21,6 @@ router = APIRouter(prefix='/user', )
     summary='创建用户',
 )
 async def create_user(create_data: UserCreate):
-    create_col = get_collection(COL_USER)
     # 保证用户名和邮箱地址的唯一性逻辑
     check_user_username(create_data.username)
     check_user_email(create_data.email)
@@ -39,7 +38,7 @@ async def create_user(create_data: UserCreate):
             'value': ''
         }
     }
-    doc_create(create_col, create_json)
+    doc_create(COL_USER, create_json)
     return create_json
 
 
@@ -60,7 +59,7 @@ async def read_user_page(
     if email:
         query_content['email'] = {'$regex': email}
     results = await paginate_find(
-        collection=get_collection(COL_USER),
+        collection=COL_USER,
         paginate_parameters=paginate,
         query_content=query_content,
         item_model=UserRead,
@@ -74,9 +73,8 @@ async def read_user_page(
     summary='更新用户',
 )
 async def update_user(user_id: UserObjIdParams, update_data: UserUpdate):
-    update_col = get_collection(COL_USER)
     # 集合中存储的用户数据
-    doc_before_update = update_col.find_one({'_id': user_id})
+    doc_before_update = doc_read(COL_USER, {'_id': user_id})
     # 使用 集合中存储的用户数据 创建一个 用户数据模型实例
     model_before_update = UserUpdate(**doc_before_update)
     # 生成一个只包含显式设置参数 (排除隐式设置的默认值参数) 的数据
@@ -91,7 +89,7 @@ async def update_user(user_id: UserObjIdParams, update_data: UserUpdate):
     if updated_model.role_id:
         check_role_id(updated_model.role_id)
     # 把 模型实例副本 转换为适配 JSON 的数据, 再保存至数据库集合
-    doc_update(update_col, {'_id': user_id}, jsonable_encoder(updated_model))
+    doc_update(COL_USER, {'_id': user_id}, jsonable_encoder(updated_model))
     if doc_before_update['username'] != updated_model.username:
         update_bind_username(
             stored_name=doc_before_update['username'],
@@ -105,9 +103,8 @@ async def update_user(user_id: UserObjIdParams, update_data: UserUpdate):
     summary='删除用户',
 )
 async def delete_user(user_id: UserObjIdParams):
-    delete_col = get_collection(COL_USER)
-    doc_before_delete = delete_col.find_one({'_id': user_id})
-    delete_col.delete_one({'_id': user_id})
+    doc_before_delete = doc_read(COL_USER, {'_id': user_id})
+    doc_delete(COL_USER, {'_id': user_id})
     # 同步处理全部绑定用户名的集合及其字段内容
     update_name = f'[deleted{int(time())}]{doc_before_delete["username"]}'
     if doc_before_delete['username'] != update_name:

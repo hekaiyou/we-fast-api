@@ -3,15 +3,15 @@ from random import randint, choice
 from .models import COL_ROLE, COL_USER
 from fastapi import HTTPException, status
 from core.dependencies import get_api_routes
-from core.database import get_collection, doc_update
-from core.validate import ObjIdParams, ObjectId, str_to_oid
+from core.database import doc_count, doc_read, doc_update
+from core.validate import ObjIdParams, str_to_oid
 
 
 class RoleObjIdParams(ObjIdParams):
 
     @classmethod
     def validate_doc(cls, oid):
-        if not get_collection(COL_ROLE).count_documents({'_id': oid}):
+        if not doc_count(COL_ROLE, {'_id': oid}):
             if str(oid) != '100000000000000000000001':
                 return False
         return True
@@ -21,14 +21,11 @@ class UserObjIdParams(ObjIdParams):
 
     @classmethod
     def validate_doc(cls, oid):
-        return get_collection(COL_USER).count_documents({
-            '_id': oid,
-        })
+        return doc_count(COL_USER, {'_id': oid})
 
 
 def check_role_title(v):
-    role_col = get_collection(COL_ROLE)
-    if role_col.count_documents({'title': v}):
+    if doc_count(COL_ROLE, {'title': v}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='角色名称已经存在',
@@ -53,7 +50,7 @@ def check_role_permissions(v):
 
 
 def check_role_and_user(v):
-    if get_collection(COL_USER).count_documents({'role_id': v}):
+    if doc_count(COL_USER, {'role_id': v}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='角色存在用户绑定关系',
@@ -61,7 +58,7 @@ def check_role_and_user(v):
 
 
 def check_role_id(v):
-    if not get_collection(COL_ROLE).count_documents({'_id': str_to_oid(v)}):
+    if not doc_count(COL_ROLE, {'_id': str_to_oid(v)}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='角色 ID 不存在',
@@ -69,8 +66,7 @@ def check_role_id(v):
 
 
 def check_user_username(v):
-    user_col = get_collection(COL_USER)
-    if user_col.count_documents({'username': v}):
+    if doc_count(COL_USER, {'username': v}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='用户名已存在',
@@ -83,7 +79,7 @@ def check_user_username(v):
 
 
 def check_user_email(v):
-    if get_collection(COL_USER).count_documents({'email': v}):
+    if doc_count(COL_USER, {'email': v}):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='电子邮箱地址已存在',
@@ -96,8 +92,7 @@ def check_verify_code(code, user_id, verify_key):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail='无效的验证码',
         )
-    user_col = get_collection(COL_USER)
-    user = user_col.find_one({'_id': user_id})
+    user = doc_read(COL_USER, {'_id': user_id})
     if not user['verify'][verify_key]['code']:
         return False
     if (datetime.utcnow() -
@@ -118,7 +113,7 @@ def check_verify_code(code, user_id, verify_key):
     }
     if verify_key == 'email':
         update_dict[f'bind.{verify_key}'] = user['verify'][verify_key]['value']
-    doc_update(user_col, {'_id': user['_id']}, update_dict)
+    doc_update(COL_USER, {'_id': user['_id']}, update_dict)
     return True
 
 
@@ -128,9 +123,8 @@ def get_me_user(v):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='当前为免鉴权 IP 访问',
         )
-    user = get_collection(COL_USER).find_one({
-        '_id': str_to_oid(v),
-    })
+
+    user = doc_read(COL_USER, {'_id': str_to_oid(v)})
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -147,7 +141,7 @@ def get_verify_code(value, user_id, verify_key):
         s = chr(randint(97, 122))
         code += str(choice([n, b, s]))
     doc_update(
-        get_collection(COL_USER),
+        COL_USER,
         {'_id': user_id},
         {
             f'verify.{verify_key}.code': code,

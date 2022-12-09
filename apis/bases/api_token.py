@@ -1,6 +1,6 @@
 from datetime import timedelta
 from core.validate import str_to_oid
-from core.database import get_collection
+from core.database import get_collection, doc_read
 from .models import Token, COL_USER, COL_ROLE
 from core.dynamic import get_role_permissions
 from fastapi.security import OAuth2PasswordRequestForm
@@ -39,10 +39,7 @@ async def create_api_access_token(
         )
     role = {'title': 'Default', 'permissions': get_role_permissions(None)}
     if user.role_id:
-        role = get_collection(COL_ROLE).find_one({
-            '_id':
-            str_to_oid(user.role_id),
-        })
+        role = doc_read(COL_ROLE, {'_id': str_to_oid(user.role_id)})
     # 根据令牌过期权限, 获取令牌过期时间
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     # 创建访问令牌, 同时放置唯一且是字符串的 sub 标识

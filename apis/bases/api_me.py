@@ -7,7 +7,7 @@ from core.emails import send_simple_mail
 from core.dynamic import get_apis_configs
 from fastapi.encoders import jsonable_encoder
 from core.storage import save_raw_file, FILES_PATH
-from core.database import get_collection, doc_update
+from core.database import doc_update
 from fastapi.responses import StreamingResponse, RedirectResponse
 from core.security import get_token_data, get_password_hash, verify_password
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
@@ -37,7 +37,6 @@ async def read_me_info(current_token: TokenData = Depends(get_token_data)):
 )
 async def update_me_info(update_data: UserBase,
                          current_token: TokenData = Depends(get_token_data)):
-    update_col = get_collection(COL_USER)
     doc_before_update = get_me_user(current_token.user_id)
     model_before_update = UserBase(**doc_before_update)
     update_json = update_data.dict(exclude_unset=True)
@@ -46,7 +45,7 @@ async def update_me_info(update_data: UserBase,
         check_user_username(updated_model.username)
     if model_before_update.email != updated_model.email:
         check_user_email(updated_model.email)
-    doc_update(update_col, doc_before_update, jsonable_encoder(updated_model))
+    doc_update(COL_USER, doc_before_update, jsonable_encoder(updated_model))
     if doc_before_update['username'] != updated_model.username:
         update_bind_username(
             stored_name=doc_before_update['username'],
@@ -74,7 +73,7 @@ async def update_me_password(
             detail='当前密码错误',
         )
     doc_update(
-        get_collection(COL_USER),
+        COL_USER,
         user,
         {'password': get_password_hash(update_data.new_password)},
     )
@@ -135,8 +134,7 @@ async def create_me_avata_file(
         current_token: TokenData = Depends(get_token_data)):
     save_result = await save_raw_file(file, ['avata'], current_token.user_id,
                                       ['image'])
-    doc_update(get_collection(COL_USER),
-               {'_id': str_to_oid(current_token.user_id)},
+    doc_update(COL_USER, {'_id': str_to_oid(current_token.user_id)},
                {'avata': save_result['filename']})
     return {}
 
