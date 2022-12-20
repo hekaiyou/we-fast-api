@@ -74,6 +74,7 @@
                     swal('请求成功', { icon: 'success', buttons: false, timer: 1500, });
                 }
             },
+            complete = function (request, textStatus) { },
             success_reminder = false,
             not_close = true,
         );
@@ -130,6 +131,7 @@
                     });
                 }
             },
+            complete = function (request, textStatus) { },
             success_reminder = false,
             not_close = false,
         );
@@ -154,6 +156,7 @@
                 });
                 loadPage();
             },
+            complete = function (request, textStatus) { },
             success_reminder = false,
             not_close = true,
         );
@@ -179,6 +182,7 @@
                         success = function (data, textStatus) {
                             window.location.href = '/view/bases/role/';
                         },
+                        complete = function (request, textStatus) { },
                         success_reminder = false,
                         not_close = false,
                     );
@@ -210,6 +214,7 @@
                 success = function (data, textStatus) {
                     window.location.href = '/view/bases/role/update/' + data._id + '/';
                 },
+                complete = function (request, textStatus) { },
                 success_reminder = true,
             );
         });

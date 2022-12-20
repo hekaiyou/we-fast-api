@@ -22,7 +22,7 @@ async def page_token(request: dict = Depends(get_view_request),
 
 
 @router.get('/home/', response_class=HTMLResponse, include_in_schema=False)
-async def page_bases_statistics(request: dict = Depends(get_view_request)):
+async def page_bases_home(request: dict = Depends(get_view_request)):
     configs = get_apis_configs('bases')
     if configs.app_home_path != '/view/bases/home/':
         return RedirectResponse(configs.app_home_path)
@@ -40,10 +40,12 @@ async def page_bases_statistics(request: dict = Depends(get_view_request)):
 @router.get('/statistics/path/',
             response_class=HTMLResponse,
             include_in_schema=False)
-async def page_bases_statistics(pk: str,
-                                start_date: date,
-                                end_date: date,
-                                request: dict = Depends(get_view_request)):
+async def page_bases_statistics_path(
+        pk: str,
+        start_date: date,
+        end_date: date,
+        request: dict = Depends(get_view_request),
+):
     return templates.TemplateResponse(
         'bases/statistics_path.html', {
             'pk': pk,
@@ -117,3 +119,21 @@ async def page_bases_password_update(
 @router.get('/user/', response_class=HTMLResponse, include_in_schema=False)
 async def page_bases_user(request: dict = Depends(get_view_request)):
     return templates.TemplateResponse('bases/user.html', {**request})
+
+
+@router.get('/user/create/',
+            response_class=HTMLResponse,
+            include_in_schema=False)
+async def page_bases_user_create(request: dict = Depends(get_view_request)):
+    return templates.TemplateResponse('bases/user-edit.html', {**request})
+
+
+@router.get('/user/update/{user_id}/',
+            response_class=HTMLResponse,
+            include_in_schema=False)
+async def page_bases_user_update(user_id: ObjIdParams,
+                                 request: dict = Depends(get_view_request)):
+    return templates.TemplateResponse('bases/user-edit.html', {
+        'user_id': str(user_id),
+        **request
+    })

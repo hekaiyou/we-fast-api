@@ -11,7 +11,7 @@ var navigationBar = [
     },
     {
         'path': '/view/bases/user/',
-        'permission': ['read_user_page'],
+        'permission': ['read_user_page', 'read_user', 'create_user', 'update_user', 'delete_user'],
         'text': '用户管理',
     },
     {

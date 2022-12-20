@@ -4,7 +4,6 @@
 {% block main %}
 <div id="details-content">
 </div>
-<div class="loader-pagination" style="display:none"><span></span></div>
 {% endblock %}
 
 {% block operate_right_bottom %}
@@ -15,7 +14,12 @@
 <script>
     var loadUserSwitch = false;
     var loadUserSkip = 0;
+    var loadUserMark = true;
     function loadUserData() {
+        if (!loadUserMark) {
+            return;
+        }
+        loadUserMark = false;
         utilAjax(
             type = 'GET',
             url = '/api/bases/user/',
@@ -37,8 +41,11 @@
                     $('#details-content').append('<details class="itemUser" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['username'] + ' <sup>' + auxiliary + '</sup></summary></details>');
                 });
                 $('.itemUser').click(function () {
-                    window.location.href = '/view/bases/role/update/' + $(this).attr('id') + '/';
+                    window.location.href = '/view/bases/user/update/' + $(this).attr('id') + '/';
                 });
+            },
+            complete = function (request, textStatus) {
+                loadUserMark = true;
             },
             success_reminder = false,
             not_close = false,
@@ -47,12 +54,11 @@
     $(document).ready(function () {
         loadUserData();
         $('#submit').click(function () {
-            window.location.href = '/view/bases/role/create/';
+            window.location.href = '/view/bases/user/create/';
         });
     });
     $(window).scroll(function () {
         if (loadUserSwitch) {
-            $('#loader-pagination').hide();
             // 窗口高度
             var w_h = parseFloat($(window).height());
             // 页面高度

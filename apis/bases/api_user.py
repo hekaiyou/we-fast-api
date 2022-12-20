@@ -43,6 +43,15 @@ async def create_user(create_data: UserCreate):
 
 
 @router.get(
+    '/{user_id}/',
+    response_model=UserRead,
+    summary='读取用户',
+)
+async def read_user(user_id: UserObjIdParams):
+    return UserRead(**doc_read(COL_USER, {'_id': user_id}))
+
+
+@router.get(
     '/',
     response_model=Paginate,
     summary='读取用户 (分页)',

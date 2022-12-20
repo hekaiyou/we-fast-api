@@ -1,0 +1,191 @@
+{% extends 'core/navigation.html' %}
+{% block title %}
+{% if user_id %}
+更新用户
+{% else %}
+创建用户
+{% endif %}
+{% endblock %}
+
+{% block operate_left %}
+<a href="/view/bases/user/">返回</a>
+{% endblock %}
+{% block operate_right_top %}
+{% if user_id %}
+<a id="submit" role="button" href="javascript:void(0);">更新</a>
+{% else %}
+<a id="submit" role="button" href="javascript:void(0);">创建</a>
+{% endif %}
+{% endblock %}
+
+{% block main %}
+<form id="form-content">
+    <div class="grid">
+        <label for="username">
+            账户名
+            <input type="text" id="username" placeholder="账户名" required>
+        </label>
+        <label for="full_name">
+            账户昵称
+            <input type="text" id="full_name" placeholder="账户昵称" required>
+        </label>
+    </div>
+    <label for="email">
+        电子邮箱地址
+        <input type="email" id="email" placeholder="电子邮箱地址" required>
+    </label>
+    <label for="role_id">
+        账户角色
+        <select id="role_id" placeholder="账户角色">
+            <option value="" selected>Default</option>
+        </select>
+    </label>
+    {% if not user_id %}
+    <label for="password">
+        认证密码
+        <input type="password" id="password" placeholder="认证密码" required>
+    </label>
+    {% endif %}
+    <label for="disabled">
+        <input type="checkbox" id="disabled" placeholder="是否禁用账户" role="switch">
+        是否禁用账户
+    </label>
+</form>
+{% endblock %}
+
+{% block operate_right_bottom %}
+{% if user_id %}
+<button id="delete">删除</button>
+{% endif %}
+{% endblock %}
+
+{% block javascript %}
+<script>
+    function loadPage(role_id) {
+        utilAjax(
+            type = 'GET',
+            url = '/api/bases/role/',
+            data = {},
+            data_format = 'query',
+            check = {},
+            success = function (data, textStatus) {
+                data.all_item.forEach(function (value, index) {
+                    $('#role_id').append('<option value="' + value.id + '">' + value.title + '</option>');
+                });
+                $('#role_id').val(role_id);
+            },
+            complete = function (request, textStatus) { },
+            success_reminder = false,
+            not_close = false,
+        );
+    }
+    //{% if user_id %}
+    $(document).ready(function () {
+        utilAjax(
+            type = 'GET',
+            url = '/api/bases/user/{{ user_id }}/',
+            data = {},
+            data_format = 'query',
+            check = {},
+            success = function (data, textStatus) {
+                $('#username').val(data.username);
+                $('#full_name').val(data.full_name);
+                $('#email').val(data.email);
+                if (data.disabled) {
+                    $('#disabled').attr('checked', 'checked');
+                }
+                loadPage(data.role_id);
+            },
+            complete = function (request, textStatus) { },
+            success_reminder = false,
+            not_close = true,
+        );
+        $('#submit').click(function () {
+            utilAjax(
+                type = 'PUT',
+                url = '/api/bases/user/{{ user_id }}/',
+                data = {
+                    'username': $('#username').val(),
+                    'full_name': $('#full_name').val(),
+                    'email': $('#email').val(),
+                    'disabled': $('#disabled').is(':checked'),
+                    'role_id': $('#role_id').val(),
+                },
+                data_format = 'json',
+                check = {
+                    'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
+                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位'],
+                    'email': [/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/, '电子邮箱地址的格式不正确'],
+                },
+                success = function (data, textStatus) {
+                    $('#username').val(data.username);
+                    $('#full_name').val(data.full_name);
+                    $('#email').val(data.email);
+                    $('#role_id').val(data.role_id);
+                    if (data.disabled) {
+                        $('#disabled').attr('checked', 'checked');
+                    }
+                },
+                complete = function (request, textStatus) { },
+                success_reminder = true,
+                not_close = false,
+            );
+        });
+        $('#delete').click(function () {
+            swal({
+                title: '你正在删除用户',
+                icon: 'warning',
+                buttons: ['取消', '确认删除'],
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    utilAjax(
+                        type = 'DELETE',
+                        url = '/api/bases/user/{{ user_id }}/',
+                        data = {},
+                        data_format = 'json',
+                        check = {},
+                        success = function (data, textStatus) {
+                            window.location.href = '/view/bases/user/';
+                        },
+                        complete = function (request, textStatus) { },
+                        success_reminder = false,
+                        not_close = false,
+                    );
+                }
+            });
+        });
+    });
+    //{% else %}
+    $(document).ready(function () {
+        loadPage('');
+        $('#submit').click(function () {
+            utilAjax(
+                type = 'POST',
+                url = '/api/bases/user/',
+                data = {
+                    'username': $('#username').val(),
+                    'full_name': $('#full_name').val(),
+                    'email': $('#email').val(),
+                    'disabled': $('#disabled').is(':checked'),
+                    'password': $('#password').val(),
+                    'role_id': $('#role_id').val(),
+                },
+                data_format = 'json',
+                check = {
+                    'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
+                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位'],
+                    'email': [/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/, '电子邮箱地址的格式不正确'],
+                    'password': [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$/, '认证密码需要大小写字母和数字或特殊字符的组合, 长度6-32之间'],
+                },
+                success = function (data, textStatus) {
+                    window.location.href = '/view/bases/user/update/' + data._id + '/';
+                },
+                complete = function (request, textStatus) { },
+                success_reminder = true,
+            );
+        });
+    });
+    //{% endif %}
+</script>
+{% endblock %}

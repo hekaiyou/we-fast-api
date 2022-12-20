@@ -56,6 +56,7 @@
                     }
                 }
             },
+            complete = function (request, textStatus) { },
             success_reminder = false,
             not_close = false,
         );
@@ -82,6 +83,7 @@
                     $('#full_name').val(data.full_name);
                     $('#email').val(data.email);
                 },
+                complete = function (request, textStatus) { },
                 success_reminder = (originalEmail == $('#email').val()),
             );
         });
@@ -107,6 +109,7 @@
                     swal('已发送验证邮件到 ' + originalEmail + ' 邮箱', { icon: 'success', buttons: false, });
                     $('#verifyEmail').attr('disabled', true);
                 },
+                complete = function (request, textStatus) { },
                 success_reminder = false,
                 not_close = true,
             );

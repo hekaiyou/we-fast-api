@@ -30,7 +30,7 @@ function generalErrorHandling(request) {
     });
 }
 
-function utilAjax(type, url, data, data_format, check, success, success_reminder, not_close) {
+function utilAjax(type, url, data, data_format, check, success, complete, success_reminder, not_close) {
     var checkResult = true;
     $.each(check, function (key, value) {
         if (!value[0].test(data[key])) {
@@ -79,6 +79,9 @@ function utilAjax(type, url, data, data_format, check, success, success_reminder
         },
         error: function (request, textStatus, errorThrown) {
             generalErrorHandling(request);
+        },
+        complete: function (request, textStatus) {
+            complete(request, textStatus);
         },
     });
 }
