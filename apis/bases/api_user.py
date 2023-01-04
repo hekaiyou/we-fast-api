@@ -59,12 +59,15 @@ async def read_user(user_id: UserObjIdParams):
 async def read_user_page(
     paginate: dict = Depends(get_paginate_parameters),
     username: Optional[str] = None,
+    full_name: Optional[str] = None,
     email: Optional[str] = None,
 ):
     query_content = {}
     if username:
         # 使用正则表达式查询用户名
         query_content['username'] = {'$regex': username}
+    if full_name:
+        query_content['full_name'] = {'$regex': full_name}
     if email:
         query_content['email'] = {'$regex': email}
     results = await paginate_find(

@@ -2,6 +2,16 @@
 {% block title %}用户管理{% endblock %}
 
 {% block main %}
+<form>
+    <div class="grid">
+        <label for="username">
+            <input type="search" id="username" placeholder="账户名">
+        </label>
+        <label for="full_name">
+            <input type="search" id="full_name" placeholder="账户昵称">
+        </label>
+    </div>
+</form>
 <div id="details-content">
 </div>
 {% endblock %}
@@ -15,15 +25,24 @@
     var loadUserSwitch = false;
     var loadUserSkip = 0;
     var loadUserMark = true;
+    var searchUsername = '{{ username }}';
+    var searchFullName = '{{ full_name }}';
     function loadUserData() {
         if (!loadUserMark) {
             return;
         }
         loadUserMark = false;
+        searchData = { 'limit': 20, 'skip': loadUserSkip };
+        if (searchUsername) {
+            searchData['username'] = searchUsername
+        }
+        if (searchFullName) {
+            searchData['full_name'] = searchFullName
+        }
         utilAjax(
             type = 'GET',
             url = '/api/bases/user/',
-            data = { 'limit': 20, 'skip': loadUserSkip },
+            data = searchData,
             data_format = 'query',
             check = {},
             success = function (data, textStatus) {
@@ -41,7 +60,7 @@
                     $('#details-content').append('<details class="itemUser" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['username'] + ' <sup>' + auxiliary + '</sup></summary></details>');
                 });
                 $('.itemUser').click(function () {
-                    window.location.href = '/view/bases/user/update/' + $(this).attr('id') + '/';
+                    window.location.href = '/view/bases/user/update/' + $(this).attr('id') + '/?username=' + $('#username').val() + '&full_name=' + $('#full_name').val();
                 });
             },
             complete = function (request, textStatus) {
@@ -52,9 +71,27 @@
         );
     }
     $(document).ready(function () {
+        $('#username').val('{{ username }}');
+        $('#full_name').val('{{ full_name }}');
         loadUserData();
         $('#submit').click(function () {
-            window.location.href = '/view/bases/user/create/';
+            window.location.href = '/view/bases/user/create/?username=' + $('#username').val() + '&full_name=' + $('#full_name').val();
+        });
+        $('#username').change(function (value) {
+            searchUsername = $('#username').val();
+            loadUserSwitch = false;
+            loadUserSkip = 0;
+            loadUserMark = true;
+            $('#details-content').empty();
+            loadUserData();
+        });
+        $('#full_name').change(function (value) {
+            searchFullName = $('#full_name').val();
+            loadUserSwitch = false;
+            loadUserSkip = 0;
+            loadUserMark = true;
+            $('#details-content').empty();
+            loadUserData();
         });
     });
     $(window).scroll(function () {
@@ -66,7 +103,6 @@
             //当前滚动条位置时，页面可见区域及以上区域高度
             totalheight = w_h + parseFloat($(window).scrollTop()) + 2;
             if (totalheight >= doc_h) {
-                console.log('页面滚动到达底部');
                 loadUserData();
             }
         }

@@ -33,8 +33,14 @@ async def page_bases_home(request: dict = Depends(get_view_request)):
 @router.get('/statistics/',
             response_class=HTMLResponse,
             include_in_schema=False)
-async def page_bases_statistics(request: dict = Depends(get_view_request)):
-    return templates.TemplateResponse('bases/statistics.html', {**request})
+async def page_bases_statistics(start_date: date = None,
+                                end_date: date = None,
+                                request: dict = Depends(get_view_request)):
+    return templates.TemplateResponse('bases/statistics.html', {
+        'start_date': str(start_date),
+        'end_date': str(end_date),
+        **request
+    })
 
 
 @router.get('/statistics/path/',
@@ -117,23 +123,40 @@ async def page_bases_password_update(
 
 
 @router.get('/user/', response_class=HTMLResponse, include_in_schema=False)
-async def page_bases_user(request: dict = Depends(get_view_request)):
-    return templates.TemplateResponse('bases/user.html', {**request})
+async def page_bases_user(username: str = '',
+                          full_name: str = '',
+                          request: dict = Depends(get_view_request)):
+    return templates.TemplateResponse('bases/user.html', {
+        'username': username,
+        'full_name': full_name,
+        **request
+    })
 
 
 @router.get('/user/create/',
             response_class=HTMLResponse,
             include_in_schema=False)
-async def page_bases_user_create(request: dict = Depends(get_view_request)):
-    return templates.TemplateResponse('bases/user-edit.html', {**request})
+async def page_bases_user_create(username: str = '',
+                                 full_name: str = '',
+                                 request: dict = Depends(get_view_request)):
+    return templates.TemplateResponse('bases/user-edit.html', {
+        'username': username,
+        'full_name': full_name,
+        **request
+    })
 
 
 @router.get('/user/update/{user_id}/',
             response_class=HTMLResponse,
             include_in_schema=False)
 async def page_bases_user_update(user_id: ObjIdParams,
+                                 username: str = '',
+                                 full_name: str = '',
                                  request: dict = Depends(get_view_request)):
-    return templates.TemplateResponse('bases/user-edit.html', {
-        'user_id': str(user_id),
-        **request
-    })
+    return templates.TemplateResponse(
+        'bases/user-edit.html', {
+            'user_id': str(user_id),
+            'username': username,
+            'full_name': full_name,
+            **request
+        })

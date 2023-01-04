@@ -265,13 +265,21 @@
         }
     }
     $(document).ready(function () {
-        $('#startDate').val(getBeforeDay(6));
+        if ('{{ start_date }}' != 'None') {
+            $('#startDate').val('{{ start_date }}');
+        } else {
+            $('#startDate').val(getBeforeDay(6));
+        }
         $('#startDate').change(function (value) {
             if ($('#startDate').val()) {
                 selectStatisticsDate();
             }
         });
-        $('#endDate').val(getBeforeDay(0));
+        if ('{{ end_date }}' != 'None') {
+            $('#endDate').val('{{ end_date }}');
+        } else {
+            $('#endDate').val(getBeforeDay(0));
+        }
         $('#endDate').change(function (value) {
             if ($('#endDate').val()) {
                 selectStatisticsDate();
