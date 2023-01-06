@@ -1,4 +1,5 @@
 import os
+import platform
 import importlib
 from json import dumps
 from config import Settings
@@ -103,8 +104,14 @@ def get_startup_task():
 def revise_settings(key, value, env_path: str = '.env'):
     """ 修改环境变量文件 """
     if not os.path.exists(env_path):
-        os.mknod(env_path)
-    with open(env_path, 'r', encoding='utf-8') as file_obj:
+        sys_platform = platform.platform().lower()
+        if 'windows' in sys_platform:
+            # 在 windows 下不支持 mknod 函数
+            with open(env_path, 'w', encoding='UTF-8') as f:
+                f.write('')
+        else:
+            os.mknod(env_path)
+    with open(env_path, 'r', encoding='UTF-8') as file_obj:
         contents = file_obj.read()
     if isinstance(value, list):
         value = dumps(value)
@@ -121,7 +128,7 @@ def revise_settings(key, value, env_path: str = '.env'):
             contents += f'\n{key.upper()}={value}'
         else:
             contents += f'{key.upper()}={value}'
-    with open(env_path, 'w', encoding='utf-8') as file_obj:
+    with open(env_path, 'w', encoding='UTF-8') as file_obj:
         file_obj.write(contents)
 
 
