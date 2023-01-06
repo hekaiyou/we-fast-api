@@ -1,3 +1,5 @@
+import os
+import platform
 from openpyxl import Workbook
 from tempfile import NamedTemporaryFile
 from fastapi.responses import StreamingResponse
@@ -32,10 +34,24 @@ async def get_xlsx_stream(worksheets: list):
                 )
 
     def temp_file():
-        with NamedTemporaryFile() as tmp:
-            wb.save(tmp.name)
-            tmp.seek(0)
-            yield from tmp
+        sys_platform = platform.platform().lower()
+        if 'windows' in sys_platform:
+            # delete=False 不会关闭文件后自动清理
+            windows_f = NamedTemporaryFile(mode='w', delete=False)
+            wb.save(windows_f.name)
+            windows_f.seek(0)
+            # 在 windows 下不关闭就没有权限再次打开
+            windows_f.close()
+            with open(windows_f.name, mode='rb') as tmp:
+                yield from tmp
+            # 手动清理 windows 下的临时文件
+            windows_f.close()
+            os.remove(windows_f.name)
+        else:
+            with NamedTemporaryFile() as tmp:
+                wb.save(tmp.name)
+                tmp.seek(0)
+                yield from tmp
 
     return StreamingResponse(
         temp_file(),
