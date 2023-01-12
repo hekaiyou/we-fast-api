@@ -76,10 +76,19 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 async def get_token_data(request: Request,
                          token: str = Depends(oauth2_scheme)):
     """ 依赖项: 获取当前令牌数据 """
+    is_exempt_ip = False
     if request.client.host[:request.client.host.
                            rfind('.')] in settings.token_exempt_ip:
-        return TokenData(user_id='ExemptIP', role_id='ExemptIP')
+        is_exempt_ip = True
     if request.client.host in settings.token_exempt_host:
+        is_exempt_ip = True
+    if is_exempt_ip:
+        if '/api/bases/' in request[
+                'path'] and '/api/bases/logs/' not in request['path']:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail='白名单禁止访问核心模块',
+            )
         return TokenData(user_id='ExemptIP', role_id='ExemptIP')
     if not token:
         if not request.cookies.get('token_s', None):
