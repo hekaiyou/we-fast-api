@@ -79,6 +79,8 @@ async def get_token_data(request: Request,
     if request.client.host[:request.client.host.
                            rfind('.')] in settings.token_exempt_ip:
         return TokenData(user_id='ExemptIP', role_id='ExemptIP')
+    if request.client.host in settings.token_exempt_host:
+        return TokenData(user_id='ExemptIP', role_id='ExemptIP')
     if not token:
         if not request.cookies.get('token_s', None):
             if '/open/' not in str(request.url):

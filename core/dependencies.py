@@ -62,7 +62,23 @@ async def get_paginate_parameters(
         regex='^[a-zA-Z]\w{2,31}$',
     ),
 ):
-    """ 全局依赖项: 获取分页参数 """
+    """全局依赖项: 获取分页参数
+
+    Args:
+        skip (int, optional): 指定记录起始位置. 默认为 Query(default=0, ge=0).
+        limit (int, optional): 指定页大小. 默认为 Query(default=10, ge=1, le=9999).
+        orderby (str, optional): 指定排序条件. 默认为 Query( default=None, description='示例: field1 asc,field2 desc', regex='^.+\s+(asc|desc)*$', ).
+        start_time (Optional[int], optional): 指定开始时间戳. 默认为 Query( default=None, ge=1640966400000, le=4796640000000, ).
+        end_time (Optional[int], optional): 指定结束时间戳. 默认为 Query( default=None, ge=1640966400000, le=4796640000000, ).
+        time_field (Optional[str], optional): 指定 start_time|end_time 查询字段. 默认为 Query( default='create_time', regex='^[a-zA-Z]\w{2,31}$', ).
+
+    Raises:
+        HTTPException: 排序条件(orderby)格式错误
+        HTTPException: 结束时间戳(end_time)必须大于开始时间戳(start_time)
+
+    Returns:
+        dict: 经过处理的分页参数字典
+    """
     sort_list = []
     if orderby:
         # 整理请求参数中的筛排序列表
@@ -78,7 +94,7 @@ async def get_paginate_parameters(
             else:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail='排序参数 orderby 格式错误',
+                    detail='排序条件(orderby)格式错误',
                 )
     time_te = {}
     if start_time:
@@ -91,7 +107,7 @@ async def get_paginate_parameters(
         if not time_te['$lte'].__gt__(time_te['$gte']):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail='结束时间必须大于开始时间',
+                detail='结束时间戳(end_time)必须大于开始时间戳(start_time)',
             )
     return {
         'skip': skip,
