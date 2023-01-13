@@ -125,10 +125,12 @@ async def page_bases_password_update(
 @router.get('/user/', response_class=HTMLResponse, include_in_schema=False)
 async def page_bases_user(username: str = '',
                           full_name: str = '',
+                          source: str = '',
                           request: dict = Depends(get_view_request)):
     return templates.TemplateResponse('bases/user.html', {
         'username': username,
         'full_name': full_name,
+        'source': source,
         **request
     })
 
@@ -138,10 +140,12 @@ async def page_bases_user(username: str = '',
             include_in_schema=False)
 async def page_bases_user_create(username: str = '',
                                  full_name: str = '',
+                                 source: str = '',
                                  request: dict = Depends(get_view_request)):
     return templates.TemplateResponse('bases/user-edit.html', {
         'username': username,
         'full_name': full_name,
+        'source': source,
         **request
     })
 
@@ -152,11 +156,13 @@ async def page_bases_user_create(username: str = '',
 async def page_bases_user_update(user_id: ObjIdParams,
                                  username: str = '',
                                  full_name: str = '',
+                                 source: str = '',
                                  request: dict = Depends(get_view_request)):
     return templates.TemplateResponse(
         'bases/user-edit.html', {
             'user_id': str(user_id),
             'username': username,
             'full_name': full_name,
+            'source': source,
             **request
         })

@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     mail_smtp_sender_name: str = 'fromXX'
     mail_smtp_sender: str = 'from@163.com'
     mail_smtp_password: str = 'xxxxxxx'
+    enable_ldap_ad: bool = False
+    ldap_ad_label: str = 'LDAP'
+    ldap_ad_host: str = 'ldap://127.0.0.1:389/'
     enable_wechat_app: bool = False
     wechat_app_id: str = ''
     wechat_app_secret: str = ''
@@ -48,6 +51,9 @@ settings_describe = {
     'mail_smtp_sender_name': '邮件 SMTP 服务器发件人名称',
     'mail_smtp_sender': '邮件 SMTP 服务器发件人邮箱',
     'mail_smtp_password': '邮件 SMTP 服务器授权码',
+    'enable_ldap_ad': '启用 LDAP/AD 认证',
+    'ldap_ad_label': 'LDAP/AD 服务器人性化名称',
+    'ldap_ad_host': 'LDAP/AD 服务器主机地址',
     'enable_wechat_app': '启用微信小程序支持',
     'wechat_app_id': '微信小程序唯一标识',
     'wechat_app_secret': '微信小程序密钥',

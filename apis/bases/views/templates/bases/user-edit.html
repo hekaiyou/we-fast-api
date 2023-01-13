@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block operate_left %}
-<a href="/view/bases/user/?username={{ username }}&full_name={{ full_name }}">返回</a>
+<a href="/view/bases/user/?username={{ username }}&full_name={{ full_name }}&source={{ source }}">返回</a>
 {% endblock %}
 {% block operate_right_top %}
 {% if user_id %}
@@ -146,7 +146,7 @@
                         data_format = 'json',
                         check = {},
                         success = function (data, textStatus) {
-                            window.location.href = '/view/bases/user/?username={{ username }}&full_name={{ full_name }}';
+                            window.location.href = '/view/bases/user/?username={{ username }}&full_name={{ full_name }}&source={{ source }}';
                         },
                         complete = function (request, textStatus) { },
                         success_reminder = false,
@@ -179,7 +179,7 @@
                     'password': [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$/, '认证密码需要大小写字母和数字或特殊字符的组合, 长度6-32之间'],
                 },
                 success = function (data, textStatus) {
-                    window.location.href = '/view/bases/user/update/' + data._id + '/?username={{ username }}&full_name={{ full_name }}';
+                    window.location.href = '/view/bases/user/update/' + data._id + '/?username={{ username }}&full_name={{ full_name }}&source={{ source }}';
                 },
                 complete = function (request, textStatus) { },
                 success_reminder = true,

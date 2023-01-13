@@ -61,6 +61,7 @@ async def read_user_page(
     username: Optional[str] = None,
     full_name: Optional[str] = None,
     email: Optional[str] = None,
+    source: Optional[str] = None,
 ):
     query_content = {}
     if username:
@@ -70,6 +71,8 @@ async def read_user_page(
         query_content['full_name'] = {'$regex': full_name}
     if email:
         query_content['email'] = {'$regex': email}
+    if source:
+        query_content['source'] = source
     results = await paginate_find(
         collection=COL_USER,
         paginate_parameters=paginate,

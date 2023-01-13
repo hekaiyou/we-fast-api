@@ -3,12 +3,20 @@
 
 {% block main %}
 <form>
+    <label for="source">
+        <select id="source" placeholder="筛选账户来源……">
+            <option value="" selected>筛选账户来源……</option>
+            <option value="Initialization">系统注册</option>
+            <option value="Admin">管理员注册</option>
+            <option value="WeChat">微信小程序注册</option>
+        </select>
+    </label>
     <div class="grid">
         <label for="username">
-            <input type="search" id="username" placeholder="账户名">
+            <input type="text" id="username" placeholder="搜索账户名……">
         </label>
         <label for="full_name">
-            <input type="search" id="full_name" placeholder="账户昵称">
+            <input type="text" id="full_name" placeholder="搜索账户昵称……">
         </label>
     </div>
 </form>
@@ -27,6 +35,7 @@
     var loadUserMark = true;
     var searchUsername = '{{ username }}';
     var searchFullName = '{{ full_name }}';
+    var searchSource = '{{ source }}';
     function loadUserData() {
         if (!loadUserMark) {
             return;
@@ -38,6 +47,9 @@
         }
         if (searchFullName) {
             searchData['full_name'] = searchFullName
+        }
+        if (searchSource) {
+            searchData['source'] = searchSource
         }
         utilAjax(
             type = 'GET',
@@ -60,7 +72,7 @@
                     $('#details-content').append('<details class="itemUser" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['username'] + ' <sup>' + auxiliary + '</sup></summary></details>');
                 });
                 $('.itemUser').click(function () {
-                    window.location.href = '/view/bases/user/update/' + $(this).attr('id') + '/?username=' + $('#username').val() + '&full_name=' + $('#full_name').val();
+                    window.location.href = '/view/bases/user/update/' + $(this).attr('id') + '/?username=' + $('#username').val() + '&full_name=' + $('#full_name').val() + '&source=' + $('#source').val();
                 });
             },
             complete = function (request, textStatus) {
@@ -70,28 +82,32 @@
             not_close = false,
         );
     }
+    function searchChange() {
+        loadUserSwitch = false;
+        loadUserSkip = 0;
+        loadUserMark = true;
+        $('#details-content').empty();
+        loadUserData();
+    }
     $(document).ready(function () {
         $('#username').val('{{ username }}');
         $('#full_name').val('{{ full_name }}');
+        $('#source').val('{{ source }}');
         loadUserData();
         $('#submit').click(function () {
-            window.location.href = '/view/bases/user/create/?username=' + $('#username').val() + '&full_name=' + $('#full_name').val();
+            window.location.href = '/view/bases/user/create/?username=' + $('#username').val() + '&full_name=' + $('#full_name').val() + '&source=' + $('#source').val();
         });
         $('#username').change(function (value) {
             searchUsername = $('#username').val();
-            loadUserSwitch = false;
-            loadUserSkip = 0;
-            loadUserMark = true;
-            $('#details-content').empty();
-            loadUserData();
+            searchChange();
         });
         $('#full_name').change(function (value) {
             searchFullName = $('#full_name').val();
-            loadUserSwitch = false;
-            loadUserSkip = 0;
-            loadUserMark = true;
-            $('#details-content').empty();
-            loadUserData();
+            searchChange();
+        });
+        $('#source').change(function (value) {
+            searchSource = $('#source').val();
+            searchChange();
         });
     });
     $(window).scroll(function () {
