@@ -81,6 +81,14 @@ async def update_me_password(
 
 
 @router.put(
+    '/password/open/',
+    summary='更新我的新密码 (开放)',
+)
+async def update_me_new_password():
+    return {}
+
+
+@router.put(
     '/email/verify/free/',
     summary='更新我的电子邮箱验证 (无权限)',
 )
@@ -141,7 +149,7 @@ async def create_me_avata_file(
 
 @router.get(
     '/avata/free/',
-    summary='读取我的头像文件 (无权限)',
+    summary='读取我的头像文件 (文件|无权限)',
 )
 async def read_me_avata_file(
         current_token: TokenData = Depends(get_token_data)):

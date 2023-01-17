@@ -21,6 +21,18 @@ async def page_token(request: dict = Depends(get_view_request),
     return templates.TemplateResponse('bases/token.html', {**request})
 
 
+@router.get('/token/forget/',
+            response_class=HTMLResponse,
+            include_in_schema=False)
+async def page_token_forget(request: dict = Depends(get_view_request),
+                            token_s: Optional[str] = Cookie(None)):
+    if token_s:
+        configs = get_apis_configs('bases')
+        return RedirectResponse(configs.app_home_path)
+    return templates.TemplateResponse('bases/password-forget.html',
+                                      {**request})
+
+
 @router.get('/home/', response_class=HTMLResponse, include_in_schema=False)
 async def page_bases_home(request: dict = Depends(get_view_request)):
     configs = get_apis_configs('bases')
