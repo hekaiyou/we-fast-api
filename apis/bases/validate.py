@@ -86,6 +86,21 @@ def check_user_email(v):
         )
 
 
+def check_user_verify_code(user, verify_key):
+    if user['verify'][verify_key]['code']:
+        if (datetime.utcnow() -
+                user['verify'][verify_key]['create']).seconds < 3600:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='验证邮件已经发送',
+            )
+    if not user.get('email', None):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='找不到电子邮箱信息',
+        )
+
+
 def check_verify_code(code, user_id, verify_key):
     if not code or len(code) < 6:
         raise HTTPException(
@@ -115,6 +130,16 @@ def check_verify_code(code, user_id, verify_key):
         update_dict[f'bind.{verify_key}'] = user['verify'][verify_key]['value']
     doc_update(COL_USER, {'_id': user['_id']}, update_dict)
     return True
+
+
+def get_user_username_and_email(user_username):
+    user = doc_read(COL_USER, {'username': user_username})
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='用户名不存在',
+        )
+    return user
 
 
 def get_me_user(v):

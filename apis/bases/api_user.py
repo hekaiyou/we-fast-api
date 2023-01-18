@@ -36,6 +36,11 @@ async def create_user(create_data: UserCreate):
             'code': '',
             'create': None,
             'value': ''
+        },
+        'password': {
+            'code': '',
+            'create': None,
+            'value': ''
         }
     }
     doc_create(COL_USER, create_json)

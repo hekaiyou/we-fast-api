@@ -79,6 +79,11 @@ async def read_wechat_access_token(code: str):
                         'code': '',
                         'create': None,
                         'value': ''
+                    },
+                    'password': {
+                        'code': '',
+                        'create': None,
+                        'value': ''
                     }
                 },
             })

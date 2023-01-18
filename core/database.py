@@ -84,6 +84,11 @@ def whether_to_initialize():
                         'code': '',
                         'create': None,
                         'value': ''
+                    },
+                    'password': {
+                        'code': '',
+                        'create': None,
+                        'value': ''
                     }
                 },
                 'create_time': datetime.utcnow(),

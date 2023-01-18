@@ -11,8 +11,8 @@ from core.database import doc_update
 from fastapi.responses import StreamingResponse, RedirectResponse
 from core.security import get_token_data, get_password_hash, verify_password
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from .models import TokenData, COL_USER, UserGlobal, UserBase, UserUpdatePassword
-from .validate import get_me_user, check_user_username, check_user_email, check_verify_code, get_verify_code, UserObjIdParams
+from .models import TokenData, COL_USER, UserGlobal, UserBase, UserUpdatePassword, UserForgetPassword
+from .validate import get_me_user, check_user_username, check_user_email, check_verify_code, get_verify_code, UserObjIdParams, get_user_username_and_email, check_user_verify_code
 
 router = APIRouter(prefix='/me', )
 
@@ -84,7 +84,16 @@ async def update_me_password(
     '/password/open/',
     summary='更新我的新密码 (开放)',
 )
-async def update_me_new_password():
+async def update_me_new_password(user_basis: UserForgetPassword):
+    user = get_user_username_and_email(user_basis.username)
+    check_user_verify_code(user, 'password')
+    code = get_verify_code('', user['_id'], 'password')
+    send_simple_mail([f'{user["username"]}<{user["email"]}>'], '验证密码重设', [
+        f'尊敬的 <b>{user["username"]}({user.get("full_name", user["email"])})</b> :',
+        f'请回填验证码 {code} 以完成操作!',
+        '<i>请保管好您的邮箱, 避免账号被他人盗用</i>',
+    ])
+    logger.info(f'向 {user["username"]}<{user["email"]}> 发送验证密码重设的 {code} 验证码')
     return {}
 
 
@@ -95,18 +104,7 @@ async def update_me_new_password():
 async def verify_me_email_verify(
         current_token: TokenData = Depends(get_token_data)):
     user = get_me_user(current_token.user_id)
-    if user['verify']['email']['code']:
-        if (datetime.utcnow() -
-                user['verify']['email']['create']).seconds < 3600:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail='验证邮件已经发送',
-            )
-    if not user.get('email', None):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='找不到电子邮箱信息',
-        )
+    check_user_verify_code(user, 'email')
     if user['bind'].get('email', None):
         if user['bind']['email'] == user['email']:
             raise HTTPException(

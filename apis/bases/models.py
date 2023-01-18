@@ -145,3 +145,8 @@ class UserUpdatePassword(BaseModel):
         title='重复新密码',
         regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
     )
+
+
+class UserForgetPassword(BaseModel):
+    """ 用户的忘记密码模型 """
+    username: str = Field(title='用户名称', )
