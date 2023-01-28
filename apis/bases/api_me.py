@@ -102,6 +102,9 @@ async def update_me_new_password(user_basis: UserForgetPasswordBase):
     summary='创建我的新密码 (开放)',
 )
 async def create_me_new_password(password_basis: UserForgetPassword):
+    user = get_user_username_and_email(password_basis.username)
+    check_verify_code(password_basis.code, user['_id'], 'password')
+    print(user)
     print(password_basis)
     return {}
 

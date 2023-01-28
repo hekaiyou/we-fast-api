@@ -128,6 +128,8 @@ def check_verify_code(code, user_id, verify_key):
     }
     if verify_key == 'email':
         update_dict[f'bind.{verify_key}'] = user['verify'][verify_key]['value']
+    elif verify_key == 'password':
+        update_dict['bind.email'] = user['email']
     doc_update(COL_USER, {'_id': user['_id']}, update_dict)
     return True
 
