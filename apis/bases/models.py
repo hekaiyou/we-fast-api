@@ -147,6 +147,19 @@ class UserUpdatePassword(BaseModel):
     )
 
 
-class UserForgetPassword(BaseModel):
-    """ 用户的忘记密码模型 """
+class UserForgetPasswordBase(BaseModel):
+    """ 用户忘记密码的基础模型 """
     username: str = Field(title='用户名称', )
+
+
+class UserForgetPassword(UserForgetPasswordBase):
+    """ 用户忘记密码的模型 """
+    code: str = Field(title='验证码', )
+    new_password: str = Field(
+        title='新密码',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
+    repeat_new_password: str = Field(
+        title='重复新密码',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )

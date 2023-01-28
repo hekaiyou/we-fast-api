@@ -11,7 +11,7 @@ from core.database import doc_update
 from fastapi.responses import StreamingResponse, RedirectResponse
 from core.security import get_token_data, get_password_hash, verify_password
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from .models import TokenData, COL_USER, UserGlobal, UserBase, UserUpdatePassword, UserForgetPassword
+from .models import TokenData, COL_USER, UserGlobal, UserBase, UserUpdatePassword, UserForgetPasswordBase, UserForgetPassword
 from .validate import get_me_user, check_user_username, check_user_email, check_verify_code, get_verify_code, UserObjIdParams, get_user_username_and_email, check_user_verify_code
 
 router = APIRouter(prefix='/me', )
@@ -84,7 +84,7 @@ async def update_me_password(
     '/password/open/',
     summary='更新我的新密码 (开放)',
 )
-async def update_me_new_password(user_basis: UserForgetPassword):
+async def update_me_new_password(user_basis: UserForgetPasswordBase):
     user = get_user_username_and_email(user_basis.username)
     check_user_verify_code(user, 'password')
     code = get_verify_code('', user['_id'], 'password')
@@ -94,6 +94,15 @@ async def update_me_new_password(user_basis: UserForgetPassword):
         '<i>请保管好您的邮箱, 避免账号被他人盗用</i>',
     ])
     logger.info(f'向 {user["username"]}<{user["email"]}> 发送验证密码重设的 {code} 验证码')
+    return {}
+
+
+@router.post(
+    '/password/open/',
+    summary='创建我的新密码 (开放)',
+)
+async def create_me_new_password(password_basis: UserForgetPassword):
+    print(password_basis)
     return {}
 
 
