@@ -103,9 +103,17 @@ async def update_me_new_password(user_basis: UserForgetPasswordBase):
 )
 async def create_me_new_password(password_basis: UserForgetPassword):
     user = get_user_username_and_email(password_basis.username)
+    if password_basis.new_password != password_basis.repeat_new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='重复新密码不一致',
+        )
     check_verify_code(password_basis.code, user['_id'], 'password')
-    print(user)
-    print(password_basis)
+    doc_update(
+        COL_USER,
+        {'_id': user['_id']},
+        {'password': get_password_hash(password_basis.new_password)},
+    )
     return {}
 
 

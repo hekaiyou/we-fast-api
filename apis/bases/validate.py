@@ -109,7 +109,10 @@ def check_verify_code(code, user_id, verify_key):
         )
     user = doc_read(COL_USER, {'_id': user_id})
     if not user['verify'][verify_key]['code']:
-        return False
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='未发送验证码',
+        )
     if (datetime.utcnow() -
             user['verify'][verify_key]['create']).seconds > 3600:
         raise HTTPException(
@@ -131,7 +134,6 @@ def check_verify_code(code, user_id, verify_key):
     elif verify_key == 'password':
         update_dict['bind.email'] = user['email']
     doc_update(COL_USER, {'_id': user['_id']}, update_dict)
-    return True
 
 
 def get_user_username_and_email(user_username):
