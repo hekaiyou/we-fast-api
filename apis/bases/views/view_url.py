@@ -33,6 +33,17 @@ async def page_token_forget(request: dict = Depends(get_view_request),
                                       {**request})
 
 
+@router.get('/token/register/',
+            response_class=HTMLResponse,
+            include_in_schema=False)
+async def page_token_register(request: dict = Depends(get_view_request),
+                              token_s: Optional[str] = Cookie(None)):
+    if token_s:
+        configs = get_apis_configs('bases')
+        return RedirectResponse(configs.app_home_path)
+    return templates.TemplateResponse('bases/user-register.html', {**request})
+
+
 @router.get('/home/', response_class=HTMLResponse, include_in_schema=False)
 async def page_bases_home(request: dict = Depends(get_view_request)):
     configs = get_apis_configs('bases')
