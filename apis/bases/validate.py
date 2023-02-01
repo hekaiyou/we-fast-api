@@ -86,6 +86,14 @@ def check_user_email(v):
         )
 
 
+def check_user_password(password, repeat_password):
+    if password != repeat_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='重复密码不一致',
+        )
+
+
 def check_user_verify_code(user, verify_key):
     if user['verify'][verify_key]['code']:
         if (datetime.utcnow() -

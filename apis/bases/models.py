@@ -59,6 +59,20 @@ class UserCreate(UserBase):
     role_id: Optional[str] = Field(default='', title='角色ID')
 
 
+class UserDefaultCreate(BaseModel):
+    """ 默认用户的创建模型 """
+    username: str = Field(title='用户名称', )
+    email: EmailStr = Field(title='电子邮箱', )
+    password: str = Field(
+        title='密码',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
+    repeat_password: str = Field(
+        title='重复密码',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
+
+
 class UserGlobal(UserCreate):
     """ 用户的全局模型 """
     id: ObjId = Field(alias='_id', title='用户ID')

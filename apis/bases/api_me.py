@@ -12,7 +12,7 @@ from fastapi.responses import StreamingResponse, RedirectResponse
 from core.security import get_token_data, get_password_hash, verify_password
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from .models import TokenData, COL_USER, UserGlobal, UserBase, UserUpdatePassword, UserForgetPasswordBase, UserForgetPassword
-from .validate import get_me_user, check_user_username, check_user_email, check_verify_code, get_verify_code, UserObjIdParams, get_user_username_and_email, check_user_verify_code
+from .validate import get_me_user, check_user_username, check_user_email, check_verify_code, get_verify_code, UserObjIdParams, get_user_username_and_email, check_user_verify_code, check_user_password
 
 router = APIRouter(prefix='/me', )
 
@@ -61,11 +61,7 @@ async def update_me_info(update_data: UserBase,
 async def update_me_password(
     update_data: UserUpdatePassword,
     current_token: TokenData = Depends(get_token_data)):
-    if update_data.new_password != update_data.repeat_new_password:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='重复新密码不一致',
-        )
+    check_user_password(update_data.new_password, update_data.repeat_new_password)
     user = get_me_user(current_token.user_id)
     if not verify_password(update_data.current_password, user['password']):
         raise HTTPException(
@@ -103,11 +99,7 @@ async def update_me_new_password(user_basis: UserForgetPasswordBase):
 )
 async def create_me_new_password(password_basis: UserForgetPassword):
     user = get_user_username_and_email(password_basis.username)
-    if password_basis.new_password != password_basis.repeat_new_password:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail='重复新密码不一致',
-        )
+    check_user_password(password_basis.new_password, password_basis.repeat_new_password)
     check_verify_code(password_basis.code, user['_id'], 'password')
     doc_update(
         COL_USER,

@@ -99,43 +99,22 @@
 
 <script>
     $(document).ready(function () {
-        $('#sendVerificationCode').click(function () {
-            utilAjax(
-                type = 'PUT',
-                url = '/api/bases/me/password/open/',
-                data = {
-                    'username': $('#username').val(),
-                },
-                data_format = 'json',
-                check = {
-                    'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
-                },
-                success = function (data, textStatus) { },
-                complete = function (request, textStatus) {
-                    $('#captcha').removeAttr('disabled');
-                    $('#newPassword').removeAttr('disabled');
-                    $('#repeatNewPassword').removeAttr('disabled');
-                    $('#submitVerification').removeAttr('disabled');
-                },
-                success_reminder = true,
-            );
-        });
-        $('#submitVerification').click(function () {
+        $('#submitRegister').click(function () {
             utilAjax(
                 type = 'POST',
-                url = '/api/bases/me/password/open/',
+                url = '/api/bases/user/open/',
                 data = {
                     'username': $('#username').val(),
-                    'code': $('#captcha').val(),
-                    'new_password': $('#newPassword').val(),
-                    'repeat_new_password': $('#repeatNewPassword').val(),
+                    'email': $('#email').val(),
+                    'password': $('#password').val(),
+                    'repeat_password': $('#repeatPassword').val(),
                 },
                 data_format = 'json',
                 check = {
                     'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
-                    'code': [/^[\s\S]*.*[^\s][\s\S]*$/, '需要验证邮件中的验证码'],
-                    'new_password': [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$/, '新密码需要大小写字母和数字或特殊字符的组合, 长度6-32之间'],
-                    'repeat_new_password': [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$/, '重复新密码需要大小写字母和数字或特殊字符的组合, 长度6-32之间'],
+                    'email': [/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/, '电子邮箱地址的格式不正确'],
+                    'password': [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$/, '密码需要大小写字母和数字或特殊字符的组合, 长度6-32之间'],
+                    'repeat_password': [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$/, '重复密码需要大小写字母和数字或特殊字符的组合, 长度6-32之间'],
                 },
                 success = function (data, textStatus) {
                     window.location.href = '/view/bases/token/';

@@ -58,7 +58,7 @@ async def read_wechat_access_token(code: str):
                 'email':
                 None,
                 'full_name':
-                None,
+                '',
                 'disabled':
                 False,
                 'password':

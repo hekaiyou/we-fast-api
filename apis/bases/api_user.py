@@ -8,9 +8,9 @@ from core.dependencies import get_paginate_parameters
 from fastapi import APIRouter, Depends
 from apis.bases.api_me import read_me_avata_file
 from apis.bases.models import Paginate, TokenData
-from .models import COL_USER, UserRead, UserCreate, UserUpdate
+from .models import COL_USER, UserRead, UserCreate, UserUpdate, UserDefaultCreate
 from core.database import paginate_find, doc_create, doc_update, doc_read, doc_delete
-from .validate import UserObjIdParams, check_user_username, check_role_id, check_user_email
+from .validate import UserObjIdParams, check_user_username, check_role_id, check_user_email, check_user_password
 
 router = APIRouter(prefix='/user', )
 
@@ -45,6 +45,44 @@ async def create_user(create_data: UserCreate):
     }
     doc_create(COL_USER, create_json)
     return create_json
+
+
+@router.post(
+    '/open/',
+    summary='创建默认用户 (开放)',
+)
+async def create_user_default(create_data: UserDefaultCreate):
+    check_user_password(create_data.password, create_data.repeat_password)
+    check_user_username(create_data.username)
+    check_user_email(create_data.email)
+    create_json = {
+        'username': create_data.username,
+        'full_name': '',
+        'email': create_data.email,
+        'disabled': False,
+        'password': get_password_hash(create_data.password),
+        'role_id': '',
+        'source': 'User',
+        'avata': '',
+        'bind': {
+            'wechat': '',
+            'email': ''
+        },
+        'verify': {
+            'email': {
+                'code': '',
+                'create': None,
+                'value': ''
+            },
+            'password': {
+                'code': '',
+                'create': None,
+                'value': ''
+            }
+        },
+    }
+    doc_create(COL_USER, create_json)
+    return {}
 
 
 @router.get(
