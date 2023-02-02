@@ -68,7 +68,7 @@
                 data['items'].forEach(function (value, index) {
                     let auxiliary = value['full_name'];
                     if (!auxiliary) {
-                        let auxiliary = value['email'];
+                        auxiliary = value['email'];
                     }
                     $('#details-content').append('<details class="itemUser" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['username'] + ' <sup>' + auxiliary + '</sup></summary></details>');
                 });
