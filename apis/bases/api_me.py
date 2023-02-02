@@ -61,7 +61,8 @@ async def update_me_info(update_data: UserBase,
 async def update_me_password(
     update_data: UserUpdatePassword,
     current_token: TokenData = Depends(get_token_data)):
-    check_user_password(update_data.new_password, update_data.repeat_new_password)
+    check_user_password(update_data.new_password,
+                        update_data.repeat_new_password)
     user = get_me_user(current_token.user_id)
     if not verify_password(update_data.current_password, user['password']):
         raise HTTPException(
@@ -84,8 +85,11 @@ async def update_me_new_password(user_basis: UserForgetPasswordBase):
     user = get_user_username_and_email(user_basis.username)
     check_user_verify_code(user, 'password')
     code = get_verify_code('', user['_id'], 'password')
+    _full_name = user['full_name']
+    if not _full_name:
+        _full_name = user['email']
     send_simple_mail([f'{user["username"]}<{user["email"]}>'], '验证密码重设', [
-        f'尊敬的 <b>{user["username"]}({user.get("full_name", user["email"])})</b> :',
+        f'尊敬的 <b>{user["username"]}({_full_name})</b> :',
         f'请回填验证码 {code} 以完成操作!',
         '<i>请保管好您的邮箱, 避免账号被他人盗用</i>',
     ])
@@ -99,7 +103,8 @@ async def update_me_new_password(user_basis: UserForgetPasswordBase):
 )
 async def create_me_new_password(password_basis: UserForgetPassword):
     user = get_user_username_and_email(password_basis.username)
-    check_user_password(password_basis.new_password, password_basis.repeat_new_password)
+    check_user_password(password_basis.new_password,
+                        password_basis.repeat_new_password)
     check_verify_code(password_basis.code, user['_id'], 'password')
     doc_update(
         COL_USER,
@@ -125,8 +130,11 @@ async def verify_me_email_verify(
             )
     code = get_verify_code(user['email'], user['_id'], 'email')
     configs = get_apis_configs('bases')
+    _full_name = user['full_name']
+    if not _full_name:
+        _full_name = user['email']
     send_simple_mail([f'{user["username"]}<{user["email"]}>'], '验证电子邮箱', [
-        f'尊敬的 <b>{user["username"]}({user["full_name"]})</b> :',
+        f'尊敬的 <b>{user["username"]}({_full_name})</b> :',
         f'请点击 <a href="{configs.app_host}api/bases/me/email/verify/open/?code={code}&user_id={current_token.user_id}"><span>验证链接</span></a> 以完成操作!',
         '<i>请保管好您的邮箱, 避免账号被他人盗用</i>',
     ])

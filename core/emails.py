@@ -2,7 +2,14 @@ import smtplib
 from loguru import logger
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from email.utils import parseaddr, formataddr
 from core.dynamic import get_apis_configs
+
+
+def _format_addr(s):
+    """ 收发邮件时可视化发件人和收件人信息 """
+    addr = parseaddr(s)
+    return formataddr(addr)
 
 
 def send_mail(to_addrs: list, subject: str, msg: MIMEBase):
@@ -20,8 +27,9 @@ def send_mail(to_addrs: list, subject: str, msg: MIMEBase):
                 port=configs.mail_smtp_port,
             )
         mail_server.login(configs.mail_smtp_sender, configs.mail_smtp_password)
-        msg['From'] = f'{configs.mail_smtp_sender_name}<{configs.mail_smtp_sender}>'
-        msg['To'] = ';'.join(to_addrs)
+        msg['From'] = _format_addr(
+            f'{configs.mail_smtp_sender_name}<{configs.mail_smtp_sender}>')
+        msg['To'] = _format_addr(';'.join(to_addrs))
         msg['Subject'] = subject
         mail_server.sendmail(
             from_addr=configs.mail_smtp_sender,
