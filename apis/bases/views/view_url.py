@@ -13,12 +13,18 @@ router = APIRouter(prefix='/bases', )
 
 
 @router.get('/token/', response_class=HTMLResponse, include_in_schema=False)
-async def page_token(request: dict = Depends(get_view_request),
+async def page_token(mode: str = '',
+                     request: dict = Depends(get_view_request),
                      token_s: Optional[str] = Cookie(None)):
+    configs = get_apis_configs('bases')
     if token_s:
-        configs = get_apis_configs('bases')
         return RedirectResponse(configs.app_home_path)
-    return templates.TemplateResponse('bases/token.html', {**request})
+    if mode:
+        return templates.TemplateResponse(f'bases/{mode}.html', {**request})
+    if configs.enable_ldap_ad:
+        return templates.TemplateResponse('bases/token-ldap.html', {**request})
+    else:
+        return templates.TemplateResponse('bases/token.html', {**request})
 
 
 @router.get('/token/forget/',

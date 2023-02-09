@@ -83,6 +83,7 @@ async def read_logs_file(snippet: str):
     summary='创建日志',
 )
 async def create_logs(external_log: ExternalLogBase):
+    # TODO(hekaiyou): 添加请求IP地址，识别日志提供源头
     if external_log.level == LogLevelEnum.debug:
         logger.debug(external_log.message)
     elif external_log.level == LogLevelEnum.info:

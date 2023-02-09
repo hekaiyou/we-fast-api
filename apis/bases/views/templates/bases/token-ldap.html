@@ -1,5 +1,5 @@
 {% extends 'core/basal.html' %}
-{% block title %}标准登录{% endblock %}
+{% block title %}LDAP登录{% endblock %}
 
 {% block head %}
 <style>
@@ -82,7 +82,7 @@
     <article class="grid">
         <div>
             <hgroup>
-                <h1>标准登录</h1>
+                <h1>LDAP登录</h1>
                 <h2>欢迎使用 {{ settings.app_name }} v{{ settings.app_version }} 服务</h2>
             </hgroup>
             <form>
@@ -97,8 +97,7 @@
                 </fieldset>
                 <button type="submit" onclick="event.preventDefault()">登录</button>
                 <label style="float:right;">
-                    <a href="/view/bases/token/register/" style="margin-right:10px;">注册新账户</a>
-                    <a href="/view/bases/token/forget/">忘记密码</a>
+                    <a href="/view/bases/token/?mode=token" style="margin-right:10px;">标准登录</a>
                 </label>
             </form>
         </div>
