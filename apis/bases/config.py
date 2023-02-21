@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     mail_smtp_sender: str = 'from@163.com'
     mail_smtp_password: str = 'xxxxxxx'
     enable_ldap_ad: bool = False
-    ldap_ad_host: str = 'ldap://127.0.0.1:389/'
+    ldap_ad_host: str = 'ldap.forumsys.com'
     enable_wechat_app: bool = False
     wechat_app_id: str = ''
     wechat_app_secret: str = ''

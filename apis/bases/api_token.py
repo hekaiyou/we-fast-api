@@ -11,11 +11,11 @@ router = APIRouter(prefix='/token', )
 
 
 @router.post(
-    '/open/',
+    '/standard/open/',
     response_model=Token,
-    summary='创建接口访问令牌 (开放)',
+    summary='创建标准接口访问令牌 (开放)',
 )
-async def create_api_access_token(
+async def create_standard_api_access_token(
         form_data: OAuth2PasswordRequestForm = Depends()):
     """
     按照 **OAuth 2.0** 协议规定: 客户端/用户必须将 `username` 和 `password` 字段作为表单数据发送
@@ -57,3 +57,15 @@ async def create_api_access_token(
         full_name=user.full_name,
         incomplete=(not user.email),
     )
+
+
+@router.post(
+    '/ldap/open/',
+    response_model=Token,
+    summary='创建LDAP接口访问令牌 (开放)',
+)
+async def create_ldap_api_access_token(
+        form_data: OAuth2PasswordRequestForm = Depends()):
+    print(form_data.username, form_data.password)
+
+    return {}
