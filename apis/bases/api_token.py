@@ -1,11 +1,13 @@
 from datetime import timedelta
 from core.validate import str_to_oid
+from ldap3 import Server, Connection, ALL
 from core.database import get_collection, doc_read
 from .models import Token, COL_USER, COL_ROLE
-from core.dynamic import get_role_permissions
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, status
+from core.dynamic import get_role_permissions, get_apis_configs
 from core.security import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
+from ldap3.core.exceptions import LDAPInvalidCredentialsResult, LDAPSocketOpenError, LDAPInvalidDNSyntaxResult, LDAPAttributeError
 
 router = APIRouter(prefix='/token', )
 
@@ -66,6 +68,60 @@ async def create_standard_api_access_token(
 )
 async def create_ldap_api_access_token(
         form_data: OAuth2PasswordRequestForm = Depends()):
-    print(form_data.username, form_data.password)
-
+    configs = get_apis_configs('bases')
+    server = Server(configs.ldap_ad_host, get_info=ALL)
+    try:
+        main_body = '绑定用户'
+        errors = ''
+        conn = Connection(
+            server,
+            user=configs.ldap_ad_bind_dn,
+            password=configs.ldap_ad_password,
+            auto_bind=True,
+            raise_exceptions=True,
+        )
+        user_filter = configs.ldap_ad_search_filter.split('{}')
+        if len(user_filter) != 2:
+            raise Exception('用户过滤器缺少 {} 字符')
+        result = conn.search(
+            search_base=configs.ldap_ad_search_base,
+            search_filter=
+            f'{user_filter[0]}{form_data.username}{user_filter[1]}',
+        )
+        main_body = f'用户 {form_data.username} '
+        if not result:
+            errors = f'{main_body}不存在'
+        else:
+            Connection(
+                server,
+                user=conn.response[0]['dn'],
+                password=form_data.password,
+                auto_bind=True,
+                raise_exceptions=True,
+            )
+    except LDAPInvalidCredentialsResult as e:
+        if '52e' in e.message:
+            errors = f'{main_body}密码不正确'
+        elif '775' in e.message:
+            errors = f'{main_body}已锁定, 请联系管理员或等待自动解锁'
+        elif '533' in e.message:
+            errors = f'{main_body}已禁用'
+        else:
+            errors = f'{main_body}认证失败, 请联系管理员检查该账号'
+    except LDAPSocketOpenError:
+        errors = '无效的 LDAP/AD 服务器地址'
+    except LDAPInvalidDNSyntaxResult:
+        errors = f'{main_body}无效的 DN 语法'
+    except LDAPAttributeError as e:
+        errors = f'属性错误, {e}'
+    except Exception as e:
+        errors = f'配置错误, {e}'
+    finally:
+        if errors:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=errors,
+                headers={'WWW-Authenticate': 'Bearer'},
+            )
+    # to
     return {}

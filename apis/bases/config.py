@@ -17,13 +17,17 @@ class Settings(BaseSettings):
     token_exempt_ip: list = []
     token_exempt_host: list = []
     mail_smtp_host: str = 'smtp.163.com'
-    mail_smtp_use_ssl: bool = True
     mail_smtp_port: int = 465
+    mail_smtp_use_ssl: bool = True
     mail_smtp_sender_name: str = 'fromXX'
     mail_smtp_sender: str = 'from@163.com'
-    mail_smtp_password: str = 'xxxxxxx'
+    mail_smtp_password: str = 'password'
     enable_ldap_ad: bool = False
-    ldap_ad_host: str = 'ldap.forumsys.com'
+    ldap_ad_host: str = '127.0.0.1'
+    ldap_ad_bind_dn: str = 'Example\\zhangsan'
+    ldap_ad_password: str = 'password'
+    ldap_ad_search_base: str = 'OU=OU,DC=Example,DC=LOCAL'
+    ldap_ad_search_filter: str = '(sAMAccountName={})'
     enable_wechat_app: bool = False
     wechat_app_id: str = ''
     wechat_app_secret: str = ''
@@ -32,7 +36,7 @@ class Settings(BaseSettings):
 settings_describe = {
     'app_name': '服务的标题',
     'app_version': '服务的版本号',
-    'app_host': '服务的主机地址',
+    'app_host': '服务的地址',
     'app_home_path': '服务的主页路径',
     'app_workers_num': '服务的工作进程总数 (workers)',
     'app_docs': '服务的 Swagger 文档 <需重启>',
@@ -44,14 +48,18 @@ settings_describe = {
     'token_expire_minute': '令牌的有效时间 (分钟) <需重启>',
     'token_exempt_ip': '令牌豁免 IP 网络列表 (前面3段) <需重启>',
     'token_exempt_host': '令牌豁免 IP 主机列表 (完整4段) <需重启>',
-    'mail_smtp_host': '邮件 SMTP 服务器主机地址',
-    'mail_smtp_use_ssl': '邮件 SMTP 服务器 SSL 加密',
-    'mail_smtp_port': '邮件 SMTP 服务器主机端口',
-    'mail_smtp_sender_name': '邮件 SMTP 服务器发件人名称',
-    'mail_smtp_sender': '邮件 SMTP 服务器发件人邮箱',
-    'mail_smtp_password': '邮件 SMTP 服务器授权码',
+    'mail_smtp_host': '邮件 SMTP 服务器地址',
+    'mail_smtp_port': '邮件 SMTP 服务器端口',
+    'mail_smtp_use_ssl': '邮件 SMTP 使用 SSL 加密',
+    'mail_smtp_sender_name': '邮件 SMTP 发件人名称',
+    'mail_smtp_sender': '邮件 SMTP 发件人邮箱',
+    'mail_smtp_password': '邮件 SMTP 授权码',
     'enable_ldap_ad': '启用 LDAP/AD 认证',
-    'ldap_ad_host': 'LDAP/AD 服务器主机地址',
+    'ldap_ad_host': 'LDAP/AD 服务器地址',
+    'ldap_ad_bind_dn': 'LDAP/AD 绑定用户的 DN',
+    'ldap_ad_password': 'LDAP/AD 绑定用户的密码',
+    'ldap_ad_search_base': 'LDAP/AD 搜索用户的基础路径',
+    'ldap_ad_search_filter': 'LDAP/AD 搜索用户的过滤器',
     'enable_wechat_app': '启用微信小程序支持',
     'wechat_app_id': '微信小程序唯一标识',
     'wechat_app_secret': '微信小程序密钥',
