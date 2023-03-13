@@ -72,7 +72,8 @@ async def read_wechat_access_token(code: str):
                 '',
                 'bind': {
                     'wechat': wechat_json['openid'],
-                    'email': ''
+                    'email': '',
+                    'ldap': '',
                 },
                 'verify': {
                     'email': {

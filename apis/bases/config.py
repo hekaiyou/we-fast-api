@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     ldap_ad_password: str = 'password'
     ldap_ad_search_base: str = 'OU=OU,DC=Example,DC=LOCAL'
     ldap_ad_search_filter: str = '(sAMAccountName={})'
+    ldap_ad_email_suffix: str = '@example.com'
     enable_wechat_app: bool = False
     wechat_app_id: str = ''
     wechat_app_secret: str = ''
@@ -60,6 +61,7 @@ settings_describe = {
     'ldap_ad_password': 'LDAP/AD 绑定用户的密码',
     'ldap_ad_search_base': 'LDAP/AD 搜索用户的基础路径',
     'ldap_ad_search_filter': 'LDAP/AD 搜索用户的过滤器',
+    'ldap_ad_email_suffix': 'LDAP/AD 企业邮箱后缀',
     'enable_wechat_app': '启用微信小程序支持',
     'wechat_app_id': '微信小程序唯一标识',
     'wechat_app_secret': '微信小程序密钥',

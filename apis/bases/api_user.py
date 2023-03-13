@@ -30,7 +30,7 @@ async def create_user(create_data: UserCreate):
     create_json['password'] = get_password_hash(create_data.password)
     create_json['source'] = 'Admin'
     create_json['avata'] = ''
-    create_json['bind'] = {'wechat': '', 'email': ''}
+    create_json['bind'] = {'wechat': '', 'email': '', 'ldap': ''}
     create_json['verify'] = {
         'email': {
             'code': '',
@@ -66,7 +66,8 @@ async def create_user_default(create_data: UserDefaultCreate):
         'avata': '',
         'bind': {
             'wechat': '',
-            'email': ''
+            'email': '',
+            'ldap': '',
         },
         'verify': {
             'email': {

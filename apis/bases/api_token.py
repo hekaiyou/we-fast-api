@@ -3,10 +3,11 @@ from core.validate import str_to_oid
 from ldap3 import Server, Connection, ALL
 from core.database import get_collection, doc_read
 from .models import Token, COL_USER, COL_ROLE
+from .validate import check_user_username, check_user_email
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, status
 from core.dynamic import get_role_permissions, get_apis_configs
-from core.security import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
+from core.security import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_password_hash
 from ldap3.core.exceptions import LDAPInvalidCredentialsResult, LDAPSocketOpenError, LDAPInvalidDNSyntaxResult, LDAPAttributeError
 
 router = APIRouter(prefix='/token', )
@@ -99,6 +100,7 @@ async def create_ldap_api_access_token(
                 auto_bind=True,
                 raise_exceptions=True,
             )
+            # 通过 conn.response 可以查看详细数据
     except LDAPInvalidCredentialsResult as e:
         if '52e' in e.message:
             errors = f'{main_body}密码不正确'
@@ -123,5 +125,66 @@ async def create_ldap_api_access_token(
                 detail=errors,
                 headers={'WWW-Authenticate': 'Bearer'},
             )
-    # to
-    return {}
+    # 判断 LDAP/AD 用户是否已存在
+    user_ldap_filter = {'bind.ldap': form_data.username}
+    user_ldap = doc_read(COL_USER, user_ldap_filter)
+    if not user_ldap:
+        # 保证 LDAP/AD 用户名和企业邮箱地址的唯一性
+        check_user_username(form_data.username)
+        check_user_email(f'{form_data.username}{configs.ldap_ad_email_suffix}')
+        doc_create(
+            COL_USER, {
+                'username': form_data.username,
+                'email': f'{form_data.username}{configs.ldap_ad_email_suffix}',
+                'full_name': '',
+                'disabled': False,
+                'password': get_password_hash(form_data.password),
+                'role_id': '',
+                'source': 'LDAP/AD',
+                'avata': '',
+                'bind': {
+                    'wechat': '',
+                    'email': '',
+                    'ldap': form_data.username,
+                },
+                'verify': {
+                    'email': {
+                        'code': '',
+                        'create': None,
+                        'value': ''
+                    },
+                    'password': {
+                        'code': '',
+                        'create': None,
+                        'value': ''
+                    }
+                },
+            })
+        user_ldap = doc_read(COL_USER, user_ldap_filter)
+    if user_ldap.get('disabled', False):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='账户已被禁用',
+            headers={'WWW-Authenticate': 'Bearer'},
+        )
+    role = {'title': 'Default', 'permissions': get_role_permissions(None)}
+    if user_ldap['role_id']:
+        role = doc_read(COL_ROLE, {
+            '_id': str_to_oid(user_ldap['role_id']),
+        })
+    # 生成访问令牌
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={'sub': f'{user_ldap["_id"]}:{user_ldap["role_id"]}'},
+        expires_delta=access_token_expires,
+    )
+    return Token(
+        access_token=access_token,
+        token_type='Bearer',
+        username=user_ldap['username'],
+        role_title=role['title'],
+        role_permissions=role['permissions'],
+        expires_minutes=ACCESS_TOKEN_EXPIRE_MINUTES,
+        full_name=user_ldap['full_name'] if user_ldap['full_name'] else '',
+        incomplete=(not user_ldap['email']),
+    )
