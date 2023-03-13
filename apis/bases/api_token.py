@@ -1,7 +1,7 @@
 from datetime import timedelta
 from core.validate import str_to_oid
 from ldap3 import Server, Connection, ALL
-from core.database import get_collection, doc_read
+from core.database import get_collection, doc_read, doc_create
 from .models import Token, COL_USER, COL_ROLE
 from .validate import check_user_username, check_user_email
 from fastapi.security import OAuth2PasswordRequestForm
@@ -140,7 +140,7 @@ async def create_ldap_api_access_token(
                 'disabled': False,
                 'password': get_password_hash(form_data.password),
                 'role_id': '',
-                'source': 'LDAP/AD',
+                'source': 'LDAP',
                 'avata': '',
                 'bind': {
                     'wechat': '',
