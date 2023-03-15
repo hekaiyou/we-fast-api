@@ -5,7 +5,7 @@ from datetime import date
 from apis.bases.models import NoPaginate
 from fastapi.responses import FileResponse
 from .models import ExternalLogBase, LogLevelEnum
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request
 
 router = APIRouter(prefix='/logs', )
 """
@@ -82,14 +82,14 @@ async def read_logs_file(snippet: str):
     '/',
     summary='创建日志',
 )
-async def create_logs(external_log: ExternalLogBase):
-    # TODO(hekaiyou): 添加请求IP地址，识别日志提供源头
+async def create_logs(request: Request, external_log: ExternalLogBase):
+    message = f'<ip>{request.client.host}</ip> {external_log.message}'
     if external_log.level == LogLevelEnum.debug:
-        logger.debug(external_log.message)
+        logger.debug(message)
     elif external_log.level == LogLevelEnum.info:
-        logger.info(external_log.message)
+        logger.info(message)
     elif external_log.level == LogLevelEnum.warning:
-        logger.warning(external_log.message)
+        logger.warning(message)
     elif external_log.level == LogLevelEnum.error:
-        logger.error(external_log.message)
+        logger.error(message)
     return {}

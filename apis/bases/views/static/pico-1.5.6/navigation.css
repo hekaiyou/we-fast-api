@@ -53,3 +53,8 @@ suspended button {
     position: static;
     line-height: 2.1em;
 }
+.logContent ip {
+    color: #a2afb9;
+    font-size: .75em;
+    font-weight: bold;
+}
