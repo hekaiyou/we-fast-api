@@ -57,13 +57,12 @@
     <ul>
         <li>
             {% block operate_right_top %}
-            <details role="list" dir="rtl">
+            <a id="right-hand-nav-off" role="button" href="/view/bases/token/">登录</a>
+            <details id="right-hand-nav-on" role="list" dir="rtl" style="display:none;">
                 <summary aria-haspopup="listbox" role="link" id="nav-username"></summary>
                 <ul role="listbox">
                     <li>
-                        <a href="/view/bases/me/" aria-label="Avata" style="text-align:center;">
-                            <img decoding="async" src="/api/bases/me/avata/free/" alt="Me Avata" width="40" height="40">
-                        </a>
+                        <a id="nav-avata" href="/view/bases/me/" aria-label="Avata" style="text-align:center;"></a>
                     </li>
                     <li><a href="/view/bases/me/" style="text-align:center;">我的信息</a></li>
                     <li><a href="/view/bases/password/update/" style="text-align:center;">更新密码</a></li>

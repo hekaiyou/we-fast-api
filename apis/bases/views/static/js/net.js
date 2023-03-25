@@ -1,13 +1,3 @@
-if (!Cookies.get('token_s')) {
-    if (window.location.href.indexOf('/view/bases/token') == -1) {
-        window.location.href = '/view/bases/token/';
-    }
-} else {
-    if (window.location.href.indexOf('/view/bases/token') != -1) {
-        window.location.href = '/view/bases/home/';
-    }
-}
-
 function generalErrorHandling(request) {
     if (request.status == 0) {
         var errText = '服务器无法连接';
@@ -17,6 +7,13 @@ function generalErrorHandling(request) {
         var errIcon = 'error';
     } else if (request.status == 405) {
         var errText = '请求方法不被允许';
+        var errIcon = 'error';
+    } else if (request.status == 401) {
+        if (!Cookies.get('token_s')) {
+            window.location.href = '/view/bases/home/';
+            return;
+        }
+        var errText = '登录失败或未授权';
         var errIcon = 'error';
     } else {
         var errText = request.responseJSON.detail;

@@ -4,18 +4,30 @@
 {% block main %}
 <hgroup>
     <h2 id="home-username"></h2>
-    <h3><small id="home-role"></small> <sub>(角色)</sub> <em id="home-time"></em> 🙂!</h3>
+    <h3><small id="home-role"></small> <sub id="home-role-sub" style="display:none;">(角色)</sub> <em id="home-time"></em> 🙂!</h3>
 </hgroup>
 {% endblock %}
 
 {% block javascript %}
 <script>
-    if (Cookies.get('full_name')) {
-        $('#home-username').append(Cookies.get('full_name'));
+    var c_full_name = Cookies.get('full_name');
+    var c_username = Cookies.get('username');
+    if (c_full_name) {
+        $('#home-username').append(c_full_name);
     } else {
-        $('#home-username').append(Cookies.get('username'));
+        if (c_username) {
+            $('#home-username').append(c_username);
+        } else {
+            $('#home-username').hide();
+        }
     }
-    $('#home-role').append(Cookies.get('role'));
+    var c_role = Cookies.get('role');
+    if (c_role) {
+        $('#home-role').append(c_role);
+        $('#home-role-sub').show();
+    } else {
+        $('#home-role').hide();   
+    }
     let getTimeState = () => {
         // 获取当前时间
         let timeNow = new Date();
