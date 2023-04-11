@@ -6,7 +6,7 @@ if (c_username) {  // 检测用户名称的 Cookie 值
     $('#right-hand-nav-on').show();
 }
 var c_permissions = Cookies.get('permissions');
-if (c_permissions) {  // 检测用户权限的 Cookie 值
+if (c_permissions != null) {  // 检测用户权限的 Cookie 值
     var permissions = c_permissions.split(',');  // 用户权限列表
     navigationBar.forEach(function (value, index) {
         let permission = value['permission'];  // 菜单项需要的权限列表
