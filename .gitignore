@@ -131,8 +131,8 @@ dmypy.json
 # Customize
 .vscode/
 .idea/
-apis/demo
-apis/demo_*
+apis/*
+!apis/bases/
 files/
 *.service
 apis/bases/views/static/config.js
