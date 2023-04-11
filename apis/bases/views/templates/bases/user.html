@@ -43,7 +43,7 @@
             return;
         }
         loadUserMark = false;
-        searchData = { 'limit': 20, 'skip': loadUserSkip };
+        let searchData = { 'limit': 20, 'skip': loadUserSkip };
         if (searchUsername) {
             searchData['username'] = searchUsername
         }

@@ -1,13 +1,13 @@
 import os
 from datetime import date
 from typing import Optional
-from core.validate import ObjIdParams
 from core.dynamic import get_apis_configs
 from fastapi.responses import HTMLResponse
 from fastapi.responses import RedirectResponse
 from core.dependencies import get_view_request
 from fastapi import APIRouter, Cookie, Depends
 from apis.templating import templates
+from apis.bases.validate import UserObjIdParams, RoleObjIdParams
 
 router = APIRouter(prefix='/bases', )
 
@@ -110,7 +110,7 @@ async def page_bases_role_create(request: dict = Depends(get_view_request)):
 @router.get('/role/update/{role_id}/',
             response_class=HTMLResponse,
             include_in_schema=False)
-async def page_bases_role_update(role_id: ObjIdParams,
+async def page_bases_role_update(role_id: RoleObjIdParams,
                                  request: dict = Depends(get_view_request)):
     return templates.TemplateResponse('bases/role-edit.html', {
         'role_id': str(role_id),
@@ -182,7 +182,7 @@ async def page_bases_user_create(username: str = '',
 @router.get('/user/update/{user_id}/',
             response_class=HTMLResponse,
             include_in_schema=False)
-async def page_bases_user_update(user_id: ObjIdParams,
+async def page_bases_user_update(user_id: UserObjIdParams,
                                  username: str = '',
                                  full_name: str = '',
                                  source: str = '',
