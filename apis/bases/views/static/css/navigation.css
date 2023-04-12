@@ -32,6 +32,7 @@ suspended-center button {
 suspended-center textarea {
     margin-bottom: 0px;
     background-color: #ffffff;
+    resize: none;
 }
 
 @media (min-width: 576px) {
