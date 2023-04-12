@@ -1,0 +1,15 @@
+suspended {
+    position: fixed;
+    right: calc(var(--spacing)/ 2 + var(--scrollbar-width, 0px));
+    bottom: var(--spacing);
+}
+
+suspended button {
+    width: auto;
+    margin-top: 10px;
+    margin-right: 8.5px;
+    margin-bottom: 0;
+    padding: .50rem;
+    box-shadow: var(--card-box-shadow);
+    text-align: right;
+}

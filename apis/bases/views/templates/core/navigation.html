@@ -1,15 +1,9 @@
 {% extends 'core/basal.html' %}
 
 {% block head %}
-<!-- AMP runtime -->
-<script async src="/static/bases/amp-pico-0.1/v0.js"></script>
-<!-- AMP components -->
-<script async custom-element="amp-social-share" src="/static/bases/amp-pico-0.1/amp-social-share.js"></script>
-<script async custom-element="amp-sidebar" src="/static/bases/amp-pico-0.1/amp-sidebar.js"></script>
-<script async custom-element="amp-form" src="/static/bases/amp-pico-0.1/amp-form.js"></script>
-<!-- Google font: Calistoga -->
-<link href="/static/bases/amp-pico-0.1/css2" rel="stylesheet">
-<link rel="stylesheet" href="/static/bases/pico-1.5.6/navigation.css">
+<link rel="stylesheet" href="/static/bases/css/navigation.css">
+<!-- Custom Headers -->
+{% block custom_head %}{% endblock %}
 {% endblock %}
 
 {% block body %}

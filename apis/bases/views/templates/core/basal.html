@@ -6,14 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %} • {{ settings.app_name }}</title>
     <link rel="shortcut icon" href="/static/bases/image/favicon.png" type="image/png" />
-    <link rel="stylesheet" href="/static/bases/pico-1.5.6/pico.min.css">
+    <!-- Base library -->
     <script src="/static/bases/jquery-3.6.0/jquery.min.js"></script>
     <script src="/static/bases/sweetalert-2.1.2/sweetalert.min.js"></script>
     <script src="/static/bases/js-cookie-3.0.1/js.cookie.min.js"></script>
+    <!-- Pico.css -->
+    <link rel="stylesheet" href="/static/bases/pico-1.5.9/pico.min.css">
+    <!-- Custom features -->
     <script src="/static/bases/config.js"></script>
     <script src="/static/bases/js/net.js"></script>
+    <!-- AMP runtime -->
+    <script async src="/static/bases/amp-pico-0.1/v0.js"></script>
+    <!-- AMP components -->
+    <script async custom-element="amp-social-share" src="/static/bases/amp-pico-0.1/amp-social-share.js"></script>
+    <script async custom-element="amp-sidebar" src="/static/bases/amp-pico-0.1/amp-sidebar.js"></script>
+    <script async custom-element="amp-form" src="/static/bases/amp-pico-0.1/amp-form.js"></script>
+    <!-- AMP boilerplate -->
+    <link amp-boilerplate="" href="/static/bases/amp-pico-0.1/boilerplate.css"></link>
+    <!-- Google font: Calistoga -->
+    <link href="/static/bases/amp-pico-0.1/css2" rel="stylesheet">
     <!-- Pico.css custom build inlined for Google AMP -->
-    <link rel="stylesheet" href="/static/bases/amp-pico-0.1/pico.google-amp.min.css">
+    <link amp-custom rel="stylesheet" href="/static/bases/pico-1.5.9/pico.google-amp.min.css">
     {% block head %}
     {% endblock %}
 </head>
