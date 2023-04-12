@@ -31,8 +31,10 @@
 </form>
 {% endblock %}
 
-{% block operate_right_bottom %}
-<button id="verifyEmail" style="display:none">验证电子邮箱地址</button>
+{% block operate_bottom %}
+<suspended-right>
+    <button id="verifyEmail" style="display:none">验证电子邮箱地址</button>
+</suspended-right>
 {% endblock %}
 
 {% block javascript %}

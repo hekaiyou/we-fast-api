@@ -27,9 +27,11 @@
 </form>
 {% endblock %}
 
-{% block operate_right_bottom %}
+{% block operate_bottom %}
 {% if role_id %}
-<button id="delete">删除</button>
+<suspended-right>
+    <button id="delete">删除</button>
+</suspended-right>
 {% endif %}
 {% endblock %}
 

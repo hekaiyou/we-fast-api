@@ -1,10 +1,10 @@
-suspended {
+suspended-right {
     position: fixed;
     right: calc(var(--spacing)/ 2 + var(--scrollbar-width, 0px));
     bottom: var(--spacing);
 }
 
-suspended button {
+suspended-right button {
     width: auto;
     margin-top: 10px;
     margin-right: 8.5px;
@@ -12,4 +12,40 @@ suspended button {
     padding: .50rem;
     box-shadow: var(--card-box-shadow);
     text-align: right;
+}
+
+suspended-center {
+    position: fixed;
+    width: 100%;
+    bottom: var(--spacing);
+    padding: 0px var(--block-spacing-horizontal);
+}
+
+suspended-center button {
+    margin-top: 10px;
+    margin-right: 8.5px;
+    margin-bottom: 0px;
+    padding: .50rem;
+    box-shadow: var(--card-box-shadow);
+}
+
+suspended-center textarea {
+    margin-bottom: 0px;
+    background-color: #ffffff;
+}
+
+@media (min-width: 576px) {
+    suspended-center {
+        width: 510px;
+        padding: 0px 0px;
+        left: calc((100% - 510px)/2);
+    }
+}
+
+@media (min-width: 768px) {
+    suspended-center {
+        width: 700px;
+        padding: 0px 0px;
+        left: calc((100% - 700px)/2);
+    }
 }

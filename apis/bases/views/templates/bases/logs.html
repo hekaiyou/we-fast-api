@@ -27,8 +27,10 @@
 </form>
 {% endblock %}
 
-{% block operate_right_bottom %}
-<button id="download" style="display:none">下载日志</button>
+{% block operate_bottom %}
+<suspended-right>
+    <button id="download" style="display:none">下载日志</button>
+</suspended-right>
 {% endblock %}
 
 {% block javascript %}
