@@ -153,7 +153,7 @@ async def coroutine_task_test(name):
     """ 协程任务: 测试 """
     for i in range(5):
         await asyncio.sleep(60)  # 模拟任务执行内容
-        return  # 一分钟后直接结束协程任务
+    return  # 五分钟后直接结束协程任务
 
 @router.get('/')
 async def read_test():
