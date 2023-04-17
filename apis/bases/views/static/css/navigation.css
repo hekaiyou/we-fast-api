@@ -14,29 +14,29 @@ suspended-right button {
     text-align: right;
 }
 
-suspended-center {
+suspended-message-vertical {
     position: fixed;
     width: 100%;
     bottom: var(--spacing);
     padding: 0px var(--block-spacing-horizontal);
 }
 
-suspended-center button {
-    margin-top: 10px;
+suspended-message-vertical button {
+    margin-top: 0px;
     margin-right: 8.5px;
     margin-bottom: 0px;
     padding: .50rem;
     box-shadow: var(--card-box-shadow);
 }
 
-suspended-center textarea {
+suspended-message-vertical textarea {
     margin-bottom: 0px;
     background-color: #ffffff;
     resize: none;
 }
 
 @media (min-width: 576px) {
-    suspended-center {
+    suspended-message-vertical {
         width: 510px;
         padding: 0px 0px;
         left: calc((100% - 510px)/2);
@@ -44,7 +44,7 @@ suspended-center textarea {
 }
 
 @media (min-width: 768px) {
-    suspended-center {
+    suspended-message-vertical {
         width: 700px;
         padding: 0px 0px;
         left: calc((100% - 700px)/2);
