@@ -35,18 +35,63 @@ suspended-message-vertical textarea {
     resize: none;
 }
 
+suspended-message-horizontal {
+    position: fixed;
+    width: 100%;
+    bottom: var(--spacing);
+    padding: 0px var(--block-spacing-horizontal);
+}
+
+suspended-message-horizontal button {
+    position: fixed;
+    right: calc(var(--spacing)/ 2 + var(--scrollbar-width, 0px));
+    bottom: var(--spacing);
+    width: auto;
+    margin-top: 0px;
+    margin-right: var(--spacing);
+    margin-bottom: .50rem;
+    padding: .50rem;
+    box-shadow: var(--card-box-shadow);
+}
+
+suspended-message-horizontal textarea {
+    margin-bottom: 0px;
+    background-color: #ffffff;
+    resize: none;
+}
+
 @media (min-width: 576px) {
     suspended-message-vertical {
         width: 510px;
         padding: 0px 0px;
         left: calc((100% - 510px)/2);
     }
+
+    suspended-message-horizontal {
+        width: 510px;
+        padding: 0px 0px;
+        left: calc((100% - 510px)/2);
+    }
+
+    suspended-message-horizontal button {
+        margin-right: calc((100% - 510px)/2);
+    }
 }
 
 @media (min-width: 768px) {
     suspended-message-vertical {
         width: 700px;
-        padding: 0px 0px;
+        padding-top: 0px 0px;
         left: calc((100% - 700px)/2);
+    }
+
+    suspended-message-horizontal {
+        width: 700px;
+        padding-top: 0px 0px;
+        left: calc((100% - 700px)/2);
+    }
+
+    suspended-message-horizontal button {
+        margin-right: calc((100% - 700px)/2);
     }
 }
