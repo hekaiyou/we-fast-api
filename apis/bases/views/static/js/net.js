@@ -29,6 +29,7 @@ function generalErrorHandling(request) {
 function utilAjax(type, url, data, data_format, check, success, complete, success_reminder, not_close) {
     var checkResult = true;
     $.each(check, function (key, value) {
+        data[key] = data[key].trim();
         if (!value[0].test(data[key])) {
             swal({
                 icon: 'info',

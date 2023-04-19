@@ -58,6 +58,7 @@ suspended-message-horizontal textarea {
     margin-bottom: 0px;
     background-color: #ffffff;
     resize: none;
+    width: calc(100% - var(--spacing)*4);
 }
 
 @media (min-width: 576px) {
