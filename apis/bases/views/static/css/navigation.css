@@ -61,12 +61,6 @@ suspended-message-horizontal textarea {
     width: calc(100% - var(--spacing)*4);
 }
 
-#details-content details summary {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 @media (min-width: 576px) {
     suspended-message-vertical {
         width: 510px;
