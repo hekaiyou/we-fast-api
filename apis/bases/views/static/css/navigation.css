@@ -1,9 +1,18 @@
 #nav-username {
     margin: 0px;
+    padding: 0px;
 }
 
 #nav-username::after {
     content: none;
+}
+
+#nav-username img {
+    border-radius: 50%;
+}
+
+#right-hand-nav-on ul {
+    margin: 0px;
 }
 
 suspended-right {

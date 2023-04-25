@@ -1,6 +1,6 @@
 var c_username = Cookies.get('username');
 if (c_username) {  // 检测用户名称的 Cookie 值
-    $('#nav-username').append('<img decoding="async" src="/api/bases/me/avata/free/" alt="Me Avata" width="16" height="16">');
+    $('#nav-username').append('<img decoding="async" src="/api/bases/me/avata/free/" alt="Me Avata" width="29" height="29">');
     $('#right-hand-nav-off').hide();
     $('#right-hand-nav-on').show();
 }
