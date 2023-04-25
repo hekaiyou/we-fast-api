@@ -1,3 +1,11 @@
+#nav-username {
+    margin: 0px;
+}
+
+#nav-username::after {
+    content: none;
+}
+
 suspended-right {
     position: fixed;
     right: calc(var(--spacing)/ 2 + var(--scrollbar-width, 0px));
