@@ -21,16 +21,16 @@ class Settings(BaseSettings):
     mail_smtp_use_ssl: bool = True
     mail_smtp_sender_name: str = 'fromXX'
     mail_smtp_sender: str = 'from@163.com'
-    mail_smtp_password: str = 'password'
+    mail_smtp_password: str = ''
     enable_ldap_ad: bool = False
     ldap_ad_host: str = '127.0.0.1'
     ldap_ad_bind_dn: str = 'Example\\zhangsan'
-    ldap_ad_password: str = 'password'
+    ldap_ad_password: str = ''
     ldap_ad_search_base: str = 'OU=OU,DC=Example,DC=LOCAL'
     ldap_ad_search_filter: str = '(sAMAccountName={})'
     ldap_ad_email_suffix: str = '@example.com'
     enable_wechat_app: bool = False
-    wechat_app_id: str = ''
+    wechat_app_id: str = 'wxa123456'
     wechat_app_secret: str = ''
 
 
