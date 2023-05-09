@@ -51,10 +51,15 @@ async def page_token_register(request: dict = Depends(get_view_request),
 
 
 @router.get('/home/', response_class=HTMLResponse, include_in_schema=False)
-async def page_bases_home(request: dict = Depends(get_view_request)):
+async def page_bases_home(request: dict = Depends(get_view_request),
+                          token_s: Optional[str] = Cookie(None)):
     configs = get_apis_configs('bases')
-    if configs.app_home_path != '/view/bases/home/':
-        return RedirectResponse(configs.app_home_path)
+    if token_s:
+        _app_home = configs.app_home_path
+    else:
+        _app_home = configs.app_home_path_anon
+    if _app_home != '/view/bases/home/':
+        return RedirectResponse(_app_home)
     else:
         return templates.TemplateResponse('bases/home.html', {**request})
 
