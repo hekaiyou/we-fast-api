@@ -72,11 +72,9 @@ MONGO_DB_NAME=demo
 在 `apis/bases/` 路径下创建 `.env` 配置文件, 参考以下内容设置具体的环境变量:
 
 ```bash
-APP_NAME=AI小助手
+APP_NAME=Demo服务
 APP_VERSION=1.0.0
 APP_HOST=http://127.0.0.1:8083/
-APP_HOME_PATH=/view/gpt_35/dialogue/
-TOKEN_EXPIRE_MINUTE=10080
 ```
 
 该目录下支持的全部环境变量参数如下:
@@ -134,8 +132,6 @@ python main.py
 - 通过 http://127.0.0.1:8083/redoc/ 访问由 [ReDoc](https://github.com/Rebilly/ReDoc) API 文档
 
 ## 👀 预览
-
-![image](docu/gpt-35-demo.png)
 
 ## 💨 部署
 
