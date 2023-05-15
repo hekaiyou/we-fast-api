@@ -136,3 +136,5 @@ apis/*
 files/
 *.service
 apis/bases/views/static/config.js
+Dockerfile # Build serve - Start
+!Dockerfile # Build serve - End
