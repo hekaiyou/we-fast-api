@@ -1,6 +1,7 @@
 {% extends 'core/navigation.html' %}
+
 {% block title %}
-{% if role_id %}
+{% if item_id %}
 更新角色
 {% else %}
 创建角色
@@ -10,17 +11,18 @@
 {% block operate_left %}
 <a href="/view/bases/role/">返回</a>
 {% endblock %}
+
 {% block operate_right_top %}
-{% if role_id %}
-<a id="submit" role="button" href="javascript:void(0);">更新</a>
+{% if item_id %}
+<a id="updateAndCreateItem" role="button" href="javascript:void(0);">更新</a>
 {% else %}
-<a id="submit" role="button" href="javascript:void(0);">创建</a>
+<a id="updateAndCreateItem" role="button" href="javascript:void(0);">创建</a>
 {% endif %}
 {% endblock %}
 
 {% block main %}
 <form id="form-content">
-    <label for="title">
+    <label>
         角色名称
         <input type="text" id="title" placeholder="角色名称" required>
     </label>
@@ -28,9 +30,9 @@
 {% endblock %}
 
 {% block operate_bottom %}
-{% if role_id %}
+{% if item_id %}
 <suspended-right>
-    <button id="delete">删除</button>
+    <button id="deleteItem" class="contrast">删除</button>
 </suspended-right>
 {% endif %}
 {% endblock %}
@@ -52,7 +54,7 @@
         });
         utilAjax(
             type = 'PUT',
-            url = '/api/bases/role/{{ role_id }}/',
+            url = '/api/bases/role/{{ item_id }}/',
             data = {
                 'title': $('#title').val(),
                 'permissions': permissions,
@@ -91,10 +93,10 @@
             success = function (data, textStatus) {
                 var tagDict = {};
                 data['all_item'].forEach(function (value, index) {
-                    if (tagDict[value['tag']]) {
-                        tagDict[value['tag']].push(value);
+                    if (tagDict[value.tag]) {
+                        tagDict[value.tag].push(value);
                     } else {
-                        tagDict[value['tag']] = [value];
+                        tagDict[value.tag] = [value];
                     }
                 });
                 for (var key in tagDict) {
@@ -102,20 +104,20 @@
                     let item = tagDict[keyName];
                     $('#form-content').append('<label>服务模块 ' + keyName + '<details role="list"><summary aria-haspopup="listbox" id="summary-' + keyName + '" select="">包含 0 个接口访问权限</summary><ul role="listbox" id="tag-' + keyName + '"></ul></details></label>');
                     item.forEach(function (value, index) {
-                        $('#tag-' + keyName).append('<li><label><input type="checkbox" name="' + keyName + '" value="' + value['name'] + '">' + value['summary'] + '</label></li>');
-                        if (tagSelectDict.hasOwnProperty(value['name'])) {
-                            $('[value="' + value['name'] + '"]:checkbox').attr('checked', 'checked');
+                        $('#tag-' + keyName).append('<li><label><input type="checkbox" name="' + keyName + '" value="' + value.name + '">' + value.summary + '</label></li>');
+                        if (tagSelectDict.hasOwnProperty(value.name)) {
+                            $('[value="' + value.name + '"]:checkbox').attr('checked', 'checked');
                             let summarys = $('#summary-' + keyName).attr('select').split(',');
                             if (summarys[0] == '') {
                                 summarys = [];
                             }
-                            summarys.push(value['name']);
+                            summarys.push(value.name);
                             $('#summary-' + keyName).attr('select', summarys.toString());
                             $('#summary-' + keyName).html('包含 ' + summarys.length + ' 个接口访问权限');
                         } else {
-                            tagSelectDict[value['name']] = false;
+                            tagSelectDict[value.name] = false;
                         }
-                        tagSelectArray.push(value['name'])
+                        tagSelectArray.push(value.name);
                     });
                     $('[name="' + keyName + '"]:checkbox').on('click', function () {
                         tagSelectDict[$(this).val()] = !tagSelectDict[$(this).val()];
@@ -138,11 +140,11 @@
             not_close = false,
         );
     }
-    //{% if role_id %}
+    //{% if item_id %}
     $(document).ready(function () {
         utilAjax(
             type = 'GET',
-            url = '/api/bases/role/{{ role_id }}/',
+            url = '/api/bases/role/{{ item_id }}/',
             data = {},
             data_format = 'query',
             check = {},
@@ -151,7 +153,7 @@
                 if (data.title == 'Default') {
                     $('#title').attr('disabled', true);
                     $('#title').after('<small>所有未分配角色的用户均为默认角色</small>');
-                    $('#delete').hide();
+                    $('#deleteItem').hide();
                 }
                 data.permissions.forEach(function (value, index) {
                     tagSelectDict[value] = true;
@@ -162,12 +164,12 @@
             success_reminder = false,
             not_close = true,
         );
-        $('#submit').click(function () {
+        $('#updateAndCreateItem').click(function () {
             synced_wids = [];
             synchronizations_i = 0;
             putRole();
         });
-        $('#delete').click(function () {
+        $('#deleteItem').click(function () {
             swal({
                 title: '你正在删除角色',
                 icon: 'warning',
@@ -177,7 +179,7 @@
                 if (willDelete) {
                     utilAjax(
                         type = 'DELETE',
-                        url = '/api/bases/role/{{ role_id }}/',
+                        url = '/api/bases/role/{{ item_id }}/',
                         data = {},
                         data_format = 'json',
                         check = {},
@@ -195,7 +197,7 @@
     //{% else %}
     $(document).ready(function () {
         loadPage();
-        $('#submit').click(function () {
+        $('#updateAndCreateItem').click(function () {
             let permissions = [];
             for (var key in tagSelectDict) {
                 if (tagSelectDict[key]) {

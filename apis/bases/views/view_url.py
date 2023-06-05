@@ -112,13 +112,13 @@ async def page_bases_role_create(request: dict = Depends(get_view_request)):
     return templates.TemplateResponse('bases/role-edit.html', {**request})
 
 
-@router.get('/role/update/{role_id}/',
+@router.get('/role/update/{item_id}/',
             response_class=HTMLResponse,
             include_in_schema=False)
-async def page_bases_role_update(role_id: RoleObjIdParams,
+async def page_bases_role_update(item_id: RoleObjIdParams,
                                  request: dict = Depends(get_view_request)):
     return templates.TemplateResponse('bases/role-edit.html', {
-        'role_id': str(role_id),
+        'item_id': str(item_id),
         **request
     })
 
