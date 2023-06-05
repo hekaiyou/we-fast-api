@@ -1,9 +1,12 @@
 {% extends 'core/navigation.html' %}
-{% block title %}角色与权限{% endblock %}
+
+{% block title %}
+角色与权限
+{% endblock %}
 
 {% block main %}
 <div id="details-content">
-    <details class="itemRole" onclick="event.preventDefault()" id="100000000000000000000001">
+    <details class="itemDetails" onclick="event.preventDefault()" id="100000000000000000000001">
         <summary>Default</summary>
     </details>
 </div>
@@ -11,7 +14,7 @@
 
 {% block operate_bottom %}
 <suspended-right>
-    <button id="submit">创建</button>
+    <button id="newItem">创建</button>
 </suspended-right>
 {% endblock %}
 
@@ -26,9 +29,9 @@
             check = {},
             success = function (data, textStatus) {
                 data['all_item'].forEach(function (value, index) {
-                    $('#details-content').append('<details class="itemRole" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['title'] + ' <sup>有' + value['permissions'].length + '个权限</sup></summary></details>');
+                    $('#details-content').append('<details class="itemDetails" onclick="event.preventDefault()" id="' + value.id + '"><summary>' + value.title + ' <sup>有' + value.permissions.length + '个权限</sup></summary></details>');
                 });
-                $('.itemRole').click(function () {
+                $('.itemDetails').click(function () {
                     window.location.href = '/view/bases/role/update/' + $(this).attr('id') + '/';
                 });
             },
@@ -36,7 +39,7 @@
             success_reminder = false,
             not_close = false,
         );
-        $('#submit').click(function () {
+        $('#newItem').click(function () {
             window.location.href = '/view/bases/role/create/';
         });
     });
