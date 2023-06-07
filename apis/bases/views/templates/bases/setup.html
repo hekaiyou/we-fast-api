@@ -1,5 +1,8 @@
 {% extends 'core/navigation.html' %}
-{% block title %}参数设置{% endblock %}
+
+{% block title %}
+参数设置
+{% endblock %}
 
 {% block main %}
 <div id="details-content">
@@ -18,9 +21,9 @@
             success = function (data, textStatus) {
                 data['all_item'].forEach(function (value, index) {
                     let titleName = value.name.slice(9);
-                    $('#details-content').append('<details class="setupModule" onclick="event.preventDefault()" id="' + value.name + '"><summary>模块 ' + titleName + ' 相关变量</sup></summary></details>');
+                    $('#details-content').append('<details class="itemDetails" onclick="event.preventDefault()" id="' + value.name + '"><summary>模块 ' + titleName + ' 相关变量</sup></summary></details>');
                 });
-                $('.setupModule').click(function () {
+                $('.itemDetails').click(function () {
                     window.location.href = '/view/bases/setup/update/' + $(this).attr('id') + '/';
                 });
             },
