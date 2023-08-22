@@ -63,20 +63,14 @@ class UserDefaultCreate(BaseModel):
     """ 默认用户的创建模型 """
     username: str = Field(title='用户名称', )
     email: EmailStr = Field(title='电子邮箱', )
-    password: str = Field(
-        title='密码',
-        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
-    )
-    repeat_password: str = Field(
-        title='重复密码',
-        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
-    )
+    password: str = Field(title='密码', )
+    repeat_password: str = Field(title='重复密码', )
 
 
 class UserGlobal(UserCreate):
     """ 用户的全局模型 """
     id: ObjId = Field(alias='_id', title='用户ID')
-    bind: dict = Field(title='用户绑定信息', )
+    bind: Dict = Field(title='用户绑定信息', )
     avata_url: Optional[str] = Field(default='', title='头像地址')
 
 
@@ -104,13 +98,13 @@ class PermissionRead(BaseModel):
 
 class RoleBase(BaseModel):
     """ 角色数据的基础模型 """
-    title: str = Field(title='角色名称', regex='^\S{2,}$')
+    title: str = Field(title='角色名称', )
     permissions: list = Field(title='权限列表', )
 
 
 class RoleUpdate(RoleBase):
     """ 角色的更新模型 """
-    title: Optional[str] = Field(title='角色名称', regex='^\S{2,}$')
+    title: Optional[str] = Field(title='角色名称', )
     permissions: Optional[list] = Field(title='权限列表', )
 
 
@@ -124,7 +118,7 @@ class RoleRead(RoleBase):
 class SetupUpdate(BaseModel):
     """ 设置的更新模型 """
     synced_wids: List[str] = Field(title='已同步进程ID列表', )
-    setups: dict = Field(title='设置内容', )
+    setups: Dict = Field(title='设置内容', )
 
 
 class SyncedWorkerRead(BaseModel):
@@ -147,18 +141,9 @@ class ExternalLogBase(BaseModel):
 
 class UserUpdatePassword(BaseModel):
     """ 用户的更新密码模型 """
-    current_password: str = Field(
-        title='当前密码',
-        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
-    )
-    new_password: str = Field(
-        title='新密码',
-        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
-    )
-    repeat_new_password: str = Field(
-        title='重复新密码',
-        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
-    )
+    current_password: str = Field(title='当前密码', )
+    new_password: str = Field(title='新密码', )
+    repeat_new_password: str = Field(title='重复新密码', )
 
 
 class UserForgetPasswordBase(BaseModel):
@@ -169,11 +154,5 @@ class UserForgetPasswordBase(BaseModel):
 class UserForgetPassword(UserForgetPasswordBase):
     """ 用户忘记密码的模型 """
     code: str = Field(title='验证码', )
-    new_password: str = Field(
-        title='新密码',
-        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
-    )
-    repeat_new_password: str = Field(
-        title='重复新密码',
-        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
-    )
+    new_password: str = Field(title='新密码', )
+    repeat_new_password: str = Field(title='重复新密码', )
