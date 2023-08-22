@@ -6,6 +6,7 @@ openpyxl
 passlib[bcrypt]
 pydantic[email]
 pydantic-settings
+pydantic-extra-types
 pymongo
 python-dotenv
 python-jose[cryptography]

@@ -63,8 +63,14 @@ class UserDefaultCreate(BaseModel):
     """ 默认用户的创建模型 """
     username: str = Field(title='用户名称', )
     email: EmailStr = Field(title='电子邮箱', )
-    password: str = Field(title='密码', )
-    repeat_password: str = Field(title='重复密码', )
+    password: str = Field(
+        title='密码',
+        pattern='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
+    repeat_password: str = Field(
+        title='重复密码',
+        pattern='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
 
 
 class UserGlobal(UserCreate):
@@ -98,13 +104,13 @@ class PermissionRead(BaseModel):
 
 class RoleBase(BaseModel):
     """ 角色数据的基础模型 """
-    title: str = Field(title='角色名称', )
+    title: str = Field(title='角色名称', pattern='^\S{2,}$')
     permissions: list = Field(title='权限列表', )
 
 
 class RoleUpdate(RoleBase):
     """ 角色的更新模型 """
-    title: Optional[str] = Field(title='角色名称', )
+    title: Optional[str] = Field(title='角色名称', pattern='^\S{2,}$')
     permissions: Optional[list] = Field(title='权限列表', )
 
 
@@ -141,9 +147,18 @@ class ExternalLogBase(BaseModel):
 
 class UserUpdatePassword(BaseModel):
     """ 用户的更新密码模型 """
-    current_password: str = Field(title='当前密码', )
-    new_password: str = Field(title='新密码', )
-    repeat_new_password: str = Field(title='重复新密码', )
+    current_password: str = Field(
+        title='当前密码',
+        pattern='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
+    new_password: str = Field(
+        title='新密码',
+        pattern='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
+    repeat_new_password: str = Field(
+        title='重复新密码',
+        pattern='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
 
 
 class UserForgetPasswordBase(BaseModel):
@@ -154,5 +169,11 @@ class UserForgetPasswordBase(BaseModel):
 class UserForgetPassword(UserForgetPasswordBase):
     """ 用户忘记密码的模型 """
     code: str = Field(title='验证码', )
-    new_password: str = Field(title='新密码', )
-    repeat_new_password: str = Field(title='重复新密码', )
+    new_password: str = Field(
+        title='新密码',
+        pattern='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
+    repeat_new_password: str = Field(
+        title='重复新密码',
+        pattern='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
+    )
