@@ -5,6 +5,7 @@ loguru
 openpyxl
 passlib[bcrypt]
 pydantic[email]
+pydantic-settings
 pymongo
 python-dotenv
 python-jose[cryptography]
