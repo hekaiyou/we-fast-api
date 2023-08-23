@@ -76,7 +76,6 @@ def whether_to_initialize():
                 'source': 'Initialization',
                 'avata': '',
                 'bind': {
-                    'wechat': '',
                     'email': '',
                     'ldap': '',
                 },

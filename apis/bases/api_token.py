@@ -143,7 +143,6 @@ async def create_ldap_api_access_token(
                 'source': 'LDAP',
                 'avata': '',
                 'bind': {
-                    'wechat': '',
                     'email': '',
                     'ldap': form_data.username,
                 },
