@@ -1,12 +1,10 @@
-fastapi
+fastapi==0.101.0
 jinja2
 ldap3
 loguru
 openpyxl
 passlib[bcrypt]
-pydantic[email]
-pydantic-settings
-pydantic-extra-types
+pydantic[email]==1.10.12
 pymongo
 python-dotenv
 python-jose[cryptography]

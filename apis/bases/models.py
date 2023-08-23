@@ -65,11 +65,11 @@ class UserDefaultCreate(BaseModel):
     email: EmailStr = Field(title='电子邮箱', )
     password: str = Field(
         title='密码',
-        pattern='^[a-zA-Z]\w{6,32}$',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
     )
     repeat_password: str = Field(
         title='重复密码',
-        pattern='^[a-zA-Z]\w{6,32}$',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
     )
 
 
@@ -104,13 +104,13 @@ class PermissionRead(BaseModel):
 
 class RoleBase(BaseModel):
     """ 角色数据的基础模型 """
-    title: str = Field(title='角色名称', pattern='^\S{2,}$')
+    title: str = Field(title='角色名称', regex='^\S{2,}$')
     permissions: list = Field(title='权限列表', )
 
 
 class RoleUpdate(RoleBase):
     """ 角色的更新模型 """
-    title: Optional[str] = Field(title='角色名称', pattern='^\S{2,}$')
+    title: Optional[str] = Field(title='角色名称', regex='^\S{2,}$')
     permissions: Optional[list] = Field(title='权限列表', )
 
 
@@ -149,15 +149,15 @@ class UserUpdatePassword(BaseModel):
     """ 用户的更新密码模型 """
     current_password: str = Field(
         title='当前密码',
-        pattern='^[a-zA-Z]\w{6,32}$',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
     )
     new_password: str = Field(
         title='新密码',
-        pattern='^[a-zA-Z]\w{6,32}$',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
     )
     repeat_new_password: str = Field(
         title='重复新密码',
-        pattern='^[a-zA-Z]\w{6,32}$',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
     )
 
 
@@ -171,9 +171,9 @@ class UserForgetPassword(UserForgetPasswordBase):
     code: str = Field(title='验证码', )
     new_password: str = Field(
         title='新密码',
-        pattern='^[a-zA-Z]\w{6,32}$',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
     )
     repeat_new_password: str = Field(
         title='重复新密码',
-        pattern='^[a-zA-Z]\w{6,32}$',
+        regex='^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$',
     )
