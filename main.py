@@ -19,8 +19,8 @@ def swagger_monkey_patch(*args, **kwargs):
     return get_swagger_ui_html(
         *args,
         **kwargs,
-        swagger_js_url='/static/bases/swagger-ui-4/swagger-ui-bundle.js',
-        swagger_css_url='/static/bases/swagger-ui-4/swagger-ui.css',
+        swagger_js_url='/static/bases/swagger-ui-5/swagger-ui-bundle.js',
+        swagger_css_url='/static/bases/swagger-ui-5/swagger-ui.css',
         swagger_favicon_url='/static/bases/image/favicon.png',
     )
 
@@ -29,7 +29,7 @@ def redoc_monkey_patch(*args, **kwargs):
     return get_redoc_html(
         *args,
         **kwargs,
-        redoc_js_url='/static/bases/redoc-2.0.0/redoc.standalone.js',
+        redoc_js_url='/static/bases/redoc/redoc.standalone.js',
         redoc_favicon_url='/static/bases/image/favicon.png',
     )
 
