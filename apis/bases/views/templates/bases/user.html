@@ -30,7 +30,7 @@
 
 {% block operate_bottom %}
 <suspended-right>
-    <button id="submit">创建</button>
+    <button id="newItem">创建</button>
 </suspended-right>
 {% endblock %}
 
@@ -100,7 +100,7 @@
         $('#full_name').val('{{ full_name }}');
         $('#source').val('{{ source }}');
         loadData();
-        $('#submit').click(function () {
+        $('#newItem').click(function () {
             window.location.href = '/view/bases/user/create/?username=' + $('#username').val() + '&full_name=' + $('#full_name').val() + '&source=' + $('#source').val();
         });
         $('#username').change(function (value) {
