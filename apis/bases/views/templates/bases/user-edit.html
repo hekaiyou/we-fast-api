@@ -1,4 +1,5 @@
 {% extends 'core/navigation.html' %}
+
 {% block title %}
 {% if user_id %}
 更新用户
@@ -8,45 +9,48 @@
 {% endblock %}
 
 {% block operate_left %}
-<a href="/view/bases/user/?username={{ username }}&full_name={{ full_name }}&source={{ source }}">返回</a>
+<a href="/view/bases/user/?username={{ username }}&full_name={{ full_name }}&source={{ source }}">
+    <img src="/static/bases/material-icons/arrow_back_ios_new_fill.svg" />
+</a>
 {% endblock %}
+
 {% block operate_right_top %}
 {% if user_id %}
-<a id="submit" role="button" href="javascript:void(0);">更新</a>
+<a id="updateAndCreateItem" role="button" href="javascript:void(0);">更新</a>
 {% else %}
-<a id="submit" role="button" href="javascript:void(0);">创建</a>
+<a id="updateAndCreateItem" role="button" href="javascript:void(0);">创建</a>
 {% endif %}
 {% endblock %}
 
 {% block main %}
 <form id="form-content">
     <div class="grid">
-        <label for="username">
+        <label>
             账户名
             <input type="text" id="username" placeholder="账户名" required>
         </label>
-        <label for="full_name">
+        <label>
             账户昵称
             <input type="text" id="full_name" placeholder="账户昵称" required>
         </label>
     </div>
-    <label for="email">
+    <label>
         电子邮箱地址
         <input type="email" id="email" placeholder="电子邮箱地址" required>
     </label>
-    <label for="role_id">
+    <label>
         账户角色
         <select id="role_id" placeholder="账户角色">
             <option value="" selected>Default</option>
         </select>
     </label>
     {% if not user_id %}
-    <label for="password">
+    <label>
         认证密码
         <input type="password" id="password" placeholder="认证密码" required>
     </label>
     {% endif %}
-    <label for="disabled">
+    <label>
         <input type="checkbox" id="disabled" placeholder="是否禁用账户" role="switch">
         是否禁用账户
     </label>
@@ -56,7 +60,7 @@
 {% block operate_bottom %}
 {% if user_id %}
 <suspended-right>
-    <button id="delete">删除</button>
+    <button id="deleteItem" class="contrast">删除</button>
 </suspended-right>
 {% endif %}
 {% endblock %}
@@ -102,7 +106,7 @@
             success_reminder = false,
             not_close = true,
         );
-        $('#submit').click(function () {
+        $('#updateAndCreateItem').click(function () {
             utilAjax(
                 type = 'PUT',
                 url = '/api/bases/user/{{ user_id }}/',
@@ -116,7 +120,7 @@
                 data_format = 'json',
                 check = {
                     'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
-                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位'],
+                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位(不支持空格)'],
                     'email': [/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/, '电子邮箱地址的格式不正确'],
                 },
                 success = function (data, textStatus) {
@@ -133,7 +137,7 @@
                 not_close = false,
             );
         });
-        $('#delete').click(function () {
+        $('#deleteItem').click(function () {
             swal({
                 title: '你正在删除用户',
                 icon: 'warning',
@@ -161,7 +165,7 @@
     //{% else %}
     $(document).ready(function () {
         loadPage('');
-        $('#submit').click(function () {
+        $('#updateAndCreateItem').click(function () {
             utilAjax(
                 type = 'POST',
                 url = '/api/bases/user/',
@@ -176,7 +180,7 @@
                 data_format = 'json',
                 check = {
                     'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
-                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位'],
+                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位(不支持空格)'],
                     'email': [/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/, '电子邮箱地址的格式不正确'],
                     'password': [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,32}$/, '认证密码需要大小写字母和数字或特殊字符的组合, 长度6-32之间'],
                 },

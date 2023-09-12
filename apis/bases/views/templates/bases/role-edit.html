@@ -63,7 +63,7 @@
             },
             data_format = 'json',
             check = {
-                'title': [/^\S{2,}$/, '角色名称的长度需要大于2位'],
+                'title': [/^\S{2,}$/, '角色名称的长度需要大于2位(不支持空格)'],
             },
             success = function (data, textStatus) {
                 synchronizations_i++;
@@ -215,7 +215,7 @@
                 },
                 data_format = 'json',
                 check = {
-                    'title': [/^\S{2,}$/, '角色名称的长度需要大于2位'],
+                    'title': [/^\S{2,}$/, '角色名称的长度需要大于2位(不支持空格)'],
                 },
                 success = function (data, textStatus) {
                     window.location.href = '/view/bases/role/update/' + data._id + '/';

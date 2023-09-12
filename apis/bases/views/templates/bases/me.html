@@ -1,9 +1,15 @@
 {% extends 'core/navigation.html' %}
-{% block title %}我的信息{% endblock %}
+
+{% block title %}
+我的信息
+{% endblock %}
 
 {% block operate_left %}
-<a href="javascript:history.back(-1)">返回</a>
+<a href="javascript:history.back(-1)">
+    <img src="/static/bases/material-icons/arrow_back_ios_new_fill.svg" />
+</a>
 {% endblock %}
+
 {% block operate_right_top %}
 <a id="submit" role="button" href="javascript:void(0);">更新</a>
 {% endblock %}
@@ -11,16 +17,16 @@
 {% block main %}
 <form>
     <div class="grid">
-        <label for="username">
+        <label>
             账户名
             <input type="text" id="username" placeholder="账户名" required>
         </label>
-        <label for="full_name">
+        <label>
             账户昵称
             <input type="text" id="full_name" placeholder="账户昵称" required>
         </label>
     </div>
-    <label for="email">
+    <label>
         电子邮箱地址
         <input type="email" id="email" placeholder="电子邮箱地址" required>
     </label>
@@ -74,7 +80,7 @@
                 data_format = 'json',
                 check = {
                     'username': [/^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){2,19}$/, '账户名需要3-20位以字母开头(可带数字,下划线和小数点)'],
-                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位'],
+                    'full_name': [/^\S{2,}$/, '账户昵称的长度需要大于2位(不支持空格)'],
                     'email': [/^([a-zA-Z\d])(\w|\-)+@[a-zA-Z\d]+\.[a-zA-Z]{2,4}$/, '电子邮箱地址的格式不正确'],
                 },
                 success = function (data, textStatus) {

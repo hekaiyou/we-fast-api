@@ -1,14 +1,17 @@
 {% extends 'core/navigation.html' %}
-{% block title %}访问统计{% endblock %}
+
+{% block title %}
+访问统计
+{% endblock %}
 
 {% block main %}
 <form>
     <div class="grid">
-        <label for="startDate">
+        <label>
             开始日期
             <input type="date" id="startDate" placeholder="开始日期">
         </label>
-        <label for="endDate">
+        <label>
             结束日期
             <input type="date" id="endDate" placeholder="结束日期">
         </label>
@@ -19,7 +22,7 @@
 </article>
 <form>
     <div class="grid">
-        <label for="sortValue">
+        <label>
             排序依据
             <select id="sortValue" required>
                 <option value="total" selected>接口请求次数</option>
@@ -29,7 +32,7 @@
                 <option value="avera_byte_m">接口响应平均出口流量(MB)</option>
             </select>
         </label>
-        <label for="sortOrder">
+        <label>
             排序方式
             <select id="sortOrder" required>
                 <option value="descending" selected>降序 (从大到小)</option>
