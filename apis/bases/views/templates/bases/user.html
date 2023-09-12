@@ -75,9 +75,9 @@
                     if (!auxiliary) {
                         auxiliary = value['email'];
                     }
-                    $('#details-content').append('<details class="item" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['username'] + ' <sup>' + auxiliary + '</sup></summary></details>');
+                    $('#details-content').append('<details class="itemDetails" onclick="event.preventDefault()" id="' + value['id'] + '"><summary>' + value['username'] + ' <sup>' + auxiliary + '</sup></summary></details>');
                 });
-                $('.item').click(function () {
+                $('.itemDetails').click(function () {
                     window.location.href = '/view/bases/user/update/' + $(this).attr('id') + '/?username=' + $('#username').val() + '&full_name=' + $('#full_name').val() + '&source=' + $('#source').val();
                 });
             },
