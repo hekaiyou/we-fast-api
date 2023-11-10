@@ -94,7 +94,7 @@ def whether_to_initialize():
                 'create_time': datetime.utcnow(),
                 'update_time': datetime.utcnow(),
             })
-            logger.info('第一次连接, 初始化管理员账号: admin / i23D456')
+            logger.info('第一次连接, 初始化管理员账号: admin/i23D456')
             logger.warning('请尽快登录管理员账号并及时修改密码')
         set_role_permissions(role_col)
     except Exception as e:

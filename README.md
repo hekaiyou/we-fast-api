@@ -1,12 +1,21 @@
-# We FastAPI
+# WeFastAPI
 
-一个基于 [FastAPI](https://fastapi.tiangolo.com/) 的后端服务快速启动项目。
+> 一个基于 [FastAPI](https://fastapi.tiangolo.com/) 的后端服务快速启动项目。
+
+## 🔮 教程
+
+- [WeFastAPI 第一步](https://wfa.hekaiyou.top/#/we_fast_api/step_one)
+- [WeFastAPI 权限管理](https://wfa.hekaiyou.top/#/we_fast_api/permissions)
+- [WeFastAPI 视图模板](https://wfa.hekaiyou.top/#/we_fast_api/views_template)
+- [WeFastAPI 模型设计](https://wfa.hekaiyou.top/#/we_fast_api/model_design)
+- [WeFastAPI 复杂任务](https://wfa.hekaiyou.top/#/we_fast_api/complex_tasks)
+- [WeFastAPI 简单视图](https://wfa.hekaiyou.top/#/we_fast_api/simple_view)
 
 ## 📦 安装
 
 ### 前置依赖
 
-- 开发语言: Python >= 3.7
+- 开发语言: Python >= 3.10
 - 数据库: MongoDB >= 4.0
 
 ### 操作步骤
@@ -16,15 +25,30 @@
    git clone https://github.com/hekaiyou/we-fast-api.git demo
    ```
 2. 创建 Python3 版本的虚拟环境, 在终端执行:
-   ```shell
-   cd demo
-   # 如果 python 找不到命令可以尝试 python3 命令
-   python -m venv venv
-   # Linux下执行
-   source venv/bin/activate
-   # Windows下执行
-   # venv/Scripts/activate
-   ```
+   - 使用 **virtualenv** 命令
+      ```shell
+      cd demo
+      # 如果 python 找不到命令可以尝试 python3 命令
+      python -m venv venv
+      # Linux下执行
+      source venv/bin/activate
+      # Windows下执行
+      # venv/Scripts/activate
+      ```
+   - 使用 **virtualenvwrapper** 命令
+      ```shell
+      cd demo
+      # 创建新的虚拟环境
+      mkvirtualenv -p python3.10 venv_demo
+      # 退出当前虚拟环境
+      deactivate
+      # 进入指定的虚拟环境
+      workon venv_demo
+      # 查看已创建的虚拟环境
+      # lsvirtualenv
+      # 删除指定的虚拟环境
+      # rmvirtualenv venv_demo
+      ```
 3. 先安装 [we-fast-api](https://github.com/hekaiyou/we-fast-api) 框架依赖, 在终端执行:
    ```shell
    pip install -r requirements.txt
@@ -42,6 +66,18 @@
 | ------- | ------- | ------- |
 | core | `.env` | MongoDB 连接等关键配置 (应用运行不可缺少的环境变量) |
 | bases | `apis/bases/.env` | [we-fast-api](https://github.com/hekaiyou/we-fast-api) 框架的基础环境变量 |
+
+如果想在 Ubuntu 系统下直接配置环境变量, 可以参考下面的操作指令：
+
+```shell
+$ vim ~/.bashrc
+export MONGO_DB_HOST=127.0.0.1
+export MONGO_DB_PORT=27017
+export MONGO_DB_NAME=test_database
+$ source ~/.bashrc
+```
+
+需要注意的是, 这样会覆盖掉优先级低的另外两种方式中的变量, 不利于多项目管理。
 
 ### .env
 
@@ -109,9 +145,6 @@ APP_HOST=http://127.0.0.1:8083/
 | LDAP_AD_SEARCH_BASE | LDAP/AD 搜索用户的基础路径 | str | OU=OU,DC=Example,DC=LOCAL |
 | LDAP_AD_SEARCH_FILTER | LDAP/AD 搜索用户的过滤器 | str | (sAMAccountName={}) |
 | LDAP_AD_EMAIL_SUFFIX | LDAP/AD 企业邮箱后缀 | str | @example.com |
-| ENABLE_WECHAT_APP | 启用微信小程序支持 | bool | False |
-| WECHAT_APP_ID | 微信小程序唯一标识 | str | wxa123456 |
-| WECHAT_APP_SECRET | 微信小程序密钥 | str |  |
 
 ## ✨ 启动
 
@@ -128,8 +161,8 @@ python main.py
 服务启动后, 可以访问以下文档和应用地址:
 
 - 通过 http://127.0.0.1:8083/ 访问基础 Web 站点
-- 通过 http://127.0.0.1:8083/docs/ 访问由 [Swagger UI](https://github.com/swagger-api/swagger-ui) API 文档
-- 通过 http://127.0.0.1:8083/redoc/ 访问由 [ReDoc](https://github.com/Rebilly/ReDoc) API 文档
+- 通过 http://127.0.0.1:8083/docs/ 访问由 [Swagger UI](https://github.com/swagger-api/swagger-ui) 生成的接口文档
+- 通过 http://127.0.0.1:8083/redoc/ 访问由 [ReDoc](https://github.com/Rebilly/ReDoc) 生成的接口文档
 
 ## 👀 预览
 
@@ -140,7 +173,7 @@ python main.py
 框架中提供了一个基础的 `Dockerfile` 来构建镜像, 在框架根路径下创建 `Dockerfile` 文件:
 
 ```bash
-FROM python:3.10.11
+FROM python:3.10.12
 WORKDIR /workspace
 COPY . /workspace/
 RUN pip install -r requirements.txt
@@ -183,19 +216,21 @@ docker run -t -i -d -v /{LOCAL_DIR}/files:/workspace/files -v /{LOCAL_DIR}/logs:
 以下操作在 Ubuntu 系统下进行, 首先在框架根路径下创建自启动服务配置文件:
 
 ```shell
-vim demo.service
+vim {服务名称}.service
 ```
 
-编辑自启动服务配置文件 `demo.service` 的内容:
+编辑自启动服务配置文件 `{服务名称}.service` 的内容:
 
 ```shell
 [Unit]
-Description=demo
+Description={服务名称}
 
 [Service]
+User={运行用户}
+Group={运行群组}
 Type=simple
-WorkingDirectory=/{LOCAL_DIR}/demo
-ExecStart=/{LOCAL_DIR}/demo/venv/bin/python main.py
+WorkingDirectory=/{本地目录}/{服务根目录}
+ExecStart=/{本地目录}/{服务根目录}/venv/bin/python main.py
 Restart=on-failure
 RestartSec=30s
 
@@ -203,16 +238,20 @@ RestartSec=30s
 WantedBy=multi-user.target
 ```
 
-完成配置文件后, 就可以执行下列命令配置和管理服务:
+*参数 `--workers` 指定的工作进程数需要同步在 **更新 BASES 设置** 页面编辑 **服务的工作进程总数 (workers)** 值, 因为多个进程时框架不知道你启动了多少个进程。*
 
-- 注册服务: sudo systemctl enable /{LOCAL_DIR}/demo/demo.service
-- 启动服务: sudo systemctl start demo
+如果不设置 `User` 和 `Group` 则默认以 **root** 管理员权限运行, 完成配置文件后, 就可以执行下列命令配置和管理服务:
+
+- 启用/注册服务: sudo systemctl enable /{本地目录}/{服务根目录}/{服务名称}.service
+- 启动服务: sudo systemctl start {服务名称}
+- 停止服务: sudo systemctl stop {服务名称}
 - 更新配置文件: sudo systemctl daemon-reload
-- 重新启动服务: sudo systemctl restart demo
-- 查看服务启动状态: sudo service demo status
-- 查看服务日志: sudo journalctl -u demo
+- 重新启动服务: sudo systemctl restart {服务名称}
+- 查看服务启动状态: sudo service {服务名称} status
+- 查看服务日志: sudo journalctl -u {服务名称}
 - 清理10秒之前的日志: sudo journalctl --vacuum-time=10s
-- 清理2小时之前的日志: sudo journactl --vacuum-time=2h
+- 清理2小时之前的日志: sudo journalctl --vacuum-time=2h
 - 清理7天之前的日志: sudo journalctl --vacuum-time=7d
+- 禁用/删除服务: sudo systemctl disable {服务名称}
 
-*此部署方式支持在 **参数设置** 菜单中动态变更环境变量。*
+目前只有此部署方式支持在 **参数设置** 菜单中动态变更环境变量。
