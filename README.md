@@ -83,7 +83,7 @@ $ source ~/.bashrc
 
 在框架根路径下创建 `.env` 配置文件, 参考以下内容设置具体的环境变量:
 
-```bash
+```shell
 MONGO_DB_HOST=127.0.0.1
 MONGO_DB_PORT=27017
 MONGO_DB_NAME=demo
@@ -107,7 +107,7 @@ MONGO_DB_NAME=demo
 
 在 `apis/bases/` 路径下创建 `.env` 配置文件, 参考以下内容设置具体的环境变量:
 
-```bash
+```shell
 APP_NAME=Demo服务
 APP_VERSION=1.0.0
 APP_HOST=http://127.0.0.1:8083/
@@ -149,14 +149,20 @@ APP_HOST=http://127.0.0.1:8083/
 ## ✨ 启动
 
 在框架根路径下, 进入虚拟环境并执行:
-
-```bash
-# Linux下执行
-source venv/bin/activate
-# Windows下执行
-# venv/Scripts/activate
-python main.py
-```
+   - 使用 **virtualenv** 命令
+      ```shell
+      # Linux下执行
+      source venv/bin/activate
+      # Windows下执行
+      # venv/Scripts/activate
+      python main.py
+      ```
+   - 使用 **virtualenvwrapper** 命令
+      ```shell
+      # 进入指定的虚拟环境
+      workon venv_demo
+      python main.py
+      ```
 
 服务启动后, 可以访问以下文档和应用地址:
 
@@ -166,13 +172,15 @@ python main.py
 
 ## 👀 预览
 
+![gpt-35-demo](https://raw.githubusercontent.com/hekaiyou/gpt_35/main/docu/gpt-35-demo.png)
+
 ## 💨 部署
 
 ### Docker
 
 框架中提供了一个基础的 `Dockerfile` 来构建镜像, 在框架根路径下创建 `Dockerfile` 文件:
 
-```bash
+```shell
 FROM python:3.10.12
 WORKDIR /workspace
 COPY . /workspace/
@@ -187,26 +195,26 @@ CMD ["python", "main.py"]
 使用这个 `Dockerfile` 来构建镜像:
 
 ```shell
-docker build -t demo:1.0.0 .
+docker build -t {服务名称}:1.0.0 .
 ```
 
 先检查服务在镜像容器内是否正常运行:
 
 ```shell
-docker run -t -i -v /{LOCAL_DIR}/files:/workspace/files -v /{LOCAL_DIR}/logs:/workspace/logs -p 8089:8083 --env-file .env --env-file apis/bases/.env demo:1.0.0
+docker run -t -i -v /{本地目录}/files:/workspace/files -v /{本地目录}/logs:/workspace/logs -p 8089:8083 --env-file .env --env-file apis/bases/.env {服务名称}:1.0.0
 ```
 
 | 构建参数 | 作用描述 |
 | ------- | ------- |
-| -v /{LOCAL_DIR}/files:/workspace/files | 持久化的文件存储路径 |
-| -v /{LOCAL_DIR}/logs:/workspace/logs | 持久化的日志存储路径 |
+| -v /{本地目录}/files:/workspace/files | 持久化的文件存储路径 |
+| -v /{本地目录}/logs:/workspace/logs | 持久化的日志存储路径 |
 | --env-file .env | 从文件中读取 `core` 模块的环境变量 |
 | --env-file apis/bases/.env | 从文件中读取 `bases` 模块的环境变量 |
 
 确认服务正常后, 添加 `-d` 参数将容器放后台运行:
 
 ```shell
-docker run -t -i -d -v /{LOCAL_DIR}/files:/workspace/files -v /{LOCAL_DIR}/logs:/workspace/logs -p 8089:8083 --env-file .env --env-file apis/bases/.env demo:1.0.0
+docker run -t -i -d -v /{本地目录}/files:/workspace/files -v /{本地目录}/logs:/workspace/logs -p 8089:8083 --env-file .env --env-file apis/bases/.env {服务名称}:1.0.0
 ```
 
 *最后请确认框架根路径下的 `.env` 配置文件中, 已经使用 `openssl rand -hex 32` 生成新密钥, 并设置成环境变量 `TOKEN_SECRET_KEY` 的新值。*
