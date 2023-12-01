@@ -4,7 +4,7 @@
 
 ## 🔮 教程
 
-- [WeFastAPI 第一步](https://wfa.hekaiyou.top/#/we_fast_api/step_one)
+- [WeFastAPI 第一步](docs/step_one.md)
 - [WeFastAPI 权限管理](https://wfa.hekaiyou.top/#/we_fast_api/permissions)
 - [WeFastAPI 视图模板](https://wfa.hekaiyou.top/#/we_fast_api/views_template)
 - [WeFastAPI 模型设计](https://wfa.hekaiyou.top/#/we_fast_api/model_design)
