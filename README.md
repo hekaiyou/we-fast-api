@@ -5,11 +5,11 @@
 ## 🔮 教程
 
 - [WeFastAPI 第一步](docs/step_one.md)
-- [WeFastAPI 权限管理](https://wfa.hekaiyou.top/#/we_fast_api/permissions)
-- [WeFastAPI 视图模板](https://wfa.hekaiyou.top/#/we_fast_api/views_template)
-- [WeFastAPI 模型设计](https://wfa.hekaiyou.top/#/we_fast_api/model_design)
-- [WeFastAPI 复杂任务](https://wfa.hekaiyou.top/#/we_fast_api/complex_tasks)
-- [WeFastAPI 简单视图](https://wfa.hekaiyou.top/#/we_fast_api/simple_view)
+- [WeFastAPI 权限管理](docs/permissions.md)
+- [WeFastAPI 视图模板](docs/views_template.md)
+- [WeFastAPI 模型设计](docs/model_design.md)
+- [WeFastAPI 复杂任务](docs/complex_tasks.md)
+- [WeFastAPI 简单视图](docs/simple_view.md)
 
 ## 📦 安装
 
